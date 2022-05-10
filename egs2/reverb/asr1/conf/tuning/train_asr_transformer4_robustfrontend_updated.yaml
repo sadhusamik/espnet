@@ -11,6 +11,7 @@ best_model_criterion:
     - acc
     - max
 keep_nbest_models: 10
+stop_frontend_updates_after_epoch: 5
 
 frontend: robust
 frontend_conf:
