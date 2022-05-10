@@ -72,7 +72,7 @@ from espnet2.train.abs_espnet_model import AbsESPnetModel
 from espnet2.train.class_choices import ClassChoices
 from espnet2.train.collate_fn import CommonCollateFn
 from espnet2.train.preprocessor import CommonPreprocessor
-from espnet2.train.trainer import Trainer
+from espnet2.train.trainer_frontend import Trainer
 from espnet2.utils.get_default_kwargs import get_default_kwargs
 from espnet2.utils.nested_dict_action import NestedDictAction
 from espnet2.utils.types import float_or_none
@@ -208,6 +208,13 @@ class ASRTask(AbsTask):
         # to provide --print_config mode. Instead of it, do as
         required = parser.get_default("required")
         required += ["token_list"]
+
+        group.add_argument(
+            "--stop_frontend_updates_after_epoch",
+            type=int,
+            default=-1,
+            help="Stop front-end updates after this number of epochs",
+        )
 
         group.add_argument(
             "--token_list",

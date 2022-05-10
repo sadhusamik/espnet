@@ -1,0 +1,78 @@
+# Trained using GTX-1080ti x4. It takes about 1days.
+batch_type: folded
+batch_size: 32
+accum_grad: 8
+max_epoch: 100
+patience: none
+# The initialization method for model parameters
+init: xavier_uniform
+best_model_criterion:
+-   - valid
+    - acc
+    - max
+keep_nbest_models: 10
+
+frontend: robust
+frontend_conf:
+  n_filters: 20
+  coeff_num: 80
+  coeff_range: '1,80'
+  order: 80
+  fduration: 1.5
+  frate: 125
+  overlap_fraction: 0.5
+  srate: 16000
+  precision_lpc: True
+  complex_modulation: True
+  num_chunks: 2
+  fbank_config: '1,1,2.5'
+  lifter_nonlinear_transformation: 'relu'
+  boost_lifter_lr: 1
+  update_lifter_multiband: True
+
+encoder: transformer
+encoder_conf:
+    output_size: 256
+    attention_heads: 4
+    linear_units: 2048
+    num_blocks: 12
+    dropout_rate: 0.1
+    positional_dropout_rate: 0.1
+    attention_dropout_rate: 0.0
+    input_layer: conv2d
+    normalize_before: true
+
+decoder: transformer
+decoder_conf:
+    attention_heads: 4
+    linear_units: 2028
+    num_blocks: 6
+    dropout_rate: 0.1
+    positional_dropout_rate: 0.1
+    self_attention_dropout_rate: 0.0
+    src_attention_dropout_rate: 0.0
+
+model_conf:
+    ctc_weight: 0.3
+    lsm_weight: 0.1
+    length_normalized_loss: false
+
+optim: adam
+optim_conf:
+    lr: 0.005
+scheduler: warmuplr
+scheduler_conf:
+    warmup_steps: 30000
+
+normalize: utterance_mvn
+normalize_conf:
+    norm_means: true
+    norm_vars: false
+    eps: 1.0e-20
+
+rir_scp: data/reverb_rir_single/wav.scp
+noise_scp: data/reverb_noise_single/wav.scp
+speech_volume_normalize: 1.
+noise_db_range: "12_17"
+rir_apply_prob: 1.
+noise_apply_prob: 1.

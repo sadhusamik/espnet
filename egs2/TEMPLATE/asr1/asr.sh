@@ -39,6 +39,9 @@ dumpdir=dump         # Directory to dump features.
 expdir=exp           # Directory to save experiments.
 python=python3       # Specify python to execute espnet commands.
 
+# Front-end related
+asr_train_bin='espnet2.bin.asr_train'
+
 # Data preparation related
 local_data_opts= # The options given to local/data.sh.
 
@@ -969,7 +972,7 @@ if ! "${skip_train}"; then
 
         # shellcheck disable=SC2086
         ${train_cmd} JOB=1:"${_nj}" "${_logdir}"/stats.JOB.log \
-            ${python} -m espnet2.bin.asr_train \
+            ${python} -m ${asr_train_bin} \
                 --collect_stats true \
                 --use_preprocessor true \
                 --bpemodel "${bpemodel}" \
@@ -1096,7 +1099,7 @@ if ! "${skip_train}"; then
             --num_nodes "${num_nodes}" \
             --init_file_prefix "${asr_exp}"/.dist_init_ \
             --multiprocessing_distributed true -- \
-            ${python} -m espnet2.bin.asr_train \
+            ${python} -m ${asr_train_bin} \
                 --use_preprocessor true \
                 --bpemodel "${bpemodel}" \
                 --token_type "${token_type}" \
