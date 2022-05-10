@@ -111,6 +111,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">espnet2.layers package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#espnet2-layers-abs-normalize">espnet2.layers.abs_normalize</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#espnet2-layers-time-warp">espnet2.layers.time_warp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#espnet2-layers-fdlp-spectrogram">espnet2.layers.fdlp_spectrogram</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#espnet2-layers-global-mvn">espnet2.layers.global_mvn</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#espnet2-layers-mask-along-axis">espnet2.layers.mask_along_axis</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#espnet2-layers-sinc-conv">espnet2.layers.sinc_conv</a></li>
@@ -273,8 +274,422 @@ strings are acceptable.</p>
 </dd></dl>
 
 </section>
+<section id="espnet2-layers-fdlp-spectrogram">
+<span id="id3"></span><h2>espnet2.layers.fdlp_spectrogram<a class="headerlink" href="#espnet2-layers-fdlp-spectrogram" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-espnet2.layers.fdlp_spectrogram"></span><dl class="class">
+<dt id="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram">
+<em class="property">class </em><code class="sig-prename descclassname">espnet2.layers.fdlp_spectrogram.</code><code class="sig-name descname">fdlp_spectrogram</code><span class="sig-paren">(</span><em class="sig-param">n_filters: int = 80</em>, <em class="sig-param">coeff_num: int = 100</em>, <em class="sig-param">coeff_range: str = '1</em>, <em class="sig-param">100'</em>, <em class="sig-param">order: int = 150</em>, <em class="sig-param">fduration: float = 1.5</em>, <em class="sig-param">frate: int = 100</em>, <em class="sig-param">overlap_fraction: float = 0.25</em>, <em class="sig-param">srate: int = 16000</em>, <em class="sig-param">do_bwe: bool = False</em>, <em class="sig-param">bwe_factor: float = 0.8</em>, <em class="sig-param">bwe_iter_num: int = 1</em>, <em class="sig-param">precision_lpc: bool = True</em>, <em class="sig-param">update_fbank: bool = False</em>, <em class="sig-param">update_lifter: bool = False</em>, <em class="sig-param">update_lifter_multiband: bool = False</em>, <em class="sig-param">use_complex_lifter: bool = False</em>, <em class="sig-param">scale_lifter_gradient: float = None</em>, <em class="sig-param">boost_lifter_lr: float = 1</em>, <em class="sig-param">freeze_lifter_finetune_updates: int = None</em>, <em class="sig-param">initialize_lifter: str = None</em>, <em class="sig-param">lifter_nonlinear_transformation: str = None</em>, <em class="sig-param">complex_modulation: bool = False</em>, <em class="sig-param">num_chunks: int = None</em>, <em class="sig-param">concat_utts_before_frames: bool = False</em>, <em class="sig-param">fbank_config: str = '1</em>, <em class="sig-param">1</em>, <em class="sig-param">2.5'</em>, <em class="sig-param">device: str = 'auto'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/layers/fdlp_spectrogram.html#fdlp_spectrogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<dl class="method">
+<dt id="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram.OLA">
+<code class="sig-name descname">OLA</code><span class="sig-paren">(</span><em class="sig-param">modspec</em>, <em class="sig-param">t_samples</em>, <em class="sig-param">dtype</em>, <em class="sig-param">device</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/layers/fdlp_spectrogram.html#fdlp_spectrogram.OLA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram.OLA" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram.bwe_lpc_stabilizer">
+<code class="sig-name descname">bwe_lpc_stabilizer</code><span class="sig-paren">(</span><em class="sig-param">input: torch.Tensor</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/layers/fdlp_spectrogram.html#fdlp_spectrogram.bwe_lpc_stabilizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram.bwe_lpc_stabilizer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram.compute_autocorr">
+<code class="sig-name descname">compute_autocorr</code><span class="sig-paren">(</span><em class="sig-param">input</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/layers/fdlp_spectrogram.html#fdlp_spectrogram.compute_autocorr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram.compute_autocorr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute autocorrelation of input</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram.compute_lpc">
+<code class="sig-name descname">compute_lpc</code><span class="sig-paren">(</span><em class="sig-param">input: torch.Tensor</em>, <em class="sig-param">order: int</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/layers/fdlp_spectrogram.html#fdlp_spectrogram.compute_lpc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram.compute_lpc" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>input</strong> – Tensor (batch x num_frames x n_filters x frame_dim)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Tensor (batch x num_frames x n_filters x lpc_coeff), Tensor (batch x num_frames x n_filters)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram.compute_modspec_from_lpc">
+<code class="sig-name descname">compute_modspec_from_lpc</code><span class="sig-paren">(</span><em class="sig-param">gain</em>, <em class="sig-param">lpc_coeff</em>, <em class="sig-param">lim</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/layers/fdlp_spectrogram.html#fdlp_spectrogram.compute_modspec_from_lpc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram.compute_modspec_from_lpc" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gain</strong> – Tensor (batch x  num_frames x n_filters)</p></li>
+<li><p><strong>lpc_coeff</strong> – Tensor (batch x num_frames x n_filters x lpc_num)</p></li>
+<li><p><strong>lim</strong> – int</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Tensor (batch x num_frames x n_filters x num_modspec),</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram.compute_spectrogram">
+<code class="sig-name descname">compute_spectrogram</code><span class="sig-paren">(</span><em class="sig-param">input: torch.Tensor</em>, <em class="sig-param">ilens: torch.Tensor = None</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, Optional[torch.Tensor]]<a class="reference internal" href="../_modules/espnet2/layers/fdlp_spectrogram.html#fdlp_spectrogram.compute_spectrogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram.compute_spectrogram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute FDLP-Spectrogram With Matrices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input</strong> – (Batch, Nsamples) or (Batch, Nsample)</p></li>
+<li><p><strong>ilens</strong> – (Batch)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>(Batch, Frames, Freq) or (Batch, Frames, Freq)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>output</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram.dct_type2">
+<code class="sig-name descname">dct_type2</code><span class="sig-paren">(</span><em class="sig-param">input: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="../_modules/espnet2/layers/fdlp_spectrogram.html#fdlp_spectrogram.dct_type2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram.dct_type2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Comput Discrete Cosine Transform (DCT-II) on the last tensor dimension</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">input: torch.Tensor</em>, <em class="sig-param">ilens: torch.Tensor = None</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, Optional[torch.Tensor]]<a class="reference internal" href="../_modules/espnet2/layers/fdlp_spectrogram.html#fdlp_spectrogram.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute FDLP-Spectrogram forward function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input</strong> – (Batch, Nsamples) or (Batch, Nsample, Channels)</p></li>
+<li><p><strong>ilens</strong> – (Batch)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>(Batch, Frames, Freq) or (Batch, Frames, Channels, Freq)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>output</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram.get_frames">
+<code class="sig-name descname">get_frames</code><span class="sig-paren">(</span><em class="sig-param">signal: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, Optional[torch.Tensor]]<a class="reference internal" href="../_modules/espnet2/layers/fdlp_spectrogram.html#fdlp_spectrogram.get_frames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram.get_frames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Divide speech signal into frames.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>signal</strong> – (Batch, Nsamples) or (Batch, Nsample)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>(Batch, Frame num, Frame dimension) or (Batch, Frame num, Frame dimension)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>output</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram.initialize_filterbank">
+<code class="sig-name descname">initialize_filterbank</code><span class="sig-paren">(</span><em class="sig-param">nfilters</em>, <em class="sig-param">nfft</em>, <em class="sig-param">srate</em>, <em class="sig-param">om_w=1</em>, <em class="sig-param">alp=1</em>, <em class="sig-param">fixed=1</em>, <em class="sig-param">bet=2.5</em>, <em class="sig-param">warp_fact=1</em>, <em class="sig-param">make_symmetric=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/layers/fdlp_spectrogram.html#fdlp_spectrogram.initialize_filterbank"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram.initialize_filterbank" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram.levinson_durbin">
+<code class="sig-name descname">levinson_durbin</code><span class="sig-paren">(</span><em class="sig-param">R</em>, <em class="sig-param">p</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/layers/fdlp_spectrogram.html#fdlp_spectrogram.levinson_durbin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram.levinson_durbin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Levinson Durbin recursion to compute LPC coefficients</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>- autocorrelation coefficients</strong> (<em>R</em>) – Tensor (batch x num_frames x n_filters x autocorr)</p></li>
+<li><p><strong>- lpc model order</strong> (<em>p</em>) – int</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Tensor (batch x num_frames x n_filters x lpc_coeff), Tensor (batch x num_frames x n_filters)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_dereverb">
+<em class="property">class </em><code class="sig-prename descclassname">espnet2.layers.fdlp_spectrogram.</code><code class="sig-name descname">fdlp_spectrogram_dereverb</code><span class="sig-paren">(</span><em class="sig-param">dereverb_num_layers: int = 1</em>, <em class="sig-param">dereverb_num_units: int = 765</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/layers/fdlp_spectrogram.html#fdlp_spectrogram_dereverb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_dereverb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram" title="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram"><code class="xref py py-class docutils literal notranslate"><span class="pre">espnet2.layers.fdlp_spectrogram.fdlp_spectrogram</span></code></a></p>
+<dl class="method">
+<dt id="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_dereverb.compute_spectrogram">
+<code class="sig-name descname">compute_spectrogram</code><span class="sig-paren">(</span><em class="sig-param">input: torch.Tensor</em>, <em class="sig-param">ilens: torch.Tensor = None</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, Optional[torch.Tensor]]<a class="reference internal" href="../_modules/espnet2/layers/fdlp_spectrogram.html#fdlp_spectrogram_dereverb.compute_spectrogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_dereverb.compute_spectrogram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute FDLP-Spectrogram With Matrices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input</strong> – (Batch, Nsamples) or (Batch, Nsample)</p></li>
+<li><p><strong>ilens</strong> – (Batch)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>(Batch, Frames, Freq) or (Batch, Frames, Freq)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>output</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_dereverb.dereverb">
+<code class="sig-name descname">dereverb</code><span class="sig-paren">(</span><em class="sig-param">frames</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/layers/fdlp_spectrogram.html#fdlp_spectrogram_dereverb.dereverb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_dereverb.dereverb" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_dereverb.dereverb_modspec">
+<code class="sig-name descname">dereverb_modspec</code><span class="sig-paren">(</span><em class="sig-param">frames</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/layers/fdlp_spectrogram.html#fdlp_spectrogram_dereverb.dereverb_modspec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_dereverb.dereverb_modspec" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_dropout">
+<em class="property">class </em><code class="sig-prename descclassname">espnet2.layers.fdlp_spectrogram.</code><code class="sig-name descname">fdlp_spectrogram_dropout</code><span class="sig-paren">(</span><em class="sig-param">dropout_range_hz: str = '1</em>, <em class="sig-param">20'</em>, <em class="sig-param">dropout_width_hz: float = 1</em>, <em class="sig-param">dropout_num: int = 3</em>, <em class="sig-param">dropout_frame_num: int = 1</em>, <em class="sig-param">return_nondropout_spectrogram: bool = False</em>, <em class="sig-param">return_dropout_mask: bool = False</em>, <em class="sig-param">dropout_while_eval: bool = False</em>, <em class="sig-param">fixed_dropout: str = None</em>, <em class="sig-param">pause_dropout_after_steps: int = None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/layers/fdlp_spectrogram.html#fdlp_spectrogram_dropout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_dropout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram" title="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram"><code class="xref py py-class docutils literal notranslate"><span class="pre">espnet2.layers.fdlp_spectrogram.fdlp_spectrogram</span></code></a></p>
+<dl class="method">
+<dt id="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_dropout.compute_spectrogram">
+<code class="sig-name descname">compute_spectrogram</code><span class="sig-paren">(</span><em class="sig-param">input: torch.Tensor</em>, <em class="sig-param">ilens: torch.Tensor = None</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, Optional[torch.Tensor], Optional[torch.Tensor], Optional[torch.Tensor]]<a class="reference internal" href="../_modules/espnet2/layers/fdlp_spectrogram.html#fdlp_spectrogram_dropout.compute_spectrogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_dropout.compute_spectrogram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute FDLP-Spectrogram With Matrices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input</strong> – (Batch, Nsamples) or (Batch, Nsample)</p></li>
+<li><p><strong>ilens</strong> – (Batch)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>(Batch, Frames, Freq) or (Batch, Frames, Freq)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>output</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_dropout.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">input: torch.Tensor</em>, <em class="sig-param">ilens: torch.Tensor = None</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, Optional[torch.Tensor]]<a class="reference internal" href="../_modules/espnet2/layers/fdlp_spectrogram.html#fdlp_spectrogram_dropout.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_dropout.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute FDLP-Spectrogram forward function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input</strong> – (Batch, Nsamples) or (Batch, Nsample, Channels)</p></li>
+<li><p><strong>ilens</strong> – (Batch)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>(Batch, Frames, Freq) or (Batch, Frames, Channels, Freq)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>output</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_update">
+<em class="property">class </em><code class="sig-prename descclassname">espnet2.layers.fdlp_spectrogram.</code><code class="sig-name descname">fdlp_spectrogram_update</code><span class="sig-paren">(</span><em class="sig-param">n_filters: int = 80</em>, <em class="sig-param">coeff_num: int = 100</em>, <em class="sig-param">coeff_range: str = '1</em>, <em class="sig-param">100'</em>, <em class="sig-param">order: int = 150</em>, <em class="sig-param">fduration: float = 1.5</em>, <em class="sig-param">frate: int = 100</em>, <em class="sig-param">overlap_fraction: float = 0.25</em>, <em class="sig-param">srate: int = 16000</em>, <em class="sig-param">do_bwe: bool = False</em>, <em class="sig-param">bwe_factor: float = 0.8</em>, <em class="sig-param">bwe_iter_num: int = 1</em>, <em class="sig-param">precision_lpc: bool = True</em>, <em class="sig-param">update_fbank: bool = False</em>, <em class="sig-param">update_lifter: bool = False</em>, <em class="sig-param">update_lifter_multiband: bool = False</em>, <em class="sig-param">use_complex_lifter: bool = False</em>, <em class="sig-param">scale_lifter_gradient: float = None</em>, <em class="sig-param">boost_lifter_lr: float = 1</em>, <em class="sig-param">freeze_lifter_finetune_updates: int = None</em>, <em class="sig-param">initialize_lifter: str = None</em>, <em class="sig-param">lifter_nonlinear_transformation: str = None</em>, <em class="sig-param">complex_modulation: bool = False</em>, <em class="sig-param">num_chunks: int = None</em>, <em class="sig-param">concat_utts_before_frames: bool = False</em>, <em class="sig-param">fbank_config: str = '1</em>, <em class="sig-param">1</em>, <em class="sig-param">2.5'</em>, <em class="sig-param">device: str = 'auto'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/layers/fdlp_spectrogram.html#fdlp_spectrogram_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram" title="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram"><code class="xref py py-class docutils literal notranslate"><span class="pre">espnet2.layers.fdlp_spectrogram.fdlp_spectrogram</span></code></a></p>
+<dl class="method">
+<dt id="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_update.compute_lpc">
+<code class="sig-name descname">compute_lpc</code><span class="sig-paren">(</span><em class="sig-param">input: torch.Tensor</em>, <em class="sig-param">order: int</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/layers/fdlp_spectrogram.html#fdlp_spectrogram_update.compute_lpc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_update.compute_lpc" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>input</strong> – Tensor (batch x num_frames x n_filters x frame_dim)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Tensor (batch x num_frames x n_filters x lpc_coeff), Tensor (batch x num_frames x n_filters)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_update.compute_modspec_from_lpc">
+<code class="sig-name descname">compute_modspec_from_lpc</code><span class="sig-paren">(</span><em class="sig-param">gain</em>, <em class="sig-param">lpc_coeff</em>, <em class="sig-param">lim</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/layers/fdlp_spectrogram.html#fdlp_spectrogram_update.compute_modspec_from_lpc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_update.compute_modspec_from_lpc" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gain</strong> – Tensor (batch x  num_frames x n_filters)</p></li>
+<li><p><strong>lpc_coeff</strong> – Tensor (batch x num_frames x n_filters x lpc_num)</p></li>
+<li><p><strong>lim</strong> – int</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Tensor (batch x num_frames x n_filters x num_modspec),</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_update.compute_spectrogram">
+<code class="sig-name descname">compute_spectrogram</code><span class="sig-paren">(</span><em class="sig-param">input: torch.Tensor</em>, <em class="sig-param">ilens: torch.Tensor = None</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, Optional[torch.Tensor]]<a class="reference internal" href="../_modules/espnet2/layers/fdlp_spectrogram.html#fdlp_spectrogram_update.compute_spectrogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_update.compute_spectrogram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute FDLP-Spectrogram With Matrices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input</strong> – (Batch, Nsamples) or (Batch, Nsample)</p></li>
+<li><p><strong>ilens</strong> – (Batch)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>(Batch, Frames, Freq) or (Batch, Frames, Freq)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>output</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_update.get_frames">
+<code class="sig-name descname">get_frames</code><span class="sig-paren">(</span><em class="sig-param">signal: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, Optional[torch.Tensor]]<a class="reference internal" href="../_modules/espnet2/layers/fdlp_spectrogram.html#fdlp_spectrogram_update.get_frames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_update.get_frames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Divide speech signal into frames.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>signal</strong> – (Batch, Nsamples) or (Batch, Nsample)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>(Batch, Frame num, Frame dimension) or (Batch, Frame num, Frame dimension)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>output</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_update.initialize_filterbank">
+<code class="sig-name descname">initialize_filterbank</code><span class="sig-paren">(</span><em class="sig-param">nfilters</em>, <em class="sig-param">nfft</em>, <em class="sig-param">srate</em>, <em class="sig-param">om_w=1</em>, <em class="sig-param">alp=1</em>, <em class="sig-param">fixed=1</em>, <em class="sig-param">bet=2.5</em>, <em class="sig-param">warp_fact=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/layers/fdlp_spectrogram.html#fdlp_spectrogram_update.initialize_filterbank"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_update.initialize_filterbank" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_update.levinson_durbin">
+<code class="sig-name descname">levinson_durbin</code><span class="sig-paren">(</span><em class="sig-param">R</em>, <em class="sig-param">p</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/layers/fdlp_spectrogram.html#fdlp_spectrogram_update.levinson_durbin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_update.levinson_durbin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Levinson Durbin recursion to compute LPC coefficients</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>- autocorrelation coefficients</strong> (<em>R</em>) – Tensor (batch x num_frames x n_filters x autocorr)</p></li>
+<li><p><strong>- lpc model order</strong> (<em>p</em>) – int</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Tensor (batch x num_frames x n_filters x lpc_coeff), Tensor (batch x num_frames x n_filters)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_with_mmh">
+<em class="property">class </em><code class="sig-prename descclassname">espnet2.layers.fdlp_spectrogram.</code><code class="sig-name descname">fdlp_spectrogram_with_mmh</code><span class="sig-paren">(</span><em class="sig-param">num_modulation_head: int = 1</em>, <em class="sig-param">update_mmh: bool = True</em>, <em class="sig-param">log_scaled_modulation_filters: bool = True</em>, <em class="sig-param">stop_mmh_updates_after: int = None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/layers/fdlp_spectrogram.html#fdlp_spectrogram_with_mmh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_with_mmh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram" title="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram"><code class="xref py py-class docutils literal notranslate"><span class="pre">espnet2.layers.fdlp_spectrogram.fdlp_spectrogram</span></code></a></p>
+<dl class="method">
+<dt id="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_with_mmh.OLA">
+<code class="sig-name descname">OLA</code><span class="sig-paren">(</span><em class="sig-param">modspec</em>, <em class="sig-param">t_samples</em>, <em class="sig-param">dtype</em>, <em class="sig-param">device</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/layers/fdlp_spectrogram.html#fdlp_spectrogram_with_mmh.OLA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_with_mmh.OLA" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_with_mmh.compute_spectrogram">
+<code class="sig-name descname">compute_spectrogram</code><span class="sig-paren">(</span><em class="sig-param">input: torch.Tensor</em>, <em class="sig-param">ilens: torch.Tensor = None</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, Optional[torch.Tensor]]<a class="reference internal" href="../_modules/espnet2/layers/fdlp_spectrogram.html#fdlp_spectrogram_with_mmh.compute_spectrogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_with_mmh.compute_spectrogram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute FDLP-Spectrogram With Matrices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input</strong> – (Batch, Nsamples) or (Batch, Nsample)</p></li>
+<li><p><strong>ilens</strong> – (Batch)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>(Batch, Frames, Freq) or (Batch, Frames, Freq)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>output</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_with_mmh.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">input: torch.Tensor</em>, <em class="sig-param">ilens: torch.Tensor = None</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, Optional[torch.Tensor]]<a class="reference internal" href="../_modules/espnet2/layers/fdlp_spectrogram.html#fdlp_spectrogram_with_mmh.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_with_mmh.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute FDLP-Spectrogram forward function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input</strong> – (Batch, Nsamples) or (Batch, Nsample, Channels)</p></li>
+<li><p><strong>ilens</strong> – (Batch)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>(Batch, Frames, Freq) or (Batch, Frames, Channels, Freq)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>output</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="espnet2.layers.fdlp_spectrogram.mvector">
+<em class="property">class </em><code class="sig-prename descclassname">espnet2.layers.fdlp_spectrogram.</code><code class="sig-name descname">mvector</code><span class="sig-paren">(</span><em class="sig-param">lfr: float = 5</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/layers/fdlp_spectrogram.html#mvector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.fdlp_spectrogram.mvector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram" title="espnet2.layers.fdlp_spectrogram.fdlp_spectrogram"><code class="xref py py-class docutils literal notranslate"><span class="pre">espnet2.layers.fdlp_spectrogram.fdlp_spectrogram</span></code></a></p>
+<dl class="method">
+<dt id="espnet2.layers.fdlp_spectrogram.mvector.compute_spectrogram">
+<code class="sig-name descname">compute_spectrogram</code><span class="sig-paren">(</span><em class="sig-param">input: torch.Tensor</em>, <em class="sig-param">ilens: torch.Tensor = None</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, Optional[torch.Tensor]]<a class="reference internal" href="../_modules/espnet2/layers/fdlp_spectrogram.html#mvector.compute_spectrogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.fdlp_spectrogram.mvector.compute_spectrogram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute FDLP-Spectrogram With Matrices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input</strong> – (Batch, Nsamples) or (Batch, Nsample)</p></li>
+<li><p><strong>ilens</strong> – (Batch)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>(Batch, Frames, Freq) or (Batch, Frames, Freq)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>output</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="espnet2.layers.fdlp_spectrogram.mvector.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">input: torch.Tensor</em>, <em class="sig-param">ilens: torch.Tensor = None</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, Optional[torch.Tensor]]<a class="reference internal" href="../_modules/espnet2/layers/fdlp_spectrogram.html#mvector.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.fdlp_spectrogram.mvector.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute FDLP-Spectrogram forward function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input</strong> – (Batch, Nsamples) or (Batch, Nsample, Channels)</p></li>
+<li><p><strong>ilens</strong> – (Batch)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>(Batch, Frames, Freq) or (Batch, Frames, Channels, Freq)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>output</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 <section id="espnet2-layers-global-mvn">
-<span id="id3"></span><h2>espnet2.layers.global_mvn<a class="headerlink" href="#espnet2-layers-global-mvn" title="Permalink to this headline">¶</a></h2>
+<span id="id4"></span><h2>espnet2.layers.global_mvn<a class="headerlink" href="#espnet2-layers-global-mvn" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.layers.global_mvn"></span><dl class="class">
 <dt id="espnet2.layers.global_mvn.GlobalMVN">
 <em class="property">class </em><code class="sig-prename descclassname">espnet2.layers.global_mvn.</code><code class="sig-name descname">GlobalMVN</code><span class="sig-paren">(</span><em class="sig-param">stats_file: Union[pathlib.Path, str], norm_means: bool = True, norm_vars: bool = True, eps: float = 1e-20</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/layers/global_mvn.html#GlobalMVN"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.global_mvn.GlobalMVN" title="Permalink to this definition">¶</a></dt>
@@ -323,7 +738,7 @@ strings are acceptable.</p>
 
 </section>
 <section id="espnet2-layers-mask-along-axis">
-<span id="id4"></span><h2>espnet2.layers.mask_along_axis<a class="headerlink" href="#espnet2-layers-mask-along-axis" title="Permalink to this headline">¶</a></h2>
+<span id="id5"></span><h2>espnet2.layers.mask_along_axis<a class="headerlink" href="#espnet2-layers-mask-along-axis" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.layers.mask_along_axis"></span><dl class="class">
 <dt id="espnet2.layers.mask_along_axis.MaskAlongAxis">
 <em class="property">class </em><code class="sig-prename descclassname">espnet2.layers.mask_along_axis.</code><code class="sig-name descname">MaskAlongAxis</code><span class="sig-paren">(</span><em class="sig-param">mask_width_range: Union[int</em>, <em class="sig-param">Sequence[int]] = (0</em>, <em class="sig-param">30)</em>, <em class="sig-param">num_mask: int = 2</em>, <em class="sig-param">dim: Union[int</em>, <em class="sig-param">str] = 'time'</em>, <em class="sig-param">replace_with_zero: bool = True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/layers/mask_along_axis.html#MaskAlongAxis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.mask_along_axis.MaskAlongAxis" title="Permalink to this definition">¶</a></dt>
@@ -398,7 +813,7 @@ strings are acceptable.</p>
 
 </section>
 <section id="espnet2-layers-sinc-conv">
-<span id="id5"></span><h2>espnet2.layers.sinc_conv<a class="headerlink" href="#espnet2-layers-sinc-conv" title="Permalink to this headline">¶</a></h2>
+<span id="id6"></span><h2>espnet2.layers.sinc_conv<a class="headerlink" href="#espnet2-layers-sinc-conv" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.layers.sinc_conv"></span><p>Sinc convolutions.</p>
 <dl class="class">
 <dt id="espnet2.layers.sinc_conv.BarkScale">
@@ -583,7 +998,7 @@ and not on the input values, which is different to traditional ASR.</p>
 
 </section>
 <section id="espnet2-layers-log-mel">
-<span id="id6"></span><h2>espnet2.layers.log_mel<a class="headerlink" href="#espnet2-layers-log-mel" title="Permalink to this headline">¶</a></h2>
+<span id="id7"></span><h2>espnet2.layers.log_mel<a class="headerlink" href="#espnet2-layers-log-mel" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.layers.log_mel"></span><dl class="class">
 <dt id="espnet2.layers.log_mel.LogMel">
 <em class="property">class </em><code class="sig-prename descclassname">espnet2.layers.log_mel.</code><code class="sig-name descname">LogMel</code><span class="sig-paren">(</span><em class="sig-param">fs: int = 16000</em>, <em class="sig-param">n_fft: int = 512</em>, <em class="sig-param">n_mels: int = 80</em>, <em class="sig-param">fmin: float = None</em>, <em class="sig-param">fmax: float = None</em>, <em class="sig-param">htk: bool = False</em>, <em class="sig-param">log_base: float = None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/layers/log_mel.html#LogMel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.log_mel.LogMel" title="Permalink to this definition">¶</a></dt>
@@ -630,7 +1045,7 @@ registered hooks while the latter silently ignores them.</p>
 
 </section>
 <section id="espnet2-layers-inversible-interface">
-<span id="id7"></span><h2>espnet2.layers.inversible_interface<a class="headerlink" href="#espnet2-layers-inversible-interface" title="Permalink to this headline">¶</a></h2>
+<span id="id8"></span><h2>espnet2.layers.inversible_interface<a class="headerlink" href="#espnet2-layers-inversible-interface" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.layers.inversible_interface"></span><dl class="class">
 <dt id="espnet2.layers.inversible_interface.InversibleInterface">
 <em class="property">class </em><code class="sig-prename descclassname">espnet2.layers.inversible_interface.</code><code class="sig-name descname">InversibleInterface</code><a class="reference internal" href="../_modules/espnet2/layers/inversible_interface.html#InversibleInterface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.inversible_interface.InversibleInterface" title="Permalink to this definition">¶</a></dt>
@@ -644,10 +1059,10 @@ registered hooks while the latter silently ignores them.</p>
 
 </section>
 <section id="espnet2-layers-init">
-<span id="id8"></span><h2>espnet2.layers.__init__<a class="headerlink" href="#espnet2-layers-init" title="Permalink to this headline">¶</a></h2>
+<span id="id9"></span><h2>espnet2.layers.__init__<a class="headerlink" href="#espnet2-layers-init" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.layers.__init__"></span></section>
 <section id="espnet2-layers-utterance-mvn">
-<span id="id9"></span><h2>espnet2.layers.utterance_mvn<a class="headerlink" href="#espnet2-layers-utterance-mvn" title="Permalink to this headline">¶</a></h2>
+<span id="id10"></span><h2>espnet2.layers.utterance_mvn<a class="headerlink" href="#espnet2-layers-utterance-mvn" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.layers.utterance_mvn"></span><dl class="class">
 <dt id="espnet2.layers.utterance_mvn.UtteranceMVN">
 <em class="property">class </em><code class="sig-prename descclassname">espnet2.layers.utterance_mvn.</code><code class="sig-name descname">UtteranceMVN</code><span class="sig-paren">(</span><em class="sig-param">norm_means: bool = True</em>, <em class="sig-param">norm_vars: bool = False</em>, <em class="sig-param">eps: float = 1e-20</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/layers/utterance_mvn.html#UtteranceMVN"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.utterance_mvn.UtteranceMVN" title="Permalink to this definition">¶</a></dt>
@@ -696,7 +1111,7 @@ strings are acceptable.</p>
 
 </section>
 <section id="espnet2-layers-label-aggregation">
-<span id="id10"></span><h2>espnet2.layers.label_aggregation<a class="headerlink" href="#espnet2-layers-label-aggregation" title="Permalink to this headline">¶</a></h2>
+<span id="id11"></span><h2>espnet2.layers.label_aggregation<a class="headerlink" href="#espnet2-layers-label-aggregation" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.layers.label_aggregation"></span><dl class="class">
 <dt id="espnet2.layers.label_aggregation.LabelAggregate">
 <em class="property">class </em><code class="sig-prename descclassname">espnet2.layers.label_aggregation.</code><code class="sig-name descname">LabelAggregate</code><span class="sig-paren">(</span><em class="sig-param">win_length: int = 512</em>, <em class="sig-param">hop_length: int = 128</em>, <em class="sig-param">center: bool = True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/layers/label_aggregation.html#LabelAggregate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.label_aggregation.LabelAggregate" title="Permalink to this definition">¶</a></dt>
@@ -734,7 +1149,7 @@ strings are acceptable.</p>
 
 </section>
 <section id="espnet2-layers-stft">
-<span id="id11"></span><h2>espnet2.layers.stft<a class="headerlink" href="#espnet2-layers-stft" title="Permalink to this headline">¶</a></h2>
+<span id="id12"></span><h2>espnet2.layers.stft<a class="headerlink" href="#espnet2-layers-stft" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.layers.stft"></span><dl class="class">
 <dt id="espnet2.layers.stft.Stft">
 <em class="property">class </em><code class="sig-prename descclassname">espnet2.layers.stft.</code><code class="sig-name descname">Stft</code><span class="sig-paren">(</span><em class="sig-param">n_fft: int = 512</em>, <em class="sig-param">win_length: int = None</em>, <em class="sig-param">hop_length: int = 128</em>, <em class="sig-param">window: Optional[str] = 'hann'</em>, <em class="sig-param">center: bool = True</em>, <em class="sig-param">normalized: bool = False</em>, <em class="sig-param">onesided: bool = True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/layers/stft.html#Stft"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.layers.stft.Stft" title="Permalink to this definition">¶</a></dt>

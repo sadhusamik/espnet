@@ -118,6 +118,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#espnet2-train-dataset">espnet2.train.dataset</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#espnet2-train-preprocessor">espnet2.train.preprocessor</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#espnet2-train-collate-fn">espnet2.train.collate_fn</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#espnet2-train-trainer-frontend">espnet2.train.trainer_frontend</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#espnet2-train-trainer">espnet2.train.trainer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#espnet2-train-abs-espnet-model">espnet2.train.abs_espnet_model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#espnet2-train-init">espnet2.train.__init__</a></li>
@@ -803,8 +804,81 @@ that of the dataset as they are.</p>
 </dd></dl>
 
 </section>
+<section id="espnet2-train-trainer-frontend">
+<span id="id8"></span><h2>espnet2.train.trainer_frontend<a class="headerlink" href="#espnet2-train-trainer-frontend" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-espnet2.train.trainer_frontend"></span><p>Trainer module.</p>
+<dl class="class">
+<dt id="espnet2.train.trainer_frontend.Trainer">
+<em class="property">class </em><code class="sig-prename descclassname">espnet2.train.trainer_frontend.</code><code class="sig-name descname">Trainer</code><a class="reference internal" href="../_modules/espnet2/train/trainer_frontend.html#Trainer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.train.trainer_frontend.Trainer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Trainer having a optimizer.</p>
+<p>If you’d like to use multiple optimizers, then inherit this class
+and override the methods if necessary - at least “train_one_epoch()”</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">TwoOptimizerTrainer</span><span class="p">(</span><span class="n">Trainer</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nd">@classmethod</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">add_arguments</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">parser</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="o">...</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="nd">@classmethod</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">train_one_epoch</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">optimizers</span><span class="p">,</span> <span class="o">...</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="n">loss1</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">model1</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="gp">... </span>        <span class="n">loss1</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+<span class="gp">... </span>        <span class="n">optimizers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+<span class="gp">...</span>
+<span class="gp">... </span>        <span class="n">loss2</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">model2</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="gp">... </span>        <span class="n">loss2</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+<span class="gp">... </span>        <span class="n">optimizers</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="espnet2.train.trainer_frontend.Trainer.add_arguments">
+<em class="property">classmethod </em><code class="sig-name descname">add_arguments</code><span class="sig-paren">(</span><em class="sig-param">parser: argparse.ArgumentParser</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/train/trainer_frontend.html#Trainer.add_arguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.train.trainer_frontend.Trainer.add_arguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reserved for future development of another Trainer</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="espnet2.train.trainer_frontend.Trainer.build_options">
+<em class="property">classmethod </em><code class="sig-name descname">build_options</code><span class="sig-paren">(</span><em class="sig-param">args: argparse.Namespace</em><span class="sig-paren">)</span> &#x2192; espnet2.train.trainer_frontend.TrainerOptions<a class="reference internal" href="../_modules/espnet2/train/trainer_frontend.html#Trainer.build_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.train.trainer_frontend.Trainer.build_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build options consumed by train(), eval(), and plot_attention()</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="espnet2.train.trainer_frontend.Trainer.plot_attention">
+<em class="property">classmethod </em><code class="sig-name descname">plot_attention</code><span class="sig-paren">(</span><em class="sig-param">model: torch.nn.modules.module.Module, output_dir: Optional[pathlib.Path], summary_writer, iterator: Iterable[Tuple[List[str], Dict[str, torch.Tensor]]], reporter: espnet2.train.reporter.SubReporter, options: espnet2.train.trainer_frontend.TrainerOptions</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="../_modules/espnet2/train/trainer_frontend.html#Trainer.plot_attention"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.train.trainer_frontend.Trainer.plot_attention" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="espnet2.train.trainer_frontend.Trainer.resume">
+<em class="property">static </em><code class="sig-name descname">resume</code><span class="sig-paren">(</span><em class="sig-param">checkpoint: Union[str, pathlib.Path], model: torch.nn.modules.module.Module, reporter: espnet2.train.reporter.Reporter, optimizers: Sequence[torch.optim.optimizer.Optimizer], schedulers: Sequence[Optional[espnet2.schedulers.abs_scheduler.AbsScheduler]], scaler: Optional[torch.cuda.amp.grad_scaler.GradScaler], ngpu: int = 0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/train/trainer_frontend.html#Trainer.resume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.train.trainer_frontend.Trainer.resume" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="espnet2.train.trainer_frontend.Trainer.run">
+<em class="property">classmethod </em><code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param">model: espnet2.train.abs_espnet_model.AbsESPnetModel, optimizers: Sequence[torch.optim.optimizer.Optimizer], schedulers: Sequence[Optional[espnet2.schedulers.abs_scheduler.AbsScheduler]], train_iter_factory: espnet2.iterators.abs_iter_factory.AbsIterFactory, valid_iter_factory: espnet2.iterators.abs_iter_factory.AbsIterFactory, plot_attention_iter_factory: Optional[espnet2.iterators.abs_iter_factory.AbsIterFactory], trainer_options, distributed_option: espnet2.train.distributed_utils.DistributedOption</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="../_modules/espnet2/train/trainer_frontend.html#Trainer.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.train.trainer_frontend.Trainer.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform training. This method performs the main process of training.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="espnet2.train.trainer_frontend.Trainer.train_one_epoch">
+<em class="property">classmethod </em><code class="sig-name descname">train_one_epoch</code><span class="sig-paren">(</span><em class="sig-param">model: torch.nn.modules.module.Module, iterator: Iterable[Tuple[List[str], Dict[str, torch.Tensor]]], optimizers: Sequence[torch.optim.optimizer.Optimizer], schedulers: Sequence[Optional[espnet2.schedulers.abs_scheduler.AbsScheduler]], scaler: Optional[torch.cuda.amp.grad_scaler.GradScaler], reporter: espnet2.train.reporter.SubReporter, summary_writer, options: espnet2.train.trainer_frontend.TrainerOptions, distributed_option: espnet2.train.distributed_utils.DistributedOption</em><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="../_modules/espnet2/train/trainer_frontend.html#Trainer.train_one_epoch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.train.trainer_frontend.Trainer.train_one_epoch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="espnet2.train.trainer_frontend.Trainer.validate_one_epoch">
+<em class="property">classmethod </em><code class="sig-name descname">validate_one_epoch</code><span class="sig-paren">(</span><em class="sig-param">model: torch.nn.modules.module.Module, iterator: Iterable[Dict[str, torch.Tensor]], reporter: espnet2.train.reporter.SubReporter, options: espnet2.train.trainer_frontend.TrainerOptions, distributed_option: espnet2.train.distributed_utils.DistributedOption</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="../_modules/espnet2/train/trainer_frontend.html#Trainer.validate_one_epoch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.train.trainer_frontend.Trainer.validate_one_epoch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="espnet2.train.trainer_frontend.TrainerOptions">
+<em class="property">class </em><code class="sig-prename descclassname">espnet2.train.trainer_frontend.</code><code class="sig-name descname">TrainerOptions</code><span class="sig-paren">(</span><em class="sig-param">ngpu: int, resume: bool, use_amp: bool, train_dtype: str, grad_noise: bool, accum_grad: int, grad_clip: float, grad_clip_type: float, log_interval: Union[int, NoneType], no_forward_run: bool, use_matplotlib: bool, use_tensorboard: bool, use_wandb: bool, output_dir: Union[pathlib.Path, str], max_epoch: int, seed: int, sharded_ddp: bool, patience: Union[int, NoneType], keep_nbest_models: Union[int, List[int]], nbest_averaging_interval: int, early_stopping_criterion: Sequence[str], best_model_criterion: Sequence[Sequence[str]], val_scheduler_criterion: Sequence[str], unused_parameters: bool, wandb_model_log_interval: int, stop_frontend_updates_after_epoch: int</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/train/trainer_frontend.html#TrainerOptions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.train.trainer_frontend.TrainerOptions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+</section>
 <section id="espnet2-train-trainer">
-<span id="id8"></span><h2>espnet2.train.trainer<a class="headerlink" href="#espnet2-train-trainer" title="Permalink to this headline">¶</a></h2>
+<span id="id9"></span><h2>espnet2.train.trainer<a class="headerlink" href="#espnet2-train-trainer" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.train.trainer"></span><p>Trainer module.</p>
 <dl class="class">
 <dt id="espnet2.train.trainer.Trainer">
@@ -877,7 +951,7 @@ and override the methods if necessary - at least “train_one_epoch()”</p>
 
 </section>
 <section id="espnet2-train-abs-espnet-model">
-<span id="id9"></span><h2>espnet2.train.abs_espnet_model<a class="headerlink" href="#espnet2-train-abs-espnet-model" title="Permalink to this headline">¶</a></h2>
+<span id="id10"></span><h2>espnet2.train.abs_espnet_model<a class="headerlink" href="#espnet2-train-abs-espnet-model" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.train.abs_espnet_model"></span><dl class="class">
 <dt id="espnet2.train.abs_espnet_model.AbsESPnetModel">
 <em class="property">class </em><code class="sig-prename descclassname">espnet2.train.abs_espnet_model.</code><code class="sig-name descname">AbsESPnetModel</code><a class="reference internal" href="../_modules/espnet2/train/abs_espnet_model.html#AbsESPnetModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.train.abs_espnet_model.AbsESPnetModel" title="Permalink to this definition">¶</a></dt>
@@ -927,10 +1001,10 @@ registered hooks while the latter silently ignores them.</p>
 
 </section>
 <section id="espnet2-train-init">
-<span id="id10"></span><h2>espnet2.train.__init__<a class="headerlink" href="#espnet2-train-init" title="Permalink to this headline">¶</a></h2>
+<span id="id11"></span><h2>espnet2.train.__init__<a class="headerlink" href="#espnet2-train-init" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.train.__init__"></span></section>
 <section id="espnet2-train-class-choices">
-<span id="id11"></span><h2>espnet2.train.class_choices<a class="headerlink" href="#espnet2-train-class-choices" title="Permalink to this headline">¶</a></h2>
+<span id="id12"></span><h2>espnet2.train.class_choices<a class="headerlink" href="#espnet2-train-class-choices" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.train.class_choices"></span><dl class="class">
 <dt id="espnet2.train.class_choices.ClassChoices">
 <em class="property">class </em><code class="sig-prename descclassname">espnet2.train.class_choices.</code><code class="sig-name descname">ClassChoices</code><span class="sig-paren">(</span><em class="sig-param">name: str, classes: Mapping[str, type], type_check: type = None, default: str = None, optional: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/train/class_choices.html#ClassChoices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.train.class_choices.ClassChoices" title="Permalink to this definition">¶</a></dt>
@@ -973,7 +1047,7 @@ registered hooks while the latter silently ignores them.</p>
 
 </section>
 <section id="espnet2-train-abs-gan-espnet-model">
-<span id="id12"></span><h2>espnet2.train.abs_gan_espnet_model<a class="headerlink" href="#espnet2-train-abs-gan-espnet-model" title="Permalink to this headline">¶</a></h2>
+<span id="id13"></span><h2>espnet2.train.abs_gan_espnet_model<a class="headerlink" href="#espnet2-train-abs-gan-espnet-model" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.train.abs_gan_espnet_model"></span><p>ESPnetModel abstract class for GAN-based training.</p>
 <dl class="class">
 <dt id="espnet2.train.abs_gan_espnet_model.AbsGANESPnetModel">

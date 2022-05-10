@@ -81,6 +81,17 @@ espnet2.train.collate_fn
     :show-inheritance:
 
 
+.. _espnet2.train.trainer_frontend:
+
+espnet2.train.trainer_frontend
+------------------------------
+
+.. automodule:: espnet2.train.trainer_frontend
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
 .. _espnet2.train.trainer:
 
 espnet2.train.trainer

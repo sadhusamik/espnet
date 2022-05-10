@@ -145,6 +145,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#espnet2-bin-lm-calc-perplexity">espnet2.bin.lm_calc_perplexity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#espnet2-bin-diar-inference">espnet2.bin.diar_inference</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#espnet2-bin-mt-inference">espnet2.bin.mt_inference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#espnet2-bin-asr-train-frontend">espnet2.bin.asr_train_frontend</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="espnet2.optimizers.html">espnet2.optimizers package</a></li>
@@ -1644,6 +1645,26 @@ Currently, the tags of espnet_model_zoo are supported.</p>
 <dt id="espnet2.bin.mt_inference.main">
 <code class="sig-prename descclassname">espnet2.bin.mt_inference.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param">cmd=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/bin/mt_inference.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.bin.mt_inference.main" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+</section>
+<section id="espnet2-bin-asr-train-frontend">
+<span id="id30"></span><h2>espnet2.bin.asr_train_frontend<a class="headerlink" href="#espnet2-bin-asr-train-frontend" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-espnet2.bin.asr_train_frontend"></span><dl class="function">
+<dt id="espnet2.bin.asr_train_frontend.get_parser">
+<code class="sig-prename descclassname">espnet2.bin.asr_train_frontend.</code><code class="sig-name descname">get_parser</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/bin/asr_train_frontend.html#get_parser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.bin.asr_train_frontend.get_parser" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="espnet2.bin.asr_train_frontend.main">
+<code class="sig-prename descclassname">espnet2.bin.asr_train_frontend.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param">cmd=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/bin/asr_train_frontend.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.bin.asr_train_frontend.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>ASR training.</p>
+<p class="rubric">Example</p>
+<dl class="simple">
+<dt>% python asr_train.py asr –print_config –optim adadelta </dt><dd><p>&gt; conf/train_asr.yaml</p>
+</dd>
+</dl>
+<p>% python asr_train.py –config conf/train_asr.yaml</p>
+</dd></dl>
 
 </section>
 </section>

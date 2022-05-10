@@ -136,6 +136,17 @@ espnet2.asr.frontend.s3prl
     :show-inheritance:
 
 
+.. _espnet2.asr.frontend.robust:
+
+espnet2.asr.frontend.robust
+---------------------------
+
+.. automodule:: espnet2.asr.frontend.robust
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
 .. _espnet2.asr.frontend.__init__:
 
 espnet2.asr.frontend.__init__

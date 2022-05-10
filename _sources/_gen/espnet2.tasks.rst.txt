@@ -135,3 +135,14 @@ espnet2.tasks.tts
     :undoc-members:
     :show-inheritance:
 
+
+.. _espnet2.tasks.asr_frontend:
+
+espnet2.tasks.asr_frontend
+--------------------------
+
+.. automodule:: espnet2.tasks.asr_frontend
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

@@ -322,3 +322,14 @@ espnet2.bin.mt_inference
     :undoc-members:
     :show-inheritance:
 
+
+.. _espnet2.bin.asr_train_frontend:
+
+espnet2.bin.asr_train_frontend
+------------------------------
+
+.. automodule:: espnet2.bin.asr_train_frontend
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
