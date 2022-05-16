@@ -758,7 +758,7 @@ if ! "${skip_train}"; then
             log "LM collect-stats started... log: '${_logdir}/stats.*.log'"
             # NOTE: --*_shape_file doesn't require length information if --batch_type=unsorted,
             #       but it's used only for deciding the sample ids.
-            # shellcheck disable=SC2086
+            # shellcheck disable=SC2046,SC2086
             ${train_cmd} JOB=1:"${_nj}" "${_logdir}"/stats.JOB.log \
                 ${python} -m espnet2.bin.lm_train \
                     --collect_stats true \
@@ -774,7 +774,7 @@ if ! "${skip_train}"; then
                     --train_shape_file "${_logdir}/train.JOB.scp" \
                     --valid_shape_file "${_logdir}/dev.JOB.scp" \
                     --output_dir "${_logdir}/stats.JOB" \
-                    ${_opts} ${lm_args} || { cat "${_logdir}"/stats.1.log; exit 1; }
+                    ${_opts} ${lm_args} || { cat $(grep -l -i error "${_logdir}"/stats.*.log) ; exit 1; }
 
             # 4. Aggregate shape files
             _opts=
@@ -970,7 +970,7 @@ if ! "${skip_train}"; then
         # NOTE: --*_shape_file doesn't require length information if --batch_type=unsorted,
         #       but it's used only for deciding the sample ids.
 
-        # shellcheck disable=SC2086
+        # shellcheck disable=SC2046,SC2086
         ${train_cmd} JOB=1:"${_nj}" "${_logdir}"/stats.JOB.log \
             ${python} -m ${asr_train_bin} \
                 --collect_stats true \
@@ -988,7 +988,7 @@ if ! "${skip_train}"; then
                 --train_shape_file "${_logdir}/train.JOB.scp" \
                 --valid_shape_file "${_logdir}/valid.JOB.scp" \
                 --output_dir "${_logdir}/stats.JOB" \
-                ${_opts} ${asr_args} || { cat "${_logdir}"/stats.1.log; exit 1; }
+                ${_opts} ${asr_args} || { cat $(grep -l -i error "${_logdir}"/stats.*.log) ; exit 1; }
 
         # 4. Aggregate shape files
         _opts=
@@ -1245,7 +1245,7 @@ if ! "${skip_eval}"; then
 
             # 2. Submit decoding jobs
             log "Decoding started... log: '${_logdir}/asr_inference.*.log'"
-            # shellcheck disable=SC2086
+            # shellcheck disable=SC2046,SC2086
             ${_cmd} --gpu "${_ngpu}" JOB=1:"${_nj}" "${_logdir}"/asr_inference.JOB.log \
                 ${python} -m ${asr_inference_tool} \
                     --batch_size ${batch_size} \
@@ -1255,7 +1255,7 @@ if ! "${skip_eval}"; then
                     --asr_train_config "${asr_exp}"/config.yaml \
                     --asr_model_file "${asr_exp}"/"${inference_asr_model}" \
                     --output_dir "${_logdir}"/output.JOB \
-                    ${_opts} ${inference_args}
+                    ${_opts} ${inference_args} || { cat $(grep -l -i error "${_logdir}"/asr_inference.*.log) ; exit 1; }
 
             # 3. Concatenates the output files from each jobs
             for f in token token_int score text; do
