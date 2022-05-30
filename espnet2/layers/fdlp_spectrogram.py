@@ -47,6 +47,7 @@ class fdlp_spectrogram(torch.nn.Module):
             complex_modulation: bool = False,
             num_chunks: int = None,
             concat_utts_before_frames: bool = False,
+            feature_batch: int = None,
             fbank_config: str = '1,1,2.5',  # om_w,alpha,beta
             device: str = 'auto',
     ):
@@ -178,6 +179,8 @@ class fdlp_spectrogram(torch.nn.Module):
                 logging.info('WILL FREEZE LIFTER WEIGHTS AFTER {:d} STEPS'.format(
                     self.freeze_lifter_finetune_updates))
                 self.lifter.requires_grad = True
+
+        self.feature_batch = feature_batch
 
     def dct_type2(self, input: torch.Tensor) -> torch.Tensor:
         """
@@ -338,6 +341,10 @@ class fdlp_spectrogram(torch.nn.Module):
             sp_b = int((flength_samples - 1) / 2)
             sp_f = int((flength_samples - 1) / 2)
             extend = int((flength_samples - 1) / 2)
+
+        if self.feature_batch is not None:
+            # Reshape to have longer utterances, helps in feature extraction
+            signal = torch.reshape(signal, (self.feature_batch, -1))
 
         # signal = torch.nn.functional.pad(signal.unsqueeze(1), (extend, extend), mode='constant', value=0.0).squeeze(1)
         signal = torch.nn.functional.pad(signal.unsqueeze(1), (extend, extend), mode='reflect').squeeze(1)
@@ -529,7 +536,25 @@ class fdlp_spectrogram(torch.nn.Module):
         modspec = torch.transpose(modspec, 2, 3)  # (batch x num_frames x int(self.fduration * self.frate) x n_filters)
 
         # OVERLAP AND ADD
-        modspec = self.OLA(modspec=modspec, t_samples=t_samples, dtype=input.dtype, device=input.device)
+        if self.feature_batch is not None:
+            modspec = self.OLA(modspec=modspec, t_samples=int(t_samples * num_batch / self.feature_batch),
+                               dtype=input.dtype)
+        else:
+            modspec = self.OLA(modspec=modspec, t_samples=t_samples, dtype=input.dtype, device=input.device)
+
+        if self.feature_batch is not None:
+            # Might not be equally divisible, deal with that
+            modspec_size = modspec.shape[0] * modspec.shape[1] * modspec.shape[2]
+            div_req = num_batch * self.n_filters
+            div_reminder = modspec_size % div_req
+            if div_reminder != 0:
+                modspec = modspec.flatten()
+                if div_reminder < int(div_req / 2):
+                    modspec = modspec[:-div_reminder]
+                else:
+                    modspec = torch.cat([modspec, torch.zeros(div_reminder)])
+
+            modspec = torch.reshape(modspec, (num_batch, -1, self.n_filters))
 
         if ilens is not None:
             olens = torch.floor(ilens * self.frate / self.srate)
@@ -635,7 +660,7 @@ class fdlp_spectrogram_dereverb(fdlp_spectrogram):
 
         frames = torch.reshape(frames,
                                (frames.shape[0], frames.shape[1], -1))  # (batch x num_frames x n_filters * num_modspec)
-        #frames = torch.log(torch.fft.ifft(torch.exp(torch.fft.fft(frames))))
+        # frames = torch.log(torch.fft.ifft(torch.exp(torch.fft.fft(frames))))
         frames = torch.log(frames)
 
         frames_real = torch.reshape(torch.view_as_real(frames), (
@@ -659,8 +684,8 @@ class fdlp_spectrogram_dereverb(fdlp_spectrogram):
         frames_dereverb = frames_dereverb.unsqueeze(1)  # ( batch x 1 x n_filters * num_modspec)
         # frames_dereverb = frames_dereverb.unsqueeze(0)
         frames = frames - frames_dereverb
-        #frames = frames - frames_dereverb
-        #frames = torch.fft.ifft(torch.log(torch.fft.fft(torch.exp(frames))))
+        # frames = frames - frames_dereverb
+        # frames = torch.fft.ifft(torch.log(torch.fft.fft(torch.exp(frames))))
         frames = torch.exp(frames)
         return torch.reshape(frames, (frames.shape[0], frames.shape[1], self.n_filters, self.coeff_num))
 
@@ -1045,6 +1070,7 @@ class fdlp_spectrogram_with_mmh(fdlp_spectrogram):
             )
 
         return output, olens
+
 
 class fdlp_spectrogram_dropout(fdlp_spectrogram):
 
