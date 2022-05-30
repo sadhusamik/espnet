@@ -344,6 +344,16 @@ class fdlp_spectrogram(torch.nn.Module):
 
         if self.feature_batch is not None:
             # Reshape to have longer utterances, helps in feature extraction
+            # Might not be equally divisible, deal with that
+            sig_size = signal.shape[0] * signal.shape[1]
+            div_req = self.feature_batch
+            div_reminder = sig_size % div_req
+            if div_reminder != 0:
+                signal = signal.flatten()
+                if div_reminder < int(div_req / 2):
+                    signal = signal[:-div_reminder]
+                else:
+                    signal = torch.cat([signal, torch.zeros(div_req - div_reminder, device=signal.device)])
             signal = torch.reshape(signal, (self.feature_batch, -1))
 
         # signal = torch.nn.functional.pad(signal.unsqueeze(1), (extend, extend), mode='constant', value=0.0).squeeze(1)
