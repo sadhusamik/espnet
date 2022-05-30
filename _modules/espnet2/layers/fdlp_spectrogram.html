@@ -497,6 +497,16 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_batch</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># Reshape to have longer utterances, helps in feature extraction</span>
+            <span class="c1"># Might not be equally divisible, deal with that</span>
+            <span class="n">sig_size</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">signal</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">div_req</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_batch</span>
+            <span class="n">div_reminder</span> <span class="o">=</span> <span class="n">sig_size</span> <span class="o">%</span> <span class="n">div_req</span>
+            <span class="k">if</span> <span class="n">div_reminder</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">signal</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">div_reminder</span> <span class="o">&lt;</span> <span class="nb">int</span><span class="p">(</span><span class="n">div_req</span> <span class="o">/</span> <span class="mi">2</span><span class="p">):</span>
+                    <span class="n">signal</span> <span class="o">=</span> <span class="n">signal</span><span class="p">[:</span><span class="o">-</span><span class="n">div_reminder</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">signal</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">signal</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">div_req</span> <span class="o">-</span> <span class="n">div_reminder</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">signal</span><span class="o">.</span><span class="n">device</span><span class="p">)])</span>
             <span class="n">signal</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_batch</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
 
         <span class="c1"># signal = torch.nn.functional.pad(signal.unsqueeze(1), (extend, extend), mode=&#39;constant&#39;, value=0.0).squeeze(1)</span>
