@@ -547,16 +547,12 @@ class fdlp_spectrogram(torch.nn.Module):
             modspec_size = modspec.shape[0] * modspec.shape[1] * modspec.shape[2]
             div_req = num_batch * self.n_filters
             div_reminder = modspec_size % div_req
-            print(modspec.shape)
             if div_reminder != 0:
                 modspec = modspec.flatten()
-                print(modspec.shape)
                 if div_reminder < int(div_req / 2):
                     modspec = modspec[:-div_reminder]
-                    print(modspec.shape)
                 else:
                     modspec = torch.cat([modspec, torch.zeros(div_req - div_reminder, device=input.device)])
-                    print(modspec.shape)
 
             modspec = torch.reshape(modspec, (num_batch, -1, self.n_filters))
 
