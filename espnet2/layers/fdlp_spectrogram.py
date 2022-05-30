@@ -552,7 +552,7 @@ class fdlp_spectrogram(torch.nn.Module):
                 if div_reminder < int(div_req / 2):
                     modspec = modspec[:-div_reminder]
                 else:
-                    modspec = torch.cat([modspec, torch.zeros(div_reminder, dtype=input.device)])
+                    modspec = torch.cat([modspec, torch.zeros(div_reminder, device=input.device)])
 
             modspec = torch.reshape(modspec, (num_batch, -1, self.n_filters))
 
