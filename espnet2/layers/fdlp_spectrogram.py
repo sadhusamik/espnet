@@ -555,7 +555,7 @@ class fdlp_spectrogram(torch.nn.Module):
                     modspec = modspec[:-div_reminder]
                     print(modspec.shape)
                 else:
-                    modspec = torch.cat([modspec, torch.zeros(div_reminder, device=input.device)])
+                    modspec = torch.cat([modspec, torch.zeros(div_req - div_reminder, device=input.device)])
                     print(modspec.shape)
 
             modspec = torch.reshape(modspec, (num_batch, -1, self.n_filters))
