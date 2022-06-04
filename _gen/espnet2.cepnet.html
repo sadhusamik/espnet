@@ -189,6 +189,38 @@
 <span class="target" id="module-espnet2.cepnet.__init__"></span></section>
 <section id="espnet2-cepnet-espnet-model">
 <span id="id2"></span><h2>espnet2.cepnet.espnet_model<a class="headerlink" href="#espnet2-cepnet-espnet-model" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-espnet2.cepnet.espnet_model"></span><dl class="class">
+<dt id="espnet2.cepnet.espnet_model.CepNet">
+<em class="property">class </em><code class="sig-prename descclassname">espnet2.cepnet.espnet_model.</code><code class="sig-name descname">CepNet</code><span class="sig-paren">(</span><em class="sig-param">encoder_real: espnet2.asr.encoder.abs_encoder.AbsEncoder</em>, <em class="sig-param">encoder_imag: espnet2.asr.encoder.abs_encoder.AbsEncoder</em>, <em class="sig-param">projector_real</em>, <em class="sig-param">projector_imag</em>, <em class="sig-param">extract_feats_in_collect_stats: bool = True</em>, <em class="sig-param">prediction_loss: str = 'MSE'</em>, <em class="sig-param">nfft: int = 100000</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/cepnet/espnet_model.html#CepNet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.cepnet.espnet_model.CepNet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="espnet2.train.html#espnet2.train.abs_espnet_model.AbsESPnetModel" title="espnet2.train.abs_espnet_model.AbsESPnetModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">espnet2.train.abs_espnet_model.AbsESPnetModel</span></code></a></p>
+<p>Speech dereverberation network</p>
+<dl class="method">
+<dt id="espnet2.cepnet.espnet_model.CepNet.collect_feats">
+<code class="sig-name descname">collect_feats</code><span class="sig-paren">(</span><em class="sig-param">speech: torch.Tensor</em>, <em class="sig-param">speech_lengths: torch.Tensor</em>, <em class="sig-param">text: torch.Tensor</em>, <em class="sig-param">text_lengths: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; Dict[str, torch.Tensor]<a class="reference internal" href="../_modules/espnet2/cepnet/espnet_model.html#CepNet.collect_feats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.cepnet.espnet_model.CepNet.collect_feats" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="espnet2.cepnet.espnet_model.CepNet.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">speech: torch.Tensor</em>, <em class="sig-param">speech_original: torch.Tensor</em>, <em class="sig-param">speech_lengths: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, Dict[str, torch.Tensor], torch.Tensor]<a class="reference internal" href="../_modules/espnet2/cepnet/espnet_model.html#CepNet.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.cepnet.espnet_model.CepNet.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Frontend + Encoder + Calc loss</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>speech</strong> – (Batch, Length, …)</p></li>
+<li><p><strong>speech_original</strong> – (Batch, Length, …)</p></li>
+<li><p><strong>speech_lengths</strong> – (Batch, )</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="espnet2.cepnet.espnet_model.CepNet.load_noise_rir_scp">
+<code class="sig-name descname">load_noise_rir_scp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/cepnet/espnet_model.html#CepNet.load_noise_rir_scp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.cepnet.espnet_model.CepNet.load_noise_rir_scp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
 </section>
 
