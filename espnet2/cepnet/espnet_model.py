@@ -45,9 +45,9 @@ class CepNet(AbsESPnetModel):
             encoder_imag: AbsEncoder,
             projector_real,
             projector_imag,
+            nfft: int,
             extract_feats_in_collect_stats: bool = True,
             prediction_loss: str = 'MSE',
-            nfft: int = 100000,
     ):
         assert check_argument_types()
 
