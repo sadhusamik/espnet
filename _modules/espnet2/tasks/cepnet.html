@@ -272,14 +272,6 @@
         <span class="c1"># NOTE(kamo): add_arguments(..., required=True) can&#39;t be used</span>
         <span class="c1"># to provide --print_config mode. Instead of it, do as</span>
         <span class="n">required</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">get_default</span><span class="p">(</span><span class="s2">&quot;required&quot;</span><span class="p">)</span>
-        <span class="n">required</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;token_list&quot;</span><span class="p">]</span>
-
-        <span class="n">group</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-            <span class="s2">&quot;--token_list&quot;</span><span class="p">,</span>
-            <span class="nb">type</span><span class="o">=</span><span class="n">str_or_none</span><span class="p">,</span>
-            <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;A text mapping int-id to token&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
 
         <span class="n">group</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
             <span class="s2">&quot;--model_conf&quot;</span><span class="p">,</span>
@@ -308,41 +300,6 @@
             <span class="nb">type</span><span class="o">=</span><span class="n">int_or_none</span><span class="p">,</span>
             <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The number of input dimension of the feature&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
-
-        <span class="n">group</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-            <span class="s2">&quot;--token_type&quot;</span><span class="p">,</span>
-            <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
-            <span class="n">default</span><span class="o">=</span><span class="s2">&quot;bpe&quot;</span><span class="p">,</span>
-            <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;bpe&quot;</span><span class="p">,</span> <span class="s2">&quot;char&quot;</span><span class="p">,</span> <span class="s2">&quot;word&quot;</span><span class="p">,</span> <span class="s2">&quot;phn&quot;</span><span class="p">],</span>
-            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The text will be tokenized &quot;</span> <span class="s2">&quot;in the specified level token&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">group</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-            <span class="s2">&quot;--bpemodel&quot;</span><span class="p">,</span>
-            <span class="nb">type</span><span class="o">=</span><span class="n">str_or_none</span><span class="p">,</span>
-            <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The model file of sentencepiece&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
-
-        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-            <span class="s2">&quot;--non_linguistic_symbols&quot;</span><span class="p">,</span>
-            <span class="nb">type</span><span class="o">=</span><span class="n">str_or_none</span><span class="p">,</span>
-            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;non_linguistic_symbols file path&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-            <span class="s2">&quot;--cleaner&quot;</span><span class="p">,</span>
-            <span class="nb">type</span><span class="o">=</span><span class="n">str_or_none</span><span class="p">,</span>
-            <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;tacotron&quot;</span><span class="p">,</span> <span class="s2">&quot;jaconv&quot;</span><span class="p">,</span> <span class="s2">&quot;vietnamese&quot;</span><span class="p">],</span>
-            <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Apply text cleaning&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
-
-        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-            <span class="s2">&quot;--g2p&quot;</span><span class="p">,</span>
-            <span class="nb">type</span><span class="o">=</span><span class="n">str_or_none</span><span class="p">,</span>
-            <span class="n">choices</span><span class="o">=</span><span class="n">g2p_choices</span><span class="p">,</span>
-            <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Specify g2p method if --token_type=phn&quot;</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="n">group</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">add_argument_group</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Preprocess related&quot;</span><span class="p">)</span>
@@ -438,7 +395,7 @@
     <span class="k">def</span> <span class="nf">required_data_names</span><span class="p">(</span>
             <span class="bp">cls</span><span class="p">,</span> <span class="n">train</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">inference</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
-        <span class="n">retval</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;speech&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">)</span>
+        <span class="n">retval</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;speech&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">retval</span></div>
 
 <div class="viewcode-block" id="CepNetTask.optional_data_names"><a class="viewcode-back" href="../../../_gen/espnet2.tasks.html#espnet2.tasks.cepnet.CepNetTask.optional_data_names">[docs]</a>    <span class="nd">@classmethod</span>
