@@ -241,7 +241,7 @@ class CepNetTask(AbsTask):
     def required_data_names(
             cls, train: bool = True, inference: bool = False
     ) -> Tuple[str, ...]:
-        retval = ("speech")
+        retval = ("speech",)
         return retval
 
     @classmethod
