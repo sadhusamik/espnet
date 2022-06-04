@@ -40,6 +40,22 @@ from espnet2.utils.types import int_or_none
 from espnet2.utils.types import str2bool
 from espnet2.utils.types import str_or_none
 
+from espnet2.asr.encoder.vgg_rnn_encoder import VGGRNNEncoder
+from espnet2.asr.encoder.wav2vec2_encoder import FairSeqWav2Vec2Encoder
+from espnet2.asr.espnet_model import ESPnetASRModel
+from espnet2.asr.frontend.abs_frontend import AbsFrontend
+from espnet2.asr.frontend.default import DefaultFrontend
+from espnet2.asr.frontend.fused import FusedFrontends
+from espnet2.asr.frontend.robust import RobustFrontend
+from espnet2.asr.frontend.s3prl import S3prlFrontend
+from espnet2.asr.frontend.windowing import SlidingWindow
+from espnet2.asr.maskctc_model import MaskCTCModel
+from espnet2.asr.postencoder.abs_postencoder import AbsPostEncoder
+
+from espnet2.layers.global_mvn import GlobalMVN
+from espnet2.layers.utterance_mvn import UtteranceMVN
+from espnet2.layers.abs_normalize import AbsNormalize
+
 encoder_choices = ClassChoices(
     "encoder",
     classes=dict(
@@ -56,6 +72,29 @@ encoder_choices = ClassChoices(
     default="rnn",
 )
 
+normalize_choices = ClassChoices(
+    "normalize",
+    classes=dict(
+        global_mvn=GlobalMVN,
+        utterance_mvn=UtteranceMVN,
+    ),
+    type_check=AbsNormalize,
+    default="utterance_mvn",
+    optional=True,
+)
+
+frontend_choices = ClassChoices(
+    name="frontend",
+    classes=dict(
+        default=DefaultFrontend,
+        sliding_window=SlidingWindow,
+        s3prl=S3prlFrontend,
+        fused=FusedFrontends,
+        robust=RobustFrontend,
+    ),
+    type_check=AbsFrontend,
+    default="default",
+)
 
 class CepNetTask(AbsTask):
     # If you need more than one optimizers, change this value
@@ -65,7 +104,8 @@ class CepNetTask(AbsTask):
     class_choices_list = [
         # --specaug and --specaug_conf
         encoder_choices,
-
+        frontend_choices,
+        normalize_choices,
     ]
 
     # If you need to modify train() or eval() procedures, change Trainer class here
@@ -78,6 +118,14 @@ class CepNetTask(AbsTask):
         # NOTE(kamo): add_arguments(..., required=True) can't be used
         # to provide --print_config mode. Instead of it, do as
         required = parser.get_default("required")
+        required += ["token_list"]
+
+        group.add_argument(
+            "--token_list",
+            type=str_or_none,
+            default=None,
+            help="A text mapping int-id to token",
+        )
 
         group.add_argument(
             "--model_conf",
@@ -106,6 +154,41 @@ class CepNetTask(AbsTask):
             type=int_or_none,
             default=None,
             help="The number of input dimension of the feature",
+        )
+
+        group.add_argument(
+            "--token_type",
+            type=str,
+            default="bpe",
+            choices=["bpe", "char", "word", "phn"],
+            help="The text will be tokenized " "in the specified level token",
+        )
+        group.add_argument(
+            "--bpemodel",
+            type=str_or_none,
+            default=None,
+            help="The model file of sentencepiece",
+        )
+
+        parser.add_argument(
+            "--non_linguistic_symbols",
+            type=str_or_none,
+            help="non_linguistic_symbols file path",
+        )
+        parser.add_argument(
+            "--cleaner",
+            type=str_or_none,
+            choices=[None, "tacotron", "jaconv", "vietnamese"],
+            default=None,
+            help="Apply text cleaning",
+        )
+
+        parser.add_argument(
+            "--g2p",
+            type=str_or_none,
+            choices=g2p_choices,
+            default=None,
+            help="Specify g2p method if --token_type=phn",
         )
 
         group = parser.add_argument_group(description="Preprocess related")
