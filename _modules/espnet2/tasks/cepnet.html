@@ -178,7 +178,6 @@
 <span class="kn">from</span> <span class="nn">espnet2.asr.encoder.vgg_rnn_encoder</span> <span class="kn">import</span> <span class="n">VGGRNNEncoder</span>
 <span class="kn">from</span> <span class="nn">espnet2.asr.encoder.wav2vec2_encoder</span> <span class="kn">import</span> <span class="n">FairSeqWav2Vec2Encoder</span>
 
-
 <span class="kn">from</span> <span class="nn">espnet2.cepnet.espnet_model</span> <span class="kn">import</span> <span class="n">CepNet</span>
 <span class="kn">from</span> <span class="nn">espnet2.tasks.abs_task</span> <span class="kn">import</span> <span class="n">AbsTask</span>
 <span class="kn">from</span> <span class="nn">espnet2.text.phoneme_tokenizer</span> <span class="kn">import</span> <span class="n">g2p_choices</span>
@@ -249,6 +248,7 @@
     <span class="n">type_check</span><span class="o">=</span><span class="n">AbsFrontend</span><span class="p">,</span>
     <span class="n">default</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
 <span class="p">)</span>
+
 
 <div class="viewcode-block" id="CepNetTask"><a class="viewcode-back" href="../../../_gen/espnet2.tasks.html#espnet2.tasks.cepnet.CepNetTask">[docs]</a><span class="k">class</span> <span class="nc">CepNetTask</span><span class="p">(</span><span class="n">AbsTask</span><span class="p">):</span>
     <span class="c1"># If you need more than one optimizers, change this value</span>
@@ -438,7 +438,7 @@
     <span class="k">def</span> <span class="nf">required_data_names</span><span class="p">(</span>
             <span class="bp">cls</span><span class="p">,</span> <span class="n">train</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">inference</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
-        <span class="n">retval</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;speech&quot;</span><span class="p">,)</span>
+        <span class="n">retval</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;speech&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">retval</span></div>
 
 <div class="viewcode-block" id="CepNetTask.optional_data_names"><a class="viewcode-back" href="../../../_gen/espnet2.tasks.html#espnet2.tasks.cepnet.CepNetTask.optional_data_names">[docs]</a>    <span class="nd">@classmethod</span>
