@@ -118,14 +118,6 @@ class CepNetTask(AbsTask):
         # NOTE(kamo): add_arguments(..., required=True) can't be used
         # to provide --print_config mode. Instead of it, do as
         required = parser.get_default("required")
-        required += ["token_list"]
-
-        group.add_argument(
-            "--token_list",
-            type=str_or_none,
-            default=None,
-            help="A text mapping int-id to token",
-        )
 
         group.add_argument(
             "--model_conf",
@@ -154,41 +146,6 @@ class CepNetTask(AbsTask):
             type=int_or_none,
             default=None,
             help="The number of input dimension of the feature",
-        )
-
-        group.add_argument(
-            "--token_type",
-            type=str,
-            default="bpe",
-            choices=["bpe", "char", "word", "phn"],
-            help="The text will be tokenized " "in the specified level token",
-        )
-        group.add_argument(
-            "--bpemodel",
-            type=str_or_none,
-            default=None,
-            help="The model file of sentencepiece",
-        )
-
-        parser.add_argument(
-            "--non_linguistic_symbols",
-            type=str_or_none,
-            help="non_linguistic_symbols file path",
-        )
-        parser.add_argument(
-            "--cleaner",
-            type=str_or_none,
-            choices=[None, "tacotron", "jaconv", "vietnamese"],
-            default=None,
-            help="Apply text cleaning",
-        )
-
-        parser.add_argument(
-            "--g2p",
-            type=str_or_none,
-            choices=g2p_choices,
-            default=None,
-            help="Specify g2p method if --token_type=phn",
         )
 
         group = parser.add_argument_group(description="Preprocess related")
@@ -284,7 +241,7 @@ class CepNetTask(AbsTask):
     def required_data_names(
             cls, train: bool = True, inference: bool = False
     ) -> Tuple[str, ...]:
-        retval = ("speech", "text")
+        retval = ("speech")
         return retval
 
     @classmethod
