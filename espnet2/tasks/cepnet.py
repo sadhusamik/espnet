@@ -24,7 +24,6 @@ from espnet2.asr.encoder.contextual_block_transformer_encoder import (
 from espnet2.asr.encoder.vgg_rnn_encoder import VGGRNNEncoder
 from espnet2.asr.encoder.wav2vec2_encoder import FairSeqWav2Vec2Encoder
 
-
 from espnet2.cepnet.espnet_model import CepNet
 from espnet2.tasks.abs_task import AbsTask
 from espnet2.text.phoneme_tokenizer import g2p_choices
@@ -95,6 +94,7 @@ frontend_choices = ClassChoices(
     type_check=AbsFrontend,
     default="default",
 )
+
 
 class CepNetTask(AbsTask):
     # If you need more than one optimizers, change this value
@@ -284,7 +284,7 @@ class CepNetTask(AbsTask):
     def required_data_names(
             cls, train: bool = True, inference: bool = False
     ) -> Tuple[str, ...]:
-        retval = ("speech",)
+        retval = ("speech", "text")
         return retval
 
     @classmethod
