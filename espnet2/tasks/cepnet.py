@@ -241,14 +241,14 @@ class CepNetTask(AbsTask):
     def required_data_names(
             cls, train: bool = True, inference: bool = False
     ) -> Tuple[str, ...]:
-        retval = ("speech", "speech_original")
+        retval = ("speech",)
         return retval
 
     @classmethod
     def optional_data_names(
             cls, train: bool = True, inference: bool = False
     ) -> Tuple[str, ...]:
-        retval = ()
+        retval = ("speech_original",)
         assert check_return_type(retval)
         return retval
 
