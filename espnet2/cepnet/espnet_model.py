@@ -134,8 +134,8 @@ class CepNet(AbsESPnetModel):
         encoder_out_imag = self.projector_imag(encoder_out_imag)
 
         print(encoder_out_real.shape)
-        encoder_out_real = torch.cat((encoder_out_real, torch.flip(encoder_out_real[:, :-1], [1])), dim=1)
-        encoder_out_imag = torch.cat((encoder_out_imag, -torch.flip(encoder_out_imag[:, :-1], [1])), dim=1)
+        encoder_out_real = torch.cat((encoder_out_real, torch.flip(encoder_out_real[:, :-2], [1])), dim=1)
+        encoder_out_imag = torch.cat((encoder_out_imag, -torch.flip(encoder_out_imag[:, :-2], [1])), dim=1)
 
         print(encoder_out_real.shape)
 
