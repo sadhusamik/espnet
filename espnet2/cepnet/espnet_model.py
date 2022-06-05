@@ -119,21 +119,25 @@ class CepNet(AbsESPnetModel):
         sig_len = speech.shape[1]
         fft_signal = torch.log(torch.fft.fft(speech, n=self.nfft))  # Batch x nfft
         fft_signal_original = torch.log(torch.fft.fft(speech_original, n=self.nfft))  # Batch x nfft
+        fft_signal = fft_signal.unsqueeze(-1)  # Batch x nfft x 1
+        fft_signal_original = fft_signal_original.unsqueeze(-1)  # Batch x nfft x 1
 
         # 1. Encoder for real and imaginary parts
-        encoder_out_real, _, _ = self.encoder_real(torch.real(fft_signal[:, :int(self.nfft / 2) + 1]), None)
+        ll = torch.Tensor([int(self.nfft / 2) + 1] * batch_size, device=speech.device)
+        encoder_out_real, _, _ = self.encoder_real(torch.real(fft_signal[:, :int(self.nfft / 2) + 1, :]), ll)
         encoder_out_real = self.projector_real(encoder_out_real)
-        encoder_out_imag, _, _ = self.encoder_real(torch.imag(fft_signal[:, :int(self.nfft / 2) + 1]), None)
+        encoder_out_imag, _, _ = self.encoder_real(torch.imag(fft_signal[:, :int(self.nfft / 2) + 1, :]), ll)
         encoder_out_imag = self.projector_imag(encoder_out_imag)
 
         encoder_out_real = torch.cat((encoder_out_real, torch.flip(encoder_out_real[:, :-1], [1])), dim=1)
         encoder_out_imag = torch.cat((encoder_out_imag, -torch.flip(encoder_out_imag[:, :-1], [1])), dim=1)
 
-        encoder_out_real=torch.view_as_complex(torch.cat( ( encoder_out_real.unsqueeze(-1), encoder_out_imag.unsqueeze(-1) ), dim=-1 ))
+        encoder_out_real = torch.view_as_complex(
+            torch.cat((encoder_out_real.unsqueeze(-1), encoder_out_imag.unsqueeze(-1)), dim=-1))
 
-        fft_signal-encoder_out_real
+        fft_signal - encoder_out_real
 
-        loss = self.prediction_loss(fft_signal_original-(fft_signal-encoder_out_real))
+        loss = self.prediction_loss(fft_signal_original - (fft_signal - encoder_out_real))
 
         stats = dict(
             loss=loss.detach(),
