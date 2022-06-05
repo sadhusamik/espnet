@@ -263,8 +263,8 @@ class CepNetTask(AbsTask):
         encoder_imag = encoder_class(input_size=1, **args.encoder_conf)
 
         encoder_output_size = encoder_real.output_size()
-        projector_real = torch.nn.Linear(in_features=encoder_output_size, out_features=input_size)
-        projector_imag = torch.nn.Linear(in_features=encoder_output_size, out_features=input_size)
+        projector_real = torch.nn.Linear(in_features=encoder_output_size, out_features=int(input_size/2)+1)
+        projector_imag = torch.nn.Linear(in_features=encoder_output_size, out_features=int(input_size/2)+1)
 
         # Build model
         model = CepNet(
