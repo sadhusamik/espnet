@@ -259,8 +259,8 @@ class CepNetTask(AbsTask):
         input_size = args.input_size
 
         encoder_class = encoder_choices.get_class(args.encoder)
-        encoder_real = encoder_class(input_size=input_size, **args.encoder_conf)
-        encoder_imag = encoder_class(input_size=input_size, **args.encoder_conf)
+        encoder_real = encoder_class(input_size=1, **args.encoder_conf)
+        encoder_imag = encoder_class(input_size=1, **args.encoder_conf)
 
         encoder_output_size = encoder_real.output_size()
         projector_real = torch.nn.Linear(in_features=encoder_output_size, out_features=input_size)
