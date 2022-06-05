@@ -104,6 +104,7 @@ class CepNet(AbsESPnetModel):
             speech_original: torch.Tensor,
             speech_lengths: torch.Tensor,
             speech_original_lengths: torch.Tensor,
+            **kwargs,
     ) -> Tuple[torch.Tensor, Dict[str, torch.Tensor], torch.Tensor]:
         """Frontend + Encoder + Calc loss
 
