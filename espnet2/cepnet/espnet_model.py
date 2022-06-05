@@ -144,18 +144,17 @@ class CepNet(AbsESPnetModel):
     def collect_feats(
             self,
             speech: torch.Tensor,
+            speech_original: torch.Tensor,
             speech_lengths: torch.Tensor,
             text: torch.Tensor,
             text_lengths: torch.Tensor,
     ) -> Dict[str, torch.Tensor]:
-        if self.extract_feats_in_collect_stats:
-            feats, _, feats_lengths, _ = self._extract_feats(speech, speech_lengths)
-        else:
-            # Generate dummy stats if extract_feats_in_collect_stats is False
-            logging.warning(
-                "Generating dummy stats for feats and feats_lengths, "
-                "because encoder_conf.extract_feats_in_collect_stats is "
-                f"{self.extract_feats_in_collect_stats}"
-            )
-            feats, feats_lengths = speech, speech_lengths
+
+        # Generate dummy stats if extract_feats_in_collect_stats is False
+        logging.warning(
+            "Generating dummy stats for feats and feats_lengths, "
+            "because encoder_conf.extract_feats_in_collect_stats is "
+            f"{self.extract_feats_in_collect_stats}"
+        )
+        feats, feats_lengths = speech, speech_lengths
         return {"feats": feats, "feats_lengths": feats_lengths}
