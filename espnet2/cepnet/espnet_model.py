@@ -144,7 +144,7 @@ class CepNet(AbsESPnetModel):
 
         print(encoder_out_real.shape)
 
-        loss = self.prediction_loss(fft_signal_original - (fft_signal - encoder_out_real))
+        loss = self.prediction_loss(fft_signal_original, fft_signal - encoder_out_real)
 
         stats = dict(
             loss=loss.detach(),
