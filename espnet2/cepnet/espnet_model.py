@@ -123,7 +123,7 @@ class CepNet(AbsESPnetModel):
         fft_signal_original = fft_signal_original.unsqueeze(-1)  # Batch x nfft x 1
 
         # 1. Encoder for real and imaginary parts
-        ll = torch.Tensor([int(self.nfft / 2) + 1] * batch_size, device=speech.device)
+        ll = torch.Tensor([int(self.nfft / 2) + 1] * batch_size)
         encoder_out_real, _, _ = self.encoder_real(torch.real(fft_signal[:, :int(self.nfft / 2) + 1, :]), ll)
         encoder_out_real = self.projector_real(encoder_out_real)
         encoder_out_imag, _, _ = self.encoder_real(torch.imag(fft_signal[:, :int(self.nfft / 2) + 1, :]), ll)
