@@ -130,7 +130,7 @@ class CepNet(AbsESPnetModel):
         print(encoder_out_real.shape)
         encoder_out_real = self.projector_real(encoder_out_real)
         print(encoder_out_real.shape)
-        encoder_out_imag, _, _ = self.encoder_real(torch.imag(fft_signal[:, :int(self.nfft / 2) + 1, :]), ll)
+        encoder_out_imag, _, _ = self.encoder_imag(torch.imag(fft_signal[:, :int(self.nfft / 2) + 1, :]), ll)
         encoder_out_imag = self.projector_imag(encoder_out_imag)
 
         print(encoder_out_real.shape)
@@ -139,13 +139,13 @@ class CepNet(AbsESPnetModel):
 
         print(encoder_out_real.shape)
 
-        encoder_out_real = torch.view_as_complex(
+        encoder_out = torch.view_as_complex(
             torch.cat((encoder_out_real.unsqueeze(-1), encoder_out_imag.unsqueeze(-1)), dim=-1))
 
         print(encoder_out_real.shape)
 
-        loss1 = self.prediction_loss(torch.real(fft_signal_original), torch.real(fft_signal - encoder_out_real))
-        loss2 = self.prediction_loss(torch.imag(fft_signal_original), torch.imag(fft_signal - encoder_out_real))
+        loss1 = self.prediction_loss(torch.real(fft_signal_original), torch.real(fft_signal - encoder_out))
+        loss2 = self.prediction_loss(torch.imag(fft_signal_original), torch.imag(fft_signal - encoder_out))
         loss = loss2 + loss1
 
         stats = dict(
