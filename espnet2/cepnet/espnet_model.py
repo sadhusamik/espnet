@@ -148,8 +148,6 @@ class CepNet(AbsESPnetModel):
             speech_original: torch.Tensor,
             speech_lengths: torch.Tensor,
             speech_original_lengths: torch.Tensor,
-            text: torch.Tensor,
-            text_lengths: torch.Tensor,
     ) -> Dict[str, torch.Tensor]:
 
         # Generate dummy stats if extract_feats_in_collect_stats is False
