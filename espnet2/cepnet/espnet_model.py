@@ -117,8 +117,7 @@ class CepNet(AbsESPnetModel):
 
         batch_size = speech.shape[0]
         sig_len = speech.shape[1]
-        #print('batch_size: {:d}'.format(batch_size))
-        #print('signal_length: {:d}'.format(sig_len))
+
         fft_signal = torch.fft.fft(speech, n=self.nfft)  # Batch x nfft
         fft_signal_original = torch.fft.fft(speech_original, n=self.nfft)  # Batch x nfft
         fft_signal = fft_signal.unsqueeze(-1)  # Batch x nfft x 1
@@ -138,14 +137,14 @@ class CepNet(AbsESPnetModel):
         encoder_out = torch.view_as_complex(
             torch.cat((encoder_out_real.unsqueeze(-1), encoder_out_imag.unsqueeze(-1)), dim=-1))
 
-        loss = self.prediction_loss(speech_original[:, :self.nfft],
-                                    torch.real(torch.fft.ifft(fft_signal / encoder_out))[:, :, 0])
+        #loss = self.prediction_loss(speech_original[:, :self.nfft],
+        #                            torch.real(torch.fft.ifft(fft_signal / encoder_out))[:, :, 0])
 
-        # loss1 = self.prediction_loss(torch.real(fft_signal_original), torch.real(fft_signal - encoder_out))
+        loss1 = self.prediction_loss(torch.real(fft_signal_original), torch.real(fft_signal/encoder_out))
         # loss1 = self.prediction_loss(torch.real(fft_signal_original), torch.real(fft_signal - 0.00000*encoder_out))
-        # loss2 = self.prediction_loss(torch.imag(fft_signal_original), torch.imag(fft_signal - encoder_out))
+        loss2 = self.prediction_loss(torch.imag(fft_signal_original), torch.imag(fft_signal/encoder_out))
         # loss2 = self.prediction_loss(torch.imag(fft_signal_original), torch.imag(fft_signal - 0.00000*encoder_out))
-        # loss = loss2 + loss1
+        loss = loss2 + loss1
 
         stats = dict(
             loss=loss.detach(),
