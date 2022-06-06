@@ -50,7 +50,7 @@ class CepNet(AbsESPnetModel):
             srate: int = 16000,
             fduration: float = 3,
             overlap_fraction: float = 0.75,
-            num_chunks: int = 4,
+            chunk_size: int = 2,
 
     ):
         assert check_argument_types()
@@ -67,7 +67,7 @@ class CepNet(AbsESPnetModel):
         self.srate = srate
         self.lfr = 1 / (self.overlap_fraction * self.fduration)
         self.nfft = int(fduration * srate)
-        self.num_chunks=num_chunks
+        self.chunk_size = chunk_size
 
         if prediction_loss == 'MSE':
             self.prediction_loss = torch.nn.MSELoss()
@@ -180,21 +180,22 @@ class CepNet(AbsESPnetModel):
 
         # 1. Encoder for real and imaginary parts
 
-        if self.num_chunks:
+        if self.chunk_size:
 
             # Divide computation to num_chunks along num_batch direction
-            chunk_size = int(np.ceil(speech.shape[0] / self.num_chunks))
-            speech = list(torch.split(speech, split_size_or_sections=chunk_size, dim=0))
-            encoder_out_real=[]
-            encoder_out_imag=[]
+            # chunk_size = int(np.ceil(speech.shape[0] / self.num_chunks))
+            speech = list(torch.split(speech, split_size_or_sections=self.chunk_size, dim=0))
+            encoder_out_real = []
+            encoder_out_imag = []
             for chunk_idx in range(len(speech)):
-
                 ll = torch.Tensor([int(self.nfft / 2) + 1] * speech[chunk_idx].shape[0])
-                encoder_out_real_1, _, _ = self.encoder_real(torch.real(speech[chunk_idx][:, :int(self.nfft / 2) + 1, :]), ll)
+                encoder_out_real_1, _, _ = self.encoder_real(
+                    torch.real(speech[chunk_idx][:, :int(self.nfft / 2) + 1, :]), ll)
                 encoder_out_real_1 = self.projector_real(encoder_out_real_1)
                 encoder_out_real.append(encoder_out_real_1)
 
-                encoder_out_imag_1, _, _ = self.encoder_imag(torch.imag(speech[chunk_idx][:, :int(self.nfft / 2) + 1, :]), ll)
+                encoder_out_imag_1, _, _ = self.encoder_imag(
+                    torch.imag(speech[chunk_idx][:, :int(self.nfft / 2) + 1, :]), ll)
                 encoder_out_imag_1 = self.projector_imag(encoder_out_imag_1)
                 encoder_out_imag.append(encoder_out_imag_1)
 
