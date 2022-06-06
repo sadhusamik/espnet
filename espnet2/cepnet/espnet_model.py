@@ -140,7 +140,7 @@ class CepNet(AbsESPnetModel):
         frames = torch.cat(frames, dim=1)
         return frames
 
-    def forward(
+    def forward_x(
             self,
             speech: torch.Tensor,
             speech_original: torch.Tensor,
@@ -222,7 +222,7 @@ class CepNet(AbsESPnetModel):
         loss, stats, weight = force_gatherable((loss, stats, batch_size), loss.device)
         return loss, stats, weight
 
-    def forward_x(
+    def forward(
             self,
             speech: torch.Tensor,
             speech_original: torch.Tensor,
@@ -241,6 +241,9 @@ class CepNet(AbsESPnetModel):
 
         batch_size = speech.shape[0]
         sig_len = speech.shape[1]
+        rand_loc = np.random.choice(sig_len - self.nfft, 1)
+        speech = speech[:, rand_loc:rand_loc + self.nfft]
+        speech_original = speech_original[:, rand_loc:rand_loc + self.nfft]
 
         fft_signal = torch.fft.fft(speech, n=self.nfft)  # Batch x nfft
         fft_signal_original = torch.fft.fft(speech_original, n=self.nfft)  # Batch x nfft
@@ -249,17 +252,14 @@ class CepNet(AbsESPnetModel):
 
         # 1. Encoder for real and imaginary parts
         ll = torch.Tensor([int(self.nfft / 2) + 1] * batch_size)
-        encoder_out_real, _, _ = self.encoder_real(torch.real(fft_signal[:, :int(self.nfft / 2) + 1, :]), ll)
+        encoder_out, _, _ = self.encoder(torch.view_as_real(fft_signal[:, :int(self.nfft / 2) + 1, :]), ll)
 
-        encoder_out_real = self.projector_real(encoder_out_real)
-        encoder_out_imag, _, _ = self.encoder_imag(torch.imag(fft_signal[:, :int(self.nfft / 2) + 1, :]), ll)
-        encoder_out_imag = self.projector_imag(encoder_out_imag)
+        encoder_out = self.projector(encoder_out)
 
-        encoder_out_real = torch.cat((encoder_out_real, torch.flip(encoder_out_real[:, :-2], [1])), dim=1)
-        encoder_out_imag = torch.cat((encoder_out_imag, -torch.flip(encoder_out_imag[:, :-2], [1])), dim=1)
+        encoder_out = torch.cat((encoder_out, torch.flip(encoder_out[:, :-2], [1])), dim=1)
+        encoder_out[:, int(self.nfft / 2) + 1:, 1] = -encoder_out[:, int(self.nfft / 2) + 1:, 1]
 
-        encoder_out = torch.view_as_complex(
-            torch.cat((encoder_out_real.unsqueeze(-1), encoder_out_imag.unsqueeze(-1)), dim=-1))
+        encoder_out = torch.view_as_complex(encoder_out)
 
         # loss = self.prediction_loss(speech_original[:, :self.nfft],
         #                            torch.real(torch.fft.ifft(fft_signal / encoder_out))[:, :, 0])
