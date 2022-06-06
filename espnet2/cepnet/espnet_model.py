@@ -183,6 +183,7 @@ class CepNet(AbsESPnetModel):
             speech = list(torch.split(speech, split_size_or_sections=self.chunk_size, dim=0))
             encoder_out = []
             for chunk_idx in range(len(speech)):
+                print(chunk_idx)
                 ll = torch.Tensor([int(self.nfft / 2) + 1] * speech[chunk_idx].shape[0])
                 encoder_out_chunk, _, _ = self.encoder(
                     torch.view_as_real(speech[chunk_idx][:, :int(self.nfft / 2) + 1, :]), ll)
