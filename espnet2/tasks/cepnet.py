@@ -257,19 +257,15 @@ class CepNetTask(AbsTask):
         assert check_argument_types()
 
         encoder_class = encoder_choices.get_class(args.encoder)
-        encoder_real = encoder_class(input_size=1, **args.encoder_conf)
-        encoder_imag = encoder_class(input_size=1, **args.encoder_conf)
+        encoder = encoder_class(input_size=2, **args.encoder_conf)
 
-        encoder_output_size = encoder_real.output_size()
-        projector_real = torch.nn.Linear(in_features=encoder_output_size, out_features=1)
-        projector_imag = torch.nn.Linear(in_features=encoder_output_size, out_features=1)
+        encoder_output_size = encoder.output_size()
+        projector = torch.nn.Linear(in_features=encoder_output_size, out_features=2)
 
         # Build model
         model = CepNet(
-            encoder_real=encoder_real,
-            encoder_imag=encoder_imag,
-            projector_real=projector_real,
-            projector_imag=projector_imag,
+            encoder=encoder,
+            projector=projector,
             **args.model_conf,
         )
 
