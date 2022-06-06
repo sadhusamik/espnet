@@ -50,6 +50,7 @@ class CepNet(AbsESPnetModel):
             srate: int = 16000,
             fduration: float = 3,
             overlap_fraction: float = 0.75,
+            num_chunks: int = 4,
 
     ):
         assert check_argument_types()
@@ -66,6 +67,7 @@ class CepNet(AbsESPnetModel):
         self.srate = srate
         self.lfr = 1 / (self.overlap_fraction * self.fduration)
         self.nfft = int(fduration * srate)
+        self.num_chunks=num_chunks
 
         if prediction_loss == 'MSE':
             self.prediction_loss = torch.nn.MSELoss()
@@ -170,22 +172,46 @@ class CepNet(AbsESPnetModel):
         speech_original = torch.reshape(speech_original,
                                         (-1, speech_original.shape[-1]))  # Batch * frame_num x frame_dimension
 
+        # FFT of frames
         speech = torch.fft.fft(speech, n=self.nfft)  # Batch * frame_num x nfft
         speech_original = torch.fft.fft(speech_original, n=self.nfft)  # Batch * frame_num x nfft
         speech = speech.unsqueeze(-1)  # Batch * frame_num x nfft x 1
         speech_original = speech_original.unsqueeze(-1)  # Batch * frame_num x nfft x 1
 
         # 1. Encoder for real and imaginary parts
-        ll = torch.Tensor([int(self.nfft / 2) + 1] * batch_size)
 
-        encoder_out_real, _, _ = self.encoder_real(torch.real(speech[:, :int(self.nfft / 2) + 1, :]), ll)
-        encoder_out_real = self.projector_real(encoder_out_real)
+        if self.num_chunks:
 
-        encoder_out_imag, _, _ = self.encoder_imag(torch.imag(speech[:, :int(self.nfft / 2) + 1, :]), ll)
-        encoder_out_imag = self.projector_imag(encoder_out_imag)
+            # Divide computation to num_chunks along num_batch direction
+            chunk_size = int(np.ceil(speech.shape[0] / self.num_chunks))
+            speech = list(torch.split(speech, split_size_or_sections=chunk_size, dim=0))
+            encoder_out_real=[]
+            encoder_out_imag=[]
+            for chunk_idx in range(len(speech)):
 
-        encoder_out_real = torch.cat((encoder_out_real, torch.flip(encoder_out_real[:, :-2], [1])), dim=1)
-        encoder_out_imag = torch.cat((encoder_out_imag, -torch.flip(encoder_out_imag[:, :-2], [1])), dim=1)
+                ll = torch.Tensor([int(self.nfft / 2) + 1] * speech[chunk_idx].shape[0])
+                encoder_out_real_1, _, _ = self.encoder_real(torch.real(speech[chunk_idx][:, :int(self.nfft / 2) + 1, :]), ll)
+                encoder_out_real_1 = self.projector_real(encoder_out_real_1)
+                encoder_out_real.append(encoder_out_real_1)
+
+                encoder_out_imag_1, _, _ = self.encoder_imag(torch.imag(speech[chunk_idx][:, :int(self.nfft / 2) + 1, :]), ll)
+                encoder_out_imag_1 = self.projector_imag(encoder_out_imag_1)
+                encoder_out_imag.append(encoder_out_imag_1)
+
+            encoder_out_real = torch.cat(encoder_out_real, dim=0)
+            encoder_out_imag = torch.cat(encoder_out_imag, dim=0)
+
+        else:
+            ll = torch.Tensor([int(self.nfft / 2) + 1] * batch_size)
+
+            encoder_out_real, _, _ = self.encoder_real(torch.real(speech[:, :int(self.nfft / 2) + 1, :]), ll)
+            encoder_out_real = self.projector_real(encoder_out_real)
+
+            encoder_out_imag, _, _ = self.encoder_imag(torch.imag(speech[:, :int(self.nfft / 2) + 1, :]), ll)
+            encoder_out_imag = self.projector_imag(encoder_out_imag)
+
+            encoder_out_real = torch.cat((encoder_out_real, torch.flip(encoder_out_real[:, :-2], [1])), dim=1)
+            encoder_out_imag = torch.cat((encoder_out_imag, -torch.flip(encoder_out_imag[:, :-2], [1])), dim=1)
 
         encoder_out_real = torch.view_as_complex(
             torch.cat((encoder_out_real.unsqueeze(-1), encoder_out_imag.unsqueeze(-1)), dim=-1))
