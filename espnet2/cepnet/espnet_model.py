@@ -136,7 +136,7 @@ class CepNet(AbsESPnetModel):
         encoder_out = torch.view_as_complex(
             torch.cat((encoder_out_real.unsqueeze(-1), encoder_out_imag.unsqueeze(-1)), dim=-1))
 
-        loss = self.prediction_loss(speech, torch.real(torch.fft.ifft(torch.exp(fft_signal_original - encoder_out))))
+        loss = self.prediction_loss(speech, torch.real(torch.fft.ifft(torch.exp(fft_signal_original - encoder_out)))[:,:sig_len] )
 
 
         # loss1 = self.prediction_loss(torch.real(fft_signal_original), torch.real(fft_signal - encoder_out))
