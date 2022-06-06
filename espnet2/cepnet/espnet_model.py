@@ -117,8 +117,8 @@ class CepNet(AbsESPnetModel):
 
         batch_size = speech.shape[0]
         sig_len = speech.shape[1]
-        print('batch_size: {:d}'.format(batch_size))
-        print('signal_length: {:d}'.format(sig_len))
+        #print('batch_size: {:d}'.format(batch_size))
+        #print('signal_length: {:d}'.format(sig_len))
         fft_signal = torch.fft.fft(speech, n=self.nfft)  # Batch x nfft
         fft_signal_original = torch.fft.fft(speech_original, n=self.nfft)  # Batch x nfft
         fft_signal = fft_signal.unsqueeze(-1)  # Batch x nfft x 1
