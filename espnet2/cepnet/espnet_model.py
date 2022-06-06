@@ -47,7 +47,7 @@ class CepNet(AbsESPnetModel):
             projector_imag,
             extract_feats_in_collect_stats: bool = True,
             prediction_loss: str = 'MSE',
-            srate: int = 16000.,
+            srate: int = 16000,
             fduration: float = 3,
             overlap_fraction: float = 0.75,
 

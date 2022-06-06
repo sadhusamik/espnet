@@ -256,8 +256,6 @@ class CepNetTask(AbsTask):
     def build_model(cls, args: argparse.Namespace) -> CepNet:
         assert check_argument_types()
 
-        input_size = args.input_size
-
         encoder_class = encoder_choices.get_class(args.encoder)
         encoder_real = encoder_class(input_size=1, **args.encoder_conf)
         encoder_imag = encoder_class(input_size=1, **args.encoder_conf)
