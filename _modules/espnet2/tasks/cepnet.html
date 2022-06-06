@@ -411,19 +411,15 @@
         <span class="k">assert</span> <span class="n">check_argument_types</span><span class="p">()</span>
 
         <span class="n">encoder_class</span> <span class="o">=</span> <span class="n">encoder_choices</span><span class="o">.</span><span class="n">get_class</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">encoder</span><span class="p">)</span>
-        <span class="n">encoder_real</span> <span class="o">=</span> <span class="n">encoder_class</span><span class="p">(</span><span class="n">input_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="o">.</span><span class="n">encoder_conf</span><span class="p">)</span>
-        <span class="n">encoder_imag</span> <span class="o">=</span> <span class="n">encoder_class</span><span class="p">(</span><span class="n">input_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="o">.</span><span class="n">encoder_conf</span><span class="p">)</span>
+        <span class="n">encoder</span> <span class="o">=</span> <span class="n">encoder_class</span><span class="p">(</span><span class="n">input_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="o">.</span><span class="n">encoder_conf</span><span class="p">)</span>
 
-        <span class="n">encoder_output_size</span> <span class="o">=</span> <span class="n">encoder_real</span><span class="o">.</span><span class="n">output_size</span><span class="p">()</span>
-        <span class="n">projector_real</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">in_features</span><span class="o">=</span><span class="n">encoder_output_size</span><span class="p">,</span> <span class="n">out_features</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">projector_imag</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">in_features</span><span class="o">=</span><span class="n">encoder_output_size</span><span class="p">,</span> <span class="n">out_features</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">encoder_output_size</span> <span class="o">=</span> <span class="n">encoder</span><span class="o">.</span><span class="n">output_size</span><span class="p">()</span>
+        <span class="n">projector</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">in_features</span><span class="o">=</span><span class="n">encoder_output_size</span><span class="p">,</span> <span class="n">out_features</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
         <span class="c1"># Build model</span>
         <span class="n">model</span> <span class="o">=</span> <span class="n">CepNet</span><span class="p">(</span>
-            <span class="n">encoder_real</span><span class="o">=</span><span class="n">encoder_real</span><span class="p">,</span>
-            <span class="n">encoder_imag</span><span class="o">=</span><span class="n">encoder_imag</span><span class="p">,</span>
-            <span class="n">projector_real</span><span class="o">=</span><span class="n">projector_real</span><span class="p">,</span>
-            <span class="n">projector_imag</span><span class="o">=</span><span class="n">projector_imag</span><span class="p">,</span>
+            <span class="n">encoder</span><span class="o">=</span><span class="n">encoder</span><span class="p">,</span>
+            <span class="n">projector</span><span class="o">=</span><span class="n">projector</span><span class="p">,</span>
             <span class="o">**</span><span class="n">args</span><span class="o">.</span><span class="n">model_conf</span><span class="p">,</span>
         <span class="p">)</span>
 
