@@ -272,7 +272,6 @@ class CepNetTask(AbsTask):
             encoder_imag=encoder_imag,
             projector_real=projector_real,
             projector_imag=projector_imag,
-            nfft=input_size,
             **args.model_conf,
         )
 

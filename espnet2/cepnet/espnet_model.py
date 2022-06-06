@@ -45,7 +45,6 @@ class CepNet(AbsESPnetModel):
             encoder_imag: AbsEncoder,
             projector_real,
             projector_imag,
-            nfft: int,
             extract_feats_in_collect_stats: bool = True,
             prediction_loss: str = 'MSE',
             srate: int = 16000.,
@@ -62,7 +61,6 @@ class CepNet(AbsESPnetModel):
         self.encoder_imag = encoder_imag
         self.projector_real = projector_real
         self.projector_imag = projector_imag
-        #self.nfft = nfft
         self.fduation = fduration
         self.overlap_fraction = overlap_fraction
         self.srate = srate
