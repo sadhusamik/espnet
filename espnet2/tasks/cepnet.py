@@ -257,7 +257,7 @@ class CepNetTask(AbsTask):
         assert check_argument_types()
 
         encoder_class = encoder_choices.get_class(args.encoder)
-        encoder = encoder_class(input_size=2, subsample=None,  **args.encoder_conf)
+        encoder = encoder_class(input_size=2, **args.encoder_conf)
 
         encoder_output_size = encoder.output_size()
         projector = torch.nn.Linear(in_features=encoder_output_size, out_features=2)
