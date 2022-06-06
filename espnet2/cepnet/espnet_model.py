@@ -201,6 +201,7 @@ class CepNet(AbsESPnetModel):
 
             encoder_out_real = torch.cat(encoder_out_real, dim=0)
             encoder_out_imag = torch.cat(encoder_out_imag, dim=0)
+            speech = torch.cat(speech, dim=0)
 
         else:
             ll = torch.Tensor([int(self.nfft / 2) + 1] * batch_size)
