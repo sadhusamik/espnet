@@ -61,7 +61,7 @@ class CepNet(AbsESPnetModel):
         self.encoder_imag = encoder_imag
         self.projector_real = projector_real
         self.projector_imag = projector_imag
-        self.fduation = fduration
+        self.fduration = fduration
         self.overlap_fraction = overlap_fraction
         self.srate = srate
         self.lfr = 1 / (self.overlap_fraction * self.fduration)
