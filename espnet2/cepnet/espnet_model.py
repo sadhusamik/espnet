@@ -247,8 +247,8 @@ class CepNet(AbsESPnetModel):
 
         speech = torch.fft.fft(speech, n=self.nfft)  # Batch x nfft
         speech_original = torch.fft.fft(speech_original, n=self.nfft)  # Batch x nfft
-        speech = speech.unsqueeze(-1)  # Batch x nfft x 1
-        speech_original = speech_original.unsqueeze(-1)  # Batch x nfft x 1
+        #speech = speech.unsqueeze(-1)  # Batch x nfft x 1
+        #speech_original = speech_original.unsqueeze(-1)  # Batch x nfft x 1
 
         # 1. Encoder for real and imaginary parts
         ll = torch.Tensor([int(self.nfft / 2) + 1] * batch_size)
