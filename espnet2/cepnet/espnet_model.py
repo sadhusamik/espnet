@@ -161,6 +161,7 @@ class CepNet(AbsESPnetModel):
 
         batch_size = speech.shape[0]
         sig_len = speech.shape[1]
+        print(self.nfft)
 
         speech = self.get_frames(speech)  # Batch x frame_num x frame_dimension
         speech = torch.reshape(speech, (-1, speech.shape[-1]))  # Batch * frame_num x frame_dimension
