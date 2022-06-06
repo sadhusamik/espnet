@@ -241,9 +241,9 @@ class CepNet(AbsESPnetModel):
 
         batch_size = speech.shape[0]
         sig_len = speech.shape[1]
-        rand_loc = int(np.random.choice(sig_len - self.nfft - 1, 1))
-        speech = speech[:, rand_loc:rand_loc + self.nfft]
-        speech_original = speech_original[:, rand_loc:rand_loc + self.nfft]
+        #rand_loc = int(np.random.choice(sig_len - self.nfft - 1, 1))
+        #speech = speech[:, rand_loc:rand_loc + self.nfft]
+        #speech_original = speech_original[:, rand_loc:rand_loc + self.nfft]
 
         speech = torch.fft.fft(speech, n=self.nfft)  # Batch x nfft
         speech_original = torch.fft.fft(speech_original, n=self.nfft)  # Batch x nfft
