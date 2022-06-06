@@ -202,6 +202,10 @@
             <span class="n">nfft</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
             <span class="n">extract_feats_in_collect_stats</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
             <span class="n">prediction_loss</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;MSE&#39;</span><span class="p">,</span>
+            <span class="n">srate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mf">16000.</span><span class="p">,</span>
+            <span class="n">fduration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="n">overlap_fraction</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.75</span><span class="p">,</span>
+
     <span class="p">):</span>
         <span class="k">assert</span> <span class="n">check_argument_types</span><span class="p">()</span>
 
@@ -212,7 +216,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">encoder_imag</span> <span class="o">=</span> <span class="n">encoder_imag</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">projector_real</span> <span class="o">=</span> <span class="n">projector_real</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">projector_imag</span> <span class="o">=</span> <span class="n">projector_imag</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">nfft</span> <span class="o">=</span> <span class="n">nfft</span>
+        <span class="c1">#self.nfft = nfft</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fduation</span> <span class="o">=</span> <span class="n">fduration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">overlap_fraction</span> <span class="o">=</span> <span class="n">overlap_fraction</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">srate</span> <span class="o">=</span> <span class="n">srate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lfr</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">overlap_fraction</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fduration</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nfft</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fduration</span> <span class="o">*</span> <span class="n">srate</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">prediction_loss</span> <span class="o">==</span> <span class="s1">&#39;MSE&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">prediction_loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">()</span>
@@ -252,7 +261,106 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">rirs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sps</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span></div>
 
+<div class="viewcode-block" id="CepNet.get_frames"><a class="viewcode-back" href="../../../_gen/espnet2.cepnet.html#espnet2.cepnet.espnet_model.CepNet.get_frames">[docs]</a>    <span class="k">def</span> <span class="nf">get_frames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signal</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Divide speech signal into frames.</span>
+
+<span class="sd">                Args:</span>
+<span class="sd">                    signal: (Batch, Nsamples) or (Batch, Nsample)</span>
+<span class="sd">                Returns:</span>
+<span class="sd">                    output: (Batch, Frame num, Frame dimension) or (Batch, Frame num, Frame dimension)</span>
+<span class="sd">                &quot;&quot;&quot;</span>
+
+        <span class="n">flength_samples</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">srate</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fduration</span><span class="p">)</span>
+        <span class="n">frate_samples</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">srate</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">lfr</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">flength_samples</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">sp_b</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">flength_samples</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">sp_f</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">flength_samples</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">extend</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">flength_samples</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sp_b</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">flength_samples</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">sp_f</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">flength_samples</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">extend</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">flength_samples</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># signal = torch.nn.functional.pad(signal.unsqueeze(1), (extend, extend), mode=&#39;constant&#39;, value=0.0).squeeze(1)</span>
+        <span class="n">signal</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="n">extend</span><span class="p">,</span> <span class="n">extend</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;reflect&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">signal_length</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">win</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">hamming_window</span><span class="p">(</span><span class="n">flength_samples</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">signal</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">signal</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">sp_b</span>
+        <span class="n">frames</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">while</span> <span class="p">(</span><span class="n">idx</span> <span class="o">+</span> <span class="n">sp_f</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">signal_length</span><span class="p">:</span>
+            <span class="n">frames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">signal</span><span class="p">[:,</span> <span class="n">idx</span> <span class="o">-</span> <span class="n">sp_b</span><span class="p">:</span><span class="n">idx</span> <span class="o">+</span> <span class="n">sp_f</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">win</span><span class="p">)</span>
+            <span class="n">idx</span> <span class="o">+=</span> <span class="n">frate_samples</span>
+
+        <span class="n">frames</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">frames</span></div>
+
 <div class="viewcode-block" id="CepNet.forward"><a class="viewcode-back" href="../../../_gen/espnet2.cepnet.html#espnet2.cepnet.espnet_model.CepNet.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">speech</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+            <span class="n">speech_original</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+            <span class="n">speech_lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+            <span class="n">speech_original_lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Frontend + Encoder + Calc loss</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            speech: (Batch, Length, ...)</span>
+<span class="sd">            speech_original: (Batch, Length, ...)</span>
+<span class="sd">            speech_lengths: (Batch, )</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">batch_size</span> <span class="o">=</span> <span class="n">speech</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">sig_len</span> <span class="o">=</span> <span class="n">speech</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">speech</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_frames</span><span class="p">(</span><span class="n">speech</span><span class="p">)</span>  <span class="c1"># Batch x frame_num x frame_dimension</span>
+        <span class="n">speech</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">speech</span><span class="p">,(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">speech</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span> <span class="c1"># Batch * frame_num x frame_dimension</span>
+
+        <span class="n">speech_original</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_frames</span><span class="p">(</span><span class="n">speech_original</span><span class="p">)</span>  <span class="c1"># Batch x frame_num x frame_dimension</span>
+        <span class="n">speech_original</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">speech_original</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">speech_original</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span> <span class="c1"># Batch * frame_num x frame_dimension</span>
+
+        <span class="n">fft_signal</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">speech</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nfft</span><span class="p">)</span>  <span class="c1"># Batch * frame_num x nfft</span>
+        <span class="n">fft_signal_original</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">speech_original</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nfft</span><span class="p">)</span>  <span class="c1"># Batch * frame_num x nfft</span>
+        <span class="n">fft_signal</span> <span class="o">=</span> <span class="n">fft_signal</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># Batch * frame_num x nfft x 1</span>
+        <span class="n">fft_signal_original</span> <span class="o">=</span> <span class="n">fft_signal_original</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># Batch * frame_num x nfft x 1</span>
+
+        <span class="c1"># 1. Encoder for real and imaginary parts</span>
+        <span class="n">ll</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nfft</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">batch_size</span><span class="p">)</span>
+        <span class="n">encoder_out_real</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder_real</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">fft_signal</span><span class="p">[:,</span> <span class="p">:</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nfft</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:]),</span> <span class="n">ll</span><span class="p">)</span>
+
+        <span class="n">encoder_out_real</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">projector_real</span><span class="p">(</span><span class="n">encoder_out_real</span><span class="p">)</span>
+        <span class="n">encoder_out_imag</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder_imag</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">fft_signal</span><span class="p">[:,</span> <span class="p">:</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nfft</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:]),</span> <span class="n">ll</span><span class="p">)</span>
+        <span class="n">encoder_out_imag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">projector_imag</span><span class="p">(</span><span class="n">encoder_out_imag</span><span class="p">)</span>
+
+        <span class="n">encoder_out_real</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">encoder_out_real</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">encoder_out_real</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">])),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">encoder_out_imag</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">encoder_out_imag</span><span class="p">,</span> <span class="o">-</span><span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">encoder_out_imag</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">])),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">encoder_out</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">view_as_complex</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">encoder_out_real</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">encoder_out_imag</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)),</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span>
+
+        <span class="c1"># loss = self.prediction_loss(speech_original[:, :self.nfft],</span>
+        <span class="c1">#                            torch.real(torch.fft.ifft(fft_signal / encoder_out))[:, :, 0])</span>
+
+        <span class="n">loss1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prediction_loss</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">fft_signal_original</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">fft_signal</span> <span class="o">/</span> <span class="n">encoder_out</span><span class="p">))</span>
+        <span class="c1"># loss1 = self.prediction_loss(torch.real(fft_signal_original), torch.real(fft_signal - 0.00000*encoder_out))</span>
+        <span class="n">loss2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prediction_loss</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">fft_signal_original</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">fft_signal</span> <span class="o">/</span> <span class="n">encoder_out</span><span class="p">))</span>
+        <span class="c1"># loss2 = self.prediction_loss(torch.imag(fft_signal_original), torch.imag(fft_signal - 0.00000*encoder_out))</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">loss2</span> <span class="o">+</span> <span class="n">loss1</span>
+
+        <span class="n">stats</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">loss</span><span class="o">=</span><span class="n">loss</span><span class="o">.</span><span class="n">detach</span><span class="p">(),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># force_gatherable: to-device and to-tensor if scalar for DataParallel</span>
+        <span class="n">loss</span><span class="p">,</span> <span class="n">stats</span><span class="p">,</span> <span class="n">weight</span> <span class="o">=</span> <span class="n">force_gatherable</span><span class="p">((</span><span class="n">loss</span><span class="p">,</span> <span class="n">stats</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">),</span> <span class="n">loss</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">loss</span><span class="p">,</span> <span class="n">stats</span><span class="p">,</span> <span class="n">weight</span></div>
+
+<div class="viewcode-block" id="CepNet.forward_x"><a class="viewcode-back" href="../../../_gen/espnet2.cepnet.html#espnet2.cepnet.espnet_model.CepNet.forward_x">[docs]</a>    <span class="k">def</span> <span class="nf">forward_x</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">speech</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
             <span class="n">speech_original</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
@@ -291,12 +399,12 @@
         <span class="n">encoder_out</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">view_as_complex</span><span class="p">(</span>
             <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">encoder_out_real</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">encoder_out_imag</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)),</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span>
 
-        <span class="c1">#loss = self.prediction_loss(speech_original[:, :self.nfft],</span>
+        <span class="c1"># loss = self.prediction_loss(speech_original[:, :self.nfft],</span>
         <span class="c1">#                            torch.real(torch.fft.ifft(fft_signal / encoder_out))[:, :, 0])</span>
 
-        <span class="n">loss1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prediction_loss</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">fft_signal_original</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">fft_signal</span><span class="o">/</span><span class="n">encoder_out</span><span class="p">))</span>
+        <span class="n">loss1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prediction_loss</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">fft_signal_original</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">fft_signal</span> <span class="o">/</span> <span class="n">encoder_out</span><span class="p">))</span>
         <span class="c1"># loss1 = self.prediction_loss(torch.real(fft_signal_original), torch.real(fft_signal - 0.00000*encoder_out))</span>
-        <span class="n">loss2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prediction_loss</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">fft_signal_original</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">fft_signal</span><span class="o">/</span><span class="n">encoder_out</span><span class="p">))</span>
+        <span class="n">loss2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prediction_loss</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">fft_signal_original</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">fft_signal</span> <span class="o">/</span> <span class="n">encoder_out</span><span class="p">))</span>
         <span class="c1"># loss2 = self.prediction_loss(torch.imag(fft_signal_original), torch.imag(fft_signal - 0.00000*encoder_out))</span>
         <span class="n">loss</span> <span class="o">=</span> <span class="n">loss2</span> <span class="o">+</span> <span class="n">loss1</span>
 
