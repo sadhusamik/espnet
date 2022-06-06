@@ -138,9 +138,9 @@ class CepNet(AbsESPnetModel):
             torch.cat((encoder_out_real.unsqueeze(-1), encoder_out_imag.unsqueeze(-1)), dim=-1))
 
         #loss1 = self.prediction_loss(torch.real(fft_signal_original), torch.real(fft_signal - encoder_out))
-        loss1 = self.prediction_loss(torch.real(fft_signal_original), torch.real(fft_signal - 0.00001*encoder_out))
+        loss1 = self.prediction_loss(torch.real(fft_signal_original), torch.real(fft_signal - 0.00000*encoder_out))
         #loss2 = self.prediction_loss(torch.imag(fft_signal_original), torch.imag(fft_signal - encoder_out))
-        loss2 = self.prediction_loss(torch.imag(fft_signal_original), torch.imag(fft_signal - 0.00001*encoder_out))
+        loss2 = self.prediction_loss(torch.imag(fft_signal_original), torch.imag(fft_signal - 0.00000*encoder_out))
         loss = loss2 + loss1
 
         stats = dict(
