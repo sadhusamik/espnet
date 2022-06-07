@@ -125,6 +125,17 @@ espnet2.tasks.lm
     :show-inheritance:
 
 
+.. _espnet2.tasks.modnet:
+
+espnet2.tasks.modnet
+--------------------
+
+.. automodule:: espnet2.tasks.modnet
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
 .. _espnet2.tasks.abs_task:
 
 espnet2.tasks.abs_task
