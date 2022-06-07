@@ -10,6 +10,7 @@ from typing import Union
 import numpy as np
 import soundfile
 import scipy
+import random
 
 import torch
 from typeguard import check_argument_types
@@ -48,7 +49,7 @@ class CepNet(AbsESPnetModel):
             srate: int = 16000,
             fduration: float = 3,
             overlap_fraction: float = 0.75,
-            chunk_size: int = 2,
+            chunk_num: int = 5,
 
     ):
         assert check_argument_types()
@@ -63,7 +64,7 @@ class CepNet(AbsESPnetModel):
         self.srate = srate
         self.lfr = 1 / (self.overlap_fraction * self.fduration)
         self.nfft = int(fduration * srate)
-        self.chunk_size = chunk_size
+        self.chunk_num = chunk_num
 
         if prediction_loss == 'MSE':
             self.prediction_loss = torch.nn.MSELoss()
@@ -242,17 +243,24 @@ class CepNet(AbsESPnetModel):
         batch_size = speech.shape[0]
         sig_len = speech.shape[1]
 
-        #speech = self.get_frames(speech)  # Batch x frame_num x frame_dimension
-        #speech = torch.reshape(speech, (-1, speech.shape[-1]))  # Batch * frame_num x frame_dimension
+        speech = self.get_frames(speech)  # Batch x frame_num x frame_dimension
+        speech = torch.reshape(speech, (-1, speech.shape[-1]))  # Batch * frame_num x frame_dimension
 
-        #speech_original = self.get_frames(speech_original)  # Batch x frame_num x frame_dimension
-        #speech_original = torch.reshape(speech_original,
-        #                               (-1, speech_original.shape[-1]))  # Batch * frame_num x frame_dimension
+        speech_original = self.get_frames(speech_original)  # Batch x frame_num x frame_dimension
+        speech_original = torch.reshape(speech_original,
+                                        (-1, speech_original.shape[-1]))  # Batch * frame_num x frame_dimension
 
-        if sig_len > self.nfft:
-            rand_loc = int(np.random.choice(sig_len - self.nfft - 1, 1))
-            speech = speech[:, rand_loc:rand_loc + self.nfft]
-            speech_original = speech_original[:, rand_loc:rand_loc + self.nfft]
+        # choose num_chunk frames randomly
+        a = np.arange(speech.shape[0])
+        random.shuffle(a)
+        a = a[:self.chunk_num]
+        speech = speech[a, :]
+        speech_original = speech_original[a, :]
+
+        #if sig_len > self.nfft:
+        #    rand_loc = int(np.random.choice(sig_len - self.nfft - 1, 1))
+        #    speech = speech[:, rand_loc:rand_loc + self.nfft]
+        #    speech_original = speech_original[:, rand_loc:rand_loc + self.nfft]
 
         speech = torch.fft.fft(speech, n=self.nfft)  # Batch * frame_num x nfft
         speech_original = torch.fft.fft(speech_original, n=self.nfft)  # Batch * frame_num x nfft
