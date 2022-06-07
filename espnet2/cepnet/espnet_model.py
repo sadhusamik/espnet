@@ -241,13 +241,21 @@ class CepNet(AbsESPnetModel):
 
         batch_size = speech.shape[0]
         sig_len = speech.shape[1]
-        if sig_len > self.nfft:
-            rand_loc = int(np.random.choice(sig_len - self.nfft - 1, 1))
-            speech = speech[:, rand_loc:rand_loc + self.nfft]
-            speech_original = speech_original[:, rand_loc:rand_loc + self.nfft]
 
-        speech = torch.fft.fft(speech, n=self.nfft)  # Batch x nfft
-        speech_original = torch.fft.fft(speech_original, n=self.nfft)  # Batch x nfft
+        speech = self.get_frames(speech)  # Batch x frame_num x frame_dimension
+        speech = torch.reshape(speech, (-1, speech.shape[-1]))  # Batch * frame_num x frame_dimension
+
+        speech_original = self.get_frames(speech_original)  # Batch x frame_num x frame_dimension
+        speech_original = torch.reshape(speech_original,
+                                        (-1, speech_original.shape[-1]))  # Batch * frame_num x frame_dimension
+
+        #if sig_len > self.nfft:
+        #    rand_loc = int(np.random.choice(sig_len - self.nfft - 1, 1))
+        #    speech = speech[:, rand_loc:rand_loc + self.nfft]
+        #    speech_original = speech_original[:, rand_loc:rand_loc + self.nfft]
+
+        speech = torch.fft.fft(speech, n=self.nfft)  # Batch * frame_num x nfft
+        speech_original = torch.fft.fft(speech_original, n=self.nfft)  # Batch * frame_num x nfft
 
         # 1. Encoder for real and imaginary parts
         ll = torch.Tensor([int(self.nfft / 2) + 1] * batch_size)
@@ -263,9 +271,8 @@ class CepNet(AbsESPnetModel):
         #                            torch.real(torch.fft.ifft(fft_signal / encoder_out))[:, :, 0])
 
         loss1 = self.prediction_loss(torch.real(speech_original), torch.real(speech / encoder_out))
-        # loss1 = self.prediction_loss(torch.real(fft_signal_original), torch.real(fft_signal - 0.00000*encoder_out))
         loss2 = self.prediction_loss(torch.imag(speech_original), torch.imag(speech / encoder_out))
-        # loss2 = self.prediction_loss(torch.imag(fft_signal_original), torch.imag(fft_signal - 0.00000*encoder_out))
+
         loss = loss2 + loss1
 
         stats = dict(
