@@ -73,37 +73,6 @@ class CepNet(AbsESPnetModel):
 
         self.extract_feats_in_collect_stats = extract_feats_in_collect_stats
 
-    def load_noise_rir_scp(self):
-
-        # Load noises and SNR range
-        self.noises = []
-        with open(self.noise_scp, "r", encoding="utf-8") as f:
-            for line in f:
-                sps = line.strip().split(None, 1)
-                if len(sps) == 1:
-                    self.noises.append(sps[0])
-                else:
-                    self.noises.append(sps[1])
-        sps = self.noise_db_range.split("_")
-        if len(sps) == 1:
-            self.noise_db_low, self.noise_db_high = float(sps[0])
-        elif len(sps) == 2:
-            self.noise_db_low, self.noise_db_high = float(sps[0]), float(sps[1])
-        else:
-            raise ValueError(
-                "Format error: '{noise_db_range}' e.g. -3_4 -> [-3db,4db]"
-            )
-
-        # Load RIRs
-        self.rirs = []
-        with open(self.rir_scp, "r", encoding="utf-8") as f:
-            for line in f:
-                sps = line.strip().split(None, 1)
-                if len(sps) == 1:
-                    self.rirs.append(sps[0])
-                else:
-                    self.rirs.append(sps[1])
-
     def get_frames(self, signal: torch.Tensor) -> torch.Tensor:
         """Divide speech signal into frames.
 
