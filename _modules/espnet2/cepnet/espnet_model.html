@@ -164,6 +164,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">soundfile</span>
 <span class="kn">import</span> <span class="nn">scipy</span>
+<span class="kn">import</span> <span class="nn">random</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">typeguard</span> <span class="kn">import</span> <span class="n">check_argument_types</span>
@@ -202,7 +203,7 @@
             <span class="n">srate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16000</span><span class="p">,</span>
             <span class="n">fduration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
             <span class="n">overlap_fraction</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.75</span><span class="p">,</span>
-            <span class="n">chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="n">chunk_num</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
 
     <span class="p">):</span>
         <span class="k">assert</span> <span class="n">check_argument_types</span><span class="p">()</span>
@@ -217,7 +218,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">srate</span> <span class="o">=</span> <span class="n">srate</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lfr</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">overlap_fraction</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fduration</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nfft</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fduration</span> <span class="o">*</span> <span class="n">srate</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">chunk_size</span> <span class="o">=</span> <span class="n">chunk_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chunk_num</span> <span class="o">=</span> <span class="n">chunk_num</span>
 
         <span class="k">if</span> <span class="n">prediction_loss</span> <span class="o">==</span> <span class="s1">&#39;MSE&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">prediction_loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">()</span>
@@ -396,17 +397,24 @@
         <span class="n">batch_size</span> <span class="o">=</span> <span class="n">speech</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">sig_len</span> <span class="o">=</span> <span class="n">speech</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
-        <span class="c1">#speech = self.get_frames(speech)  # Batch x frame_num x frame_dimension</span>
-        <span class="c1">#speech = torch.reshape(speech, (-1, speech.shape[-1]))  # Batch * frame_num x frame_dimension</span>
+        <span class="n">speech</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_frames</span><span class="p">(</span><span class="n">speech</span><span class="p">)</span>  <span class="c1"># Batch x frame_num x frame_dimension</span>
+        <span class="n">speech</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">speech</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">speech</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>  <span class="c1"># Batch * frame_num x frame_dimension</span>
 
-        <span class="c1">#speech_original = self.get_frames(speech_original)  # Batch x frame_num x frame_dimension</span>
-        <span class="c1">#speech_original = torch.reshape(speech_original,</span>
-        <span class="c1">#                               (-1, speech_original.shape[-1]))  # Batch * frame_num x frame_dimension</span>
+        <span class="n">speech_original</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_frames</span><span class="p">(</span><span class="n">speech_original</span><span class="p">)</span>  <span class="c1"># Batch x frame_num x frame_dimension</span>
+        <span class="n">speech_original</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">speech_original</span><span class="p">,</span>
+                                        <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">speech_original</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>  <span class="c1"># Batch * frame_num x frame_dimension</span>
 
-        <span class="k">if</span> <span class="n">sig_len</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">nfft</span><span class="p">:</span>
-            <span class="n">rand_loc</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">sig_len</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">nfft</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-            <span class="n">speech</span> <span class="o">=</span> <span class="n">speech</span><span class="p">[:,</span> <span class="n">rand_loc</span><span class="p">:</span><span class="n">rand_loc</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">nfft</span><span class="p">]</span>
-            <span class="n">speech_original</span> <span class="o">=</span> <span class="n">speech_original</span><span class="p">[:,</span> <span class="n">rand_loc</span><span class="p">:</span><span class="n">rand_loc</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">nfft</span><span class="p">]</span>
+        <span class="c1"># choose num_chunk frames randomly</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">speech</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">chunk_num</span><span class="p">]</span>
+        <span class="n">speech</span> <span class="o">=</span> <span class="n">speech</span><span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">speech_original</span> <span class="o">=</span> <span class="n">speech_original</span><span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="p">:]</span>
+
+        <span class="c1">#if sig_len &gt; self.nfft:</span>
+        <span class="c1">#    rand_loc = int(np.random.choice(sig_len - self.nfft - 1, 1))</span>
+        <span class="c1">#    speech = speech[:, rand_loc:rand_loc + self.nfft]</span>
+        <span class="c1">#    speech_original = speech_original[:, rand_loc:rand_loc + self.nfft]</span>
 
         <span class="n">speech</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">speech</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nfft</span><span class="p">)</span>  <span class="c1"># Batch * frame_num x nfft</span>
         <span class="n">speech_original</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">speech_original</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nfft</span><span class="p">)</span>  <span class="c1"># Batch * frame_num x nfft</span>
