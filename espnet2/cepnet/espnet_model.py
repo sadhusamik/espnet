@@ -242,17 +242,17 @@ class CepNet(AbsESPnetModel):
         batch_size = speech.shape[0]
         sig_len = speech.shape[1]
 
-        speech = self.get_frames(speech)  # Batch x frame_num x frame_dimension
-        speech = torch.reshape(speech, (-1, speech.shape[-1]))  # Batch * frame_num x frame_dimension
+        #speech = self.get_frames(speech)  # Batch x frame_num x frame_dimension
+        #speech = torch.reshape(speech, (-1, speech.shape[-1]))  # Batch * frame_num x frame_dimension
 
-        speech_original = self.get_frames(speech_original)  # Batch x frame_num x frame_dimension
-        speech_original = torch.reshape(speech_original,
-                                        (-1, speech_original.shape[-1]))  # Batch * frame_num x frame_dimension
+        #speech_original = self.get_frames(speech_original)  # Batch x frame_num x frame_dimension
+        #speech_original = torch.reshape(speech_original,
+        #                               (-1, speech_original.shape[-1]))  # Batch * frame_num x frame_dimension
 
-        #if sig_len > self.nfft:
-        #    rand_loc = int(np.random.choice(sig_len - self.nfft - 1, 1))
-        #    speech = speech[:, rand_loc:rand_loc + self.nfft]
-        #    speech_original = speech_original[:, rand_loc:rand_loc + self.nfft]
+        if sig_len > self.nfft:
+            rand_loc = int(np.random.choice(sig_len - self.nfft - 1, 1))
+            speech = speech[:, rand_loc:rand_loc + self.nfft]
+            speech_original = speech_original[:, rand_loc:rand_loc + self.nfft]
 
         speech = torch.fft.fft(speech, n=self.nfft)  # Batch * frame_num x nfft
         speech_original = torch.fft.fft(speech_original, n=self.nfft)  # Batch * frame_num x nfft
