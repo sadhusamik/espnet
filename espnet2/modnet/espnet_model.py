@@ -71,7 +71,8 @@ class ModNet(AbsESPnetModel):
         batch_size = speech.shape[0]
 
         # 1. Encoder
-        encoder_out, encoder_out_lens, feats_original, dropout_mask = self.encode(speech, speech_lengths)
+        encoder_out, encoder_out_lens, feats_original, dropout_mask = self.encode(speech, speech_original,
+                                                                                  speech_lengths)
 
         loss = self._calc_predictive_loss(feats_original, encoder_out, dropout_mask)
 
@@ -91,7 +92,7 @@ class ModNet(AbsESPnetModel):
             speech_original_lengths: torch.Tensor,
     ) -> Dict[str, torch.Tensor]:
         if self.extract_feats_in_collect_stats:
-            feats, _, feats_lengths, _ = self._extract_feats(speech, speech_lengths)
+            feats, _, feats_lengths, _ = self._extract_feats(speech, speech_original, speech_lengths)
         else:
             # Generate dummy stats if extract_feats_in_collect_stats is False
             logging.warning(
@@ -103,7 +104,7 @@ class ModNet(AbsESPnetModel):
         return {"feats": feats, "feats_lengths": feats_lengths}
 
     def encode(
-            self, speech: torch.Tensor, speech_lengths: torch.Tensor
+            self, speech: torch.Tensor, speech_original: torch.Tensor, speech_lengths: torch.Tensor
     ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
         """Frontend + Encoder. Note that this method is used by asr_inference.py
 
@@ -113,7 +114,8 @@ class ModNet(AbsESPnetModel):
         """
         with autocast(False):
             # 1. Extract feats
-            feats_dropout, feats_original, feats_lengths, dropout_mask = self._extract_feats(speech, speech_lengths)
+            feats_dropout, feats_original, feats_lengths, dropout_mask = self._extract_feats(speech, speech_original,
+                                                                                             speech_lengths)
 
         # 2. Forward encoder
         # feats: (Batch, Length, Dim)
@@ -173,7 +175,6 @@ class ModNet(AbsESPnetModel):
 
     def _extract_feats(
             self, speech: torch.Tensor, speech_original: torch.Tensor, speech_lengths: torch.Tensor,
-            speech_original_lengths: torch.Tensor,
     ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
         assert speech_lengths.dim() == 1, speech_lengths.shape
 
