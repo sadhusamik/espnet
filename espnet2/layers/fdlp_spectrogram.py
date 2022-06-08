@@ -1088,7 +1088,7 @@ class fdlp_spectrogram_dropout(fdlp_spectrogram):
                  dropout_range_hz: str = '1,20',
                  dropout_width_hz: float = 1,
                  dropout_num: int = 3,
-                 dropout_frame_num: int = 1,
+                 dropout_frame_num: int = 2,
                  return_nondropout_spectrogram: bool = False,
                  return_dropout_mask: bool = False,
                  dropout_while_eval: bool = False,
