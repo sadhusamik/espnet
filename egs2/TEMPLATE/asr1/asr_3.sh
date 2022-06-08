@@ -40,7 +40,7 @@ expdir=exp           # Directory to save experiments.
 python=python3       # Specify python to execute espnet commands.
 
 # Front-end related
-asr_train_bin='espnet2.bin.cepnet_train'
+asr_train_bin='espnet2.bin.modnet_train'
 
 # Data preparation related
 local_data_opts= # The options given to local/data.sh.
