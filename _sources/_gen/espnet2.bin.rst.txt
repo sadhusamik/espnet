@@ -344,3 +344,14 @@ espnet2.bin.hubert_train
     :undoc-members:
     :show-inheritance:
 
+
+.. _espnet2.bin.modnet_train:
+
+espnet2.bin.modnet_train
+------------------------
+
+.. automodule:: espnet2.bin.modnet_train
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
