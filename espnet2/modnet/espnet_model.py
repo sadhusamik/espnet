@@ -86,9 +86,9 @@ class ModNet(AbsESPnetModel):
     def collect_feats(
             self,
             speech: torch.Tensor,
+            speech_original: torch.Tensor,
             speech_lengths: torch.Tensor,
-            text: torch.Tensor,
-            text_lengths: torch.Tensor,
+            speech_original_lengths: torch.Tensor,
     ) -> Dict[str, torch.Tensor]:
         if self.extract_feats_in_collect_stats:
             feats, _, feats_lengths, _ = self._extract_feats(speech, speech_lengths)
