@@ -1225,7 +1225,7 @@ class fdlp_spectrogram_dropout(fdlp_spectrogram):
             modspec_ori = modspec_ori[:, :, :, 0:self.cut] * han_weight / ham_weight
             modspec_ori = torch.transpose(modspec_ori, 2,
                                           3)  # (batch x num_frames x int(self.fduration * self.frate) x n_filters)
-
+        print(modspec_ori.shape)
         if self.training or self.dropout_while_eval:
             # Do masking only during training
             if do_dropout:
