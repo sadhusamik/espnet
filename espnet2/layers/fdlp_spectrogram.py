@@ -1185,8 +1185,10 @@ class fdlp_spectrogram_dropout(fdlp_spectrogram):
         for idx in batch_idx:
             random_frame_idx.append(np.random.permutation(num_frames)[:dpfn])
 
-        # Compute DCT (olens remains the same)
-        frames = self.dct_type2(frames) / np.sqrt(2 * int(self.srate * self.fduration))
+        if self.complex_modulation:
+            frames = torch.fft.ifft(frames) * int(self.srate * self.fduration)
+        else:
+            frames = self.dct_type2(frames) / np.sqrt(2 * int(self.srate * self.fduration))
 
         # Put fbank, mask and lifter into proper device if they are already not there
         if self.fbank.device.type != input.device.type:
@@ -1219,8 +1221,12 @@ class fdlp_spectrogram_dropout(fdlp_spectrogram):
         if self.return_nondropout_spectrogram:
             # Original modulation spectrum
             modspec_ori = modspec * self.lifter  # (batch x num_frames x n_filters x num_modspec)
-            modspec_ori = torch.fft.fft(modspec_ori, 2 * int(
-                self.fduration * self.frate))  # (batch x num_frames x n_filters x int(self.fduration * self.frate))
+            if self.complex_modulation:
+                modspec_ori = torch.fft.fft(modspec_ori, 1 * int(
+                    self.fduration * self.frate))  # (batch x num_frames x n_filters x int(self.fduration * self.frate))
+            else:
+                modspec_ori = torch.fft.fft(modspec_ori, 2 * int(
+                    self.fduration * self.frate))  # (batch x num_frames x n_filters x int(self.fduration * self.frate))
             modspec_ori = torch.abs(torch.exp(modspec_ori))
             modspec_ori = modspec_ori[:, :, :, 0:self.cut] * han_weight / ham_weight
             modspec_ori = torch.transpose(modspec_ori, 2,
