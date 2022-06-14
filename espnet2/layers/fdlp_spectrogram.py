@@ -547,7 +547,7 @@ class fdlp_spectrogram(torch.nn.Module):
 
         # OVERLAP AND ADD
         if self.feature_batch is not None:
-            modspec = self.OLA(modspec=modspec, t_samples=int(t_samples * num_batch / self.feature_batch),
+            modspec = self.OLA(modspec=modspec, t_samples=int(np.ceil((t_samples * num_batch / self.feature_batch))),
                                dtype=input.dtype, device=input.device)
         else:
             modspec = self.OLA(modspec=modspec, t_samples=t_samples, dtype=input.dtype, device=input.device)
