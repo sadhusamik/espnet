@@ -508,7 +508,8 @@
                 <span class="k">if</span> <span class="n">div_reminder</span> <span class="o">&lt;</span> <span class="nb">int</span><span class="p">(</span><span class="n">div_req</span> <span class="o">/</span> <span class="mi">2</span><span class="p">):</span>
                     <span class="n">signal</span> <span class="o">=</span> <span class="n">signal</span><span class="p">[:</span><span class="o">-</span><span class="n">div_reminder</span><span class="p">]</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">signal</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">signal</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">div_req</span> <span class="o">-</span> <span class="n">div_reminder</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">signal</span><span class="o">.</span><span class="n">device</span><span class="p">)])</span>
+                    <span class="n">signal</span> <span class="o">=</span> <span class="n">signal</span><span class="p">[:</span><span class="o">-</span><span class="n">div_reminder</span><span class="p">]</span>
+                    <span class="c1">#signal = torch.cat([signal, torch.zeros(div_req - div_reminder, device=signal.device)])</span>
             <span class="n">signal</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_batch</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
 
         <span class="c1"># signal = torch.nn.functional.pad(signal.unsqueeze(1), (extend, extend), mode=&#39;constant&#39;, value=0.0).squeeze(1)</span>
@@ -699,6 +700,9 @@
         <span class="n">modspec</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">modspec</span><span class="p">))</span>
         <span class="n">modspec</span> <span class="o">=</span> <span class="n">modspec</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">cut</span><span class="p">]</span> <span class="o">*</span> <span class="n">han_weight</span> <span class="o">/</span> <span class="n">ham_weight</span>
         <span class="n">modspec</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">modspec</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>  <span class="c1"># (batch x num_frames x int(self.fduration * self.frate) x n_filters)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="n">modspec</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">num_batch</span><span class="p">)</span>
 
         <span class="c1"># OVERLAP AND ADD</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_batch</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
