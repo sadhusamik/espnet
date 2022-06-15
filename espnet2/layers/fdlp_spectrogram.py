@@ -409,7 +409,7 @@ class fdlp_spectrogram(torch.nn.Module):
 
         num_batch = modspec.shape[0]
         num_frames = modspec.shape[1]
-        feats = torch.zeros((num_batch, int(np.ceil(t_samples * self.frate / self.srate))+50, self.n_filters), dtype=dtype,
+        feats = torch.zeros((num_batch, int(np.ceil(t_samples * self.frate / self.srate))+60, self.n_filters), dtype=dtype,
                             device=device)
         ptr = int(0)
         ### Overlap and Add stage
