@@ -976,7 +976,9 @@ if ! "${skip_train}"; then
                 --collect_stats true \
                 --use_preprocessor true \
                 --train_data_path_and_name_and_type "${_asr_train_dir}/${_scp},speech,${_type}" \
+                --train_data_path_and_name_and_type "${_asr_train_dir}/${_scp},speech_original,${_type}" \
                 --valid_data_path_and_name_and_type "${_asr_valid_dir}/${_scp},speech,${_type}" \
+                --valid_data_path_and_name_and_type "${_asr_valid_dir}/${_scp},speech_original,${_type}" \
                 --train_shape_file "${_logdir}/train.JOB.scp" \
                 --valid_shape_file "${_logdir}/valid.JOB.scp" \
                 --output_dir "${_logdir}/stats.JOB" \
@@ -1064,7 +1066,9 @@ if ! "${skip_train}"; then
 
         else
             _opts+="--train_data_path_and_name_and_type ${_asr_train_dir}/${_scp},speech,${_type} "
+            _opts+="--train_data_path_and_name_and_type ${_asr_train_dir}/${_scp},speech_original,${_type} "
             _opts+="--train_shape_file ${asr_stats_dir}/train/speech_shape "
+            _opts+="--train_shape_file ${asr_stats_dir}/train/speech_original_shape "
         fi
 
         log "Generate '${asr_exp}/run.sh'. You can resume the process from stage 11 using this script"
@@ -1090,7 +1094,9 @@ if ! "${skip_train}"; then
             ${python} -m ${asr_train_bin} \
                 --use_preprocessor true \
                 --valid_data_path_and_name_and_type "${_asr_valid_dir}/${_scp},speech,${_type}" \
+                --valid_data_path_and_name_and_type "${_asr_valid_dir}/${_scp},speech_original,${_type}" \
                 --valid_shape_file "${asr_stats_dir}/valid/speech_shape" \
+                --valid_shape_file "${asr_stats_dir}/valid/speech_original_shape" \
                 --resume true \
                 --init_param ${pretrained_model} \
                 --ignore_init_mismatch ${ignore_init_mismatch} \
