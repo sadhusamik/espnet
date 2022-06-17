@@ -517,7 +517,7 @@ if ! "${skip_data_prep}"; then
                     _suf=""
                 fi
                 # 1. Copy datadir
-                utils/copy_data_dir.sh --validate_opts --non-print data/"${dset}" "${data_feats}${_suf}/${dset}"
+                utils/copy_data_dir.sh  data/"${dset}" "${data_feats}${_suf}/${dset}"
 
                 # 2. Feature extract
                 _nj=$(min "${nj}" "$(<"${data_feats}${_suf}/${dset}/utt2spk" wc -l)")
@@ -580,7 +580,7 @@ if ! "${skip_data_prep}"; then
         for dset in "${train_set}" "${valid_set}"; do
 
             # Copy data dir
-            utils/copy_data_dir.sh --validate_opts --non-print "${data_feats}/org/${dset}" "${data_feats}/${dset}"
+            utils/copy_data_dir.sh  "${data_feats}/org/${dset}" "${data_feats}/${dset}"
             cp "${data_feats}/org/${dset}/feats_type" "${data_feats}/${dset}/feats_type"
 
             # Remove short utterances
@@ -993,13 +993,13 @@ if ! "${skip_train}"; then
         ${python} -m espnet2.bin.aggregate_stats_dirs ${_opts} --output_dir "${asr_stats_dir}"
 
         # Append the num-tokens at the last dimensions. This is used for batch-bins count
-        <"${asr_stats_dir}/train/text_shape" \
-            awk -v N="$(<${token_list} wc -l)" '{ print $0 "," N }' \
-            >"${asr_stats_dir}/train/text_shape.${token_type}"
+        #<"${asr_stats_dir}/train/text_shape" \
+        #    awk -v N="$(<${token_list} wc -l)" '{ print $0 "," N }' \
+        #    >"${asr_stats_dir}/train/text_shape.${token_type}"
 
-        <"${asr_stats_dir}/valid/text_shape" \
-            awk -v N="$(<${token_list} wc -l)" '{ print $0 "," N }' \
-            >"${asr_stats_dir}/valid/text_shape.${token_type}"
+        #<"${asr_stats_dir}/valid/text_shape" \
+        #    awk -v N="$(<${token_list} wc -l)" '{ print $0 "," N }' \
+        #    >"${asr_stats_dir}/valid/text_shape.${token_type}"
     fi
 
 
