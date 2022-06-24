@@ -226,7 +226,7 @@ class CepNet(AbsESPnetModel):
         speech = speech[a, :]
         speech_original = speech_original[a, :]
 
-        #if sig_len > self.nfft:
+        # if sig_len > self.nfft:
         #    rand_loc = int(np.random.choice(sig_len - self.nfft - 1, 1))
         #    speech = speech[:, rand_loc:rand_loc + self.nfft]
         #    speech_original = speech_original[:, rand_loc:rand_loc + self.nfft]
@@ -259,6 +259,43 @@ class CepNet(AbsESPnetModel):
         # force_gatherable: to-device and to-tensor if scalar for DataParallel
         loss, stats, weight = force_gatherable((loss, stats, batch_size), loss.device)
         return loss, stats, weight
+
+    def clean_up(
+            self,
+            speech: torch.Tensor,
+            speech_lengths: torch.Tensor,
+    ) :
+        """Frontend + Encoder + Calc loss
+
+        Args:
+            speech: (Batch, Length, ...)
+            speech_lengths: (Batch, )
+
+        """
+
+        batch_size = speech.shape[0]
+        sig_len = speech.shape[1]
+
+        speech = self.get_frames(speech)  # Batch x frame_num x frame_dimension
+        frame_num = speech.shape[1]
+        speech = torch.reshape(speech, (-1, speech.shape[-1]))  # Batch * frame_num x frame_dimension
+
+        speech = torch.fft.fft(speech, n=self.nfft)  # Batch * frame_num x nfft
+
+        # 1. Encoder for real and imaginary parts
+        ll = torch.Tensor([int(self.nfft / 2) + 1] * speech.shape[0])
+        encoder_out, _, _ = self.encoder(torch.view_as_real(speech[:, :int(self.nfft / 2) + 1]), ll)
+
+        encoder_out = self.projector(encoder_out)
+        encoder_out = torch.cat((encoder_out, torch.flip(encoder_out[:, :-2], [1])), dim=1)
+        encoder_out[:, int(self.nfft / 2) + 1:, 1] = -encoder_out[:, int(self.nfft / 2) + 1:, 1]
+
+        encoder_out = torch.view_as_complex(encoder_out)
+
+        speech = torch.fft.ifft(encoder_out)  # Batch * frame_num x nfft
+        speech = torch.reshape(speech, (batch_size, frame_num, -1))  # Batch x frame_num x frame_dimension
+
+        return speech
 
     def collect_feats(
             self,
