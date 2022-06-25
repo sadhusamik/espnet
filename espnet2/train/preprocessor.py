@@ -1,3 +1,4 @@
+import sys
 from abc import ABC
 from abc import abstractmethod
 from pathlib import Path
@@ -414,6 +415,8 @@ class CommonPreprocessorPairedSpeech(AbsPreprocessor):
     ) -> Dict[str, np.ndarray]:
         assert check_argument_types()
         data['speech_original'] = copy.deepcopy(data[self.speech_name])
+        print(np.max( data['speech_original']))
+        sys.stdout.flush()
         if self.speech_name in data:
             if self.train and self.rirs is not None and self.noises is not None:
                 speech = data[self.speech_name]
@@ -426,7 +429,9 @@ class CommonPreprocessorPairedSpeech(AbsPreprocessor):
                     speech = speech.T
                 # Calc power on non shlence region
                 power = (speech[detect_non_silence(speech)] ** 2).mean()
-
+                print('speech shape')
+                print(speech.shape)
+                sys.stdout.flush()
                 # 1. Convolve RIR
                 if self.rirs is not None and self.rir_apply_prob >= np.random.random():
                     rir_path = np.random.choice(self.rirs)
@@ -437,7 +442,9 @@ class CommonPreprocessorPairedSpeech(AbsPreprocessor):
 
                         # rir: (Nmic, Time)
                         rir = rir.T
-
+                        print('rir shape')
+                        print(rir.shape)
+                        sys.stdout.flush()
                         # speech: (Nmic, Time)
                         # Note that this operation doesn't change the signal length
                         speech = scipy.signal.convolve(speech, rir, mode="full")[
