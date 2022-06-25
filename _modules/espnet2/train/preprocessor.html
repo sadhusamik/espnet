@@ -597,9 +597,7 @@
 
                         <span class="c1"># rir: (Nmic, Time)</span>
                         <span class="n">rir</span> <span class="o">=</span> <span class="n">rir</span><span class="o">.</span><span class="n">T</span>
-                        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;rir shape&#39;</span><span class="p">)</span>
-                        <span class="nb">print</span><span class="p">(</span><span class="n">rir</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-                        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
                         <span class="c1"># speech: (Nmic, Time)</span>
                         <span class="c1"># Note that this operation doesn&#39;t change the signal length</span>
                         <span class="n">speech</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">speech</span><span class="p">,</span> <span class="n">rir</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;full&quot;</span><span class="p">)[</span>
