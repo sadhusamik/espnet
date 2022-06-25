@@ -442,9 +442,7 @@ class CommonPreprocessorPairedSpeech(AbsPreprocessor):
 
                         # rir: (Nmic, Time)
                         rir = rir.T
-                        print('rir shape')
-                        print(rir.shape)
-                        sys.stdout.flush()
+
                         # speech: (Nmic, Time)
                         # Note that this operation doesn't change the signal length
                         speech = scipy.signal.convolve(speech, rir, mode="full")[
