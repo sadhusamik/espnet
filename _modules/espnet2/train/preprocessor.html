@@ -570,8 +570,8 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
         <span class="k">assert</span> <span class="n">check_argument_types</span><span class="p">()</span>
         <span class="n">data</span><span class="p">[</span><span class="s1">&#39;speech_original&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">speech_name</span><span class="p">])</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;speech_original&#39;</span><span class="p">]))</span>
-        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+        <span class="c1">#print(np.max( data[&#39;speech_original&#39;]))</span>
+        <span class="c1">#sys.stdout.flush()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">speech_name</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">train</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">rirs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">noises</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">speech</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">speech_name</span><span class="p">]</span>
@@ -584,9 +584,9 @@
                     <span class="n">speech</span> <span class="o">=</span> <span class="n">speech</span><span class="o">.</span><span class="n">T</span>
                 <span class="c1"># Calc power on non shlence region</span>
                 <span class="n">power</span> <span class="o">=</span> <span class="p">(</span><span class="n">speech</span><span class="p">[</span><span class="n">detect_non_silence</span><span class="p">(</span><span class="n">speech</span><span class="p">)]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;speech shape&#39;</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="n">speech</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-                <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+                <span class="c1">#print(&#39;speech shape&#39;)</span>
+                <span class="c1">#print(speech.shape)</span>
+                <span class="c1">#sys.stdout.flush()</span>
                 <span class="c1"># 1. Convolve RIR</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rirs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">rir_apply_prob</span> <span class="o">&gt;=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">():</span>
                     <span class="n">rir_path</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rirs</span><span class="p">)</span>
@@ -606,9 +606,9 @@
                         <span class="c1"># Reverse mean power to the original power</span>
                         <span class="n">power2</span> <span class="o">=</span> <span class="p">(</span><span class="n">speech</span><span class="p">[</span><span class="n">detect_non_silence</span><span class="p">(</span><span class="n">speech</span><span class="p">)]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
                         <span class="n">speech</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">power</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="n">power2</span><span class="p">,</span> <span class="mf">1e-10</span><span class="p">))</span> <span class="o">*</span> <span class="n">speech</span>
-                        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;final speech shape&#39;</span><span class="p">)</span>
-                        <span class="nb">print</span><span class="p">(</span><span class="n">speech</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-                        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+                        <span class="c1">#print(&#39;final speech shape&#39;)</span>
+                        <span class="c1">#print(speech.shape)</span>
+                        <span class="c1">#sys.stdout.flush()</span>
                 <span class="c1"># 2. Add Noise</span>
                 <span class="k">if</span> <span class="p">(</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">noises</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>

@@ -363,7 +363,12 @@
 <span class="sd">            speech_lengths: (Batch, )</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;speech shape&#39;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">speech</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;speech original shape&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">speech_original</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
         <span class="n">batch_size</span> <span class="o">=</span> <span class="n">speech</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">sig_len</span> <span class="o">=</span> <span class="n">speech</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
