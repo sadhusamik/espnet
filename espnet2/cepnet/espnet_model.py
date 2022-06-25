@@ -295,7 +295,7 @@ class CepNet(AbsESPnetModel):
         speech = torch.real(torch.fft.ifft(speech / encoder_out))  # Batch * frame_num x nfft
         speech = torch.reshape(speech, (batch_size, frame_num, -1))  # Batch x frame_num x frame_dimension
 
-        return speech
+        return encoder_out, speech
 
     def collect_feats(
             self,
