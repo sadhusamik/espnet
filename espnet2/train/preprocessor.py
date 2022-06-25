@@ -418,7 +418,7 @@ class CommonPreprocessorPairedSpeech(AbsPreprocessor):
         print(np.max( data['speech_original']))
         sys.stdout.flush()
         if self.speech_name in data:
-            if self.train and self.rirs is not None and self.noises is not None:
+            if self.train and self.rirs is not None or self.noises is not None:
                 speech = data[self.speech_name]
                 nsamples = len(speech)
 
