@@ -415,8 +415,8 @@ class CommonPreprocessorPairedSpeech(AbsPreprocessor):
     ) -> Dict[str, np.ndarray]:
         assert check_argument_types()
         data['speech_original'] = copy.deepcopy(data[self.speech_name])
-        print(np.max( data['speech_original']))
-        sys.stdout.flush()
+        #print(np.max( data['speech_original']))
+        #sys.stdout.flush()
         if self.speech_name in data:
             if self.train and self.rirs is not None or self.noises is not None:
                 speech = data[self.speech_name]
@@ -429,9 +429,9 @@ class CommonPreprocessorPairedSpeech(AbsPreprocessor):
                     speech = speech.T
                 # Calc power on non shlence region
                 power = (speech[detect_non_silence(speech)] ** 2).mean()
-                print('speech shape')
-                print(speech.shape)
-                sys.stdout.flush()
+                #print('speech shape')
+                #print(speech.shape)
+                #sys.stdout.flush()
                 # 1. Convolve RIR
                 if self.rirs is not None and self.rir_apply_prob >= np.random.random():
                     rir_path = np.random.choice(self.rirs)
@@ -451,9 +451,9 @@ class CommonPreprocessorPairedSpeech(AbsPreprocessor):
                         # Reverse mean power to the original power
                         power2 = (speech[detect_non_silence(speech)] ** 2).mean()
                         speech = np.sqrt(power / max(power2, 1e-10)) * speech
-                        print('final speech shape')
-                        print(speech.shape)
-                        sys.stdout.flush()
+                        #print('final speech shape')
+                        #print(speech.shape)
+                        #sys.stdout.flush()
                 # 2. Add Noise
                 if (
                         self.noises is not None
