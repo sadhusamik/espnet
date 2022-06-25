@@ -453,7 +453,9 @@ class CommonPreprocessorPairedSpeech(AbsPreprocessor):
                         # Reverse mean power to the original power
                         power2 = (speech[detect_non_silence(speech)] ** 2).mean()
                         speech = np.sqrt(power / max(power2, 1e-10)) * speech
-
+                        print('final speech shape')
+                        print(speech.shape)
+                        sys.stdout.flush()
                 # 2. Add Noise
                 if (
                         self.noises is not None
