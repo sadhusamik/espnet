@@ -419,7 +419,7 @@
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">speech</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
             <span class="n">speech_lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
-    <span class="p">)</span> <span class="p">:</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Frontend + Encoder + Calc loss</span>
 
 <span class="sd">        Args:</span>
@@ -447,7 +447,7 @@
 
         <span class="n">encoder_out</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">view_as_complex</span><span class="p">(</span><span class="n">encoder_out</span><span class="p">)</span>
 
-        <span class="n">speech</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifft</span><span class="p">(</span><span class="n">encoder_out</span><span class="p">)</span>  <span class="c1"># Batch * frame_num x nfft</span>
+        <span class="n">speech</span> <span class="o">=</span> <span class="n">speech</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifft</span><span class="p">(</span><span class="n">encoder_out</span><span class="p">)</span>  <span class="c1"># Batch * frame_num x nfft</span>
         <span class="n">speech</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">speech</span><span class="p">,</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">frame_num</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>  <span class="c1"># Batch x frame_num x frame_dimension</span>
 
         <span class="k">return</span> <span class="n">speech</span></div>
