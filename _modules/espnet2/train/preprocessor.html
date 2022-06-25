@@ -608,7 +608,9 @@
                         <span class="c1"># Reverse mean power to the original power</span>
                         <span class="n">power2</span> <span class="o">=</span> <span class="p">(</span><span class="n">speech</span><span class="p">[</span><span class="n">detect_non_silence</span><span class="p">(</span><span class="n">speech</span><span class="p">)]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
                         <span class="n">speech</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">power</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="n">power2</span><span class="p">,</span> <span class="mf">1e-10</span><span class="p">))</span> <span class="o">*</span> <span class="n">speech</span>
-
+                        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;final speech shape&#39;</span><span class="p">)</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="n">speech</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+                        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
                 <span class="c1"># 2. Add Noise</span>
                 <span class="k">if</span> <span class="p">(</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">noises</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
