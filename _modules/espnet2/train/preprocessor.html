@@ -153,7 +153,8 @@
            <div itemprop="articleBody">
              
   <h1>Source code for espnet2.train.preprocessor</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span>
+<span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span>
 <span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">abstractmethod</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Collection</span>
@@ -569,6 +570,8 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
         <span class="k">assert</span> <span class="n">check_argument_types</span><span class="p">()</span>
         <span class="n">data</span><span class="p">[</span><span class="s1">&#39;speech_original&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">speech_name</span><span class="p">])</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;speech_original&#39;</span><span class="p">]))</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">speech_name</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">train</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">rirs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">noises</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">speech</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">speech_name</span><span class="p">]</span>
@@ -581,7 +584,9 @@
                     <span class="n">speech</span> <span class="o">=</span> <span class="n">speech</span><span class="o">.</span><span class="n">T</span>
                 <span class="c1"># Calc power on non shlence region</span>
                 <span class="n">power</span> <span class="o">=</span> <span class="p">(</span><span class="n">speech</span><span class="p">[</span><span class="n">detect_non_silence</span><span class="p">(</span><span class="n">speech</span><span class="p">)]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;speech shape&#39;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">speech</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
                 <span class="c1"># 1. Convolve RIR</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rirs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">rir_apply_prob</span> <span class="o">&gt;=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">():</span>
                     <span class="n">rir_path</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rirs</span><span class="p">)</span>
@@ -592,7 +597,9 @@
 
                         <span class="c1"># rir: (Nmic, Time)</span>
                         <span class="n">rir</span> <span class="o">=</span> <span class="n">rir</span><span class="o">.</span><span class="n">T</span>
-
+                        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;rir shape&#39;</span><span class="p">)</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="n">rir</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+                        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
                         <span class="c1"># speech: (Nmic, Time)</span>
                         <span class="c1"># Note that this operation doesn&#39;t change the signal length</span>
                         <span class="n">speech</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">speech</span><span class="p">,</span> <span class="n">rir</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;full&quot;</span><span class="p">)[</span>
