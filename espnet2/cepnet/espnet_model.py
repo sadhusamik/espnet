@@ -208,6 +208,7 @@ class CepNet(AbsESPnetModel):
             speech_lengths: (Batch, )
 
         """
+        speech = speech[:, :, -1]
         print('speech shape')
         print(speech.shape)
         sys.stdout.flush()
