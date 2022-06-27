@@ -235,6 +235,13 @@ class CepNet(AbsESPnetModel):
 
         speech = torch.log(torch.fft.fft(speech, n=self.nfft))  # Batch * frame_num x nfft
         speech_original = torch.log(torch.fft.fft(speech_original, n=self.nfft))  # Batch * frame_num x nfft
+        print('max and min of speech')
+        print(torch.max(speech))
+        print(torch.min(speech))
+
+        print('max and min of speech original')
+        print(torch.max(speech_original))
+        print(torch.min(speech_original))
 
         # 1. Encoder for real and imaginary parts
         ll = torch.Tensor([int(self.nfft / 2) + 1] * speech.shape[0])
