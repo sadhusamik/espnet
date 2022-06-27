@@ -233,8 +233,8 @@ class CepNet(AbsESPnetModel):
         #    speech = speech[:, rand_loc:rand_loc + self.nfft]
         #    speech_original = speech_original[:, rand_loc:rand_loc + self.nfft]
 
-        speech = torch.fft.fft(speech, n=self.nfft)  # Batch * frame_num x nfft
-        speech_original = torch.fft.fft(speech_original, n=self.nfft)  # Batch * frame_num x nfft
+        speech = torch.log(torch.fft.fft(speech, n=self.nfft))  # Batch * frame_num x nfft
+        speech_original = torch.log(torch.fft.fft(speech_original, n=self.nfft))  # Batch * frame_num x nfft
 
         # 1. Encoder for real and imaginary parts
         ll = torch.Tensor([int(self.nfft / 2) + 1] * speech.shape[0])
@@ -249,8 +249,8 @@ class CepNet(AbsESPnetModel):
         # loss = self.prediction_loss(speech_original[:, :self.nfft],
         #                            torch.real(torch.fft.ifft(fft_signal / encoder_out))[:, :, 0])
 
-        loss1 = self.prediction_loss(torch.real(speech_original), torch.real(speech / encoder_out))
-        loss2 = self.prediction_loss(torch.imag(speech_original), torch.imag(speech / encoder_out))
+        loss1 = self.prediction_loss(torch.real(speech_original), torch.real(speech - encoder_out))
+        loss2 = self.prediction_loss(torch.imag(speech_original), torch.imag(speech - encoder_out))
 
         loss = loss2 + loss1
 
