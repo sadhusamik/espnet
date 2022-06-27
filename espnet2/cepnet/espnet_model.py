@@ -241,16 +241,6 @@ class CepNet(AbsESPnetModel):
             torch.imag(speech_original), min=-20,
             max=20)
 
-        print('max and min of speech')
-        print(torch.max(torch.abs(speech)))
-        print(torch.min(torch.abs(speech)))
-
-        print('max and min of speech original')
-        print(torch.max(torch.abs(speech_original)))
-        print(torch.min(torch.abs(speech_original)))
-
-        sys.stdout.flush()
-
         # 1. Encoder for real and imaginary parts
         ll = torch.Tensor([int(self.nfft / 2) + 1] * speech.shape[0])
         encoder_out, _, _ = self.encoder(torch.view_as_real(speech[:, :int(self.nfft / 2) + 1]), ll)
