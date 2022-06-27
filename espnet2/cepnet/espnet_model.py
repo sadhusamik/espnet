@@ -210,7 +210,6 @@ class CepNet(AbsESPnetModel):
         """
         speech = speech[:, :, -1]
 
-
         batch_size = speech.shape[0]
         sig_len = speech.shape[1]
 
@@ -235,6 +234,13 @@ class CepNet(AbsESPnetModel):
 
         speech = torch.log(torch.fft.fft(speech, n=self.nfft))  # Batch * frame_num x nfft
         speech_original = torch.log(torch.fft.fft(speech_original, n=self.nfft))  # Batch * frame_num x nfft
+
+        speech = torch.clamp(torch.real(speech), min=-20, max=20) + 1j * torch.clamp(torch.imag(speech), min=-20,
+                                                                                     max=20)
+        speech_original = torch.clamp(torch.real(speech_original), min=-20, max=20) + 1j * torch.clamp(
+            torch.imag(speech_original), min=-20,
+            max=20)
+
         print('max and min of speech')
         print(torch.max(torch.abs(speech)))
         print(torch.min(torch.abs(speech)))
