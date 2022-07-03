@@ -353,8 +353,8 @@ class fdlp_spectrogram(torch.nn.Module):
                 if div_reminder < int(div_req / 2):
                     signal = signal[:-div_reminder]
                 else:
-                    signal = signal[:-div_reminder]
-                    #signal = torch.cat([signal, torch.zeros(div_req - div_reminder, device=signal.device)])
+                    #signal = signal[:-div_reminder]
+                    signal = torch.cat([signal, torch.zeros(div_req - div_reminder, device=signal.device)])
             signal = torch.reshape(signal, (self.feature_batch, -1))
 
         # signal = torch.nn.functional.pad(signal.unsqueeze(1), (extend, extend), mode='constant', value=0.0).squeeze(1)
@@ -409,7 +409,7 @@ class fdlp_spectrogram(torch.nn.Module):
 
         num_batch = modspec.shape[0]
         num_frames = modspec.shape[1]
-        feats = torch.zeros((num_batch, int(np.ceil(t_samples * self.frate / self.srate))+60, self.n_filters), dtype=dtype,
+        feats = torch.zeros((num_batch, int(np.ceil(t_samples * self.frate / self.srate)), self.n_filters), dtype=dtype,
                             device=device)
         ptr = int(0)
         ### Overlap and Add stage
