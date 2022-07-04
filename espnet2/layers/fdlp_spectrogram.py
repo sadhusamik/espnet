@@ -432,8 +432,8 @@ class fdlp_spectrogram(torch.nn.Module):
             if j == 0:
                 ptr = int(ptr + self.cut_overlap - self.cut_half)
             else:
-                # ptr = int(ptr + self.cut_overlap + randrange(2))
-                ptr = int(ptr + self.cut_overlap + 1)
+                ptr = int(ptr + self.cut_overlap + randrange(2))
+                #ptr = int(ptr + self.cut_overlap + 1)
 
         feats = torch.log(torch.clip(feats, max=None, min=0.0000001))
         feats = torch.nan_to_num(feats, nan=0.0000001, posinf=0.0000001, neginf=0.0000001)  # Probably not the best idea
