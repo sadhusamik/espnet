@@ -348,14 +348,15 @@ class fdlp_spectrogram(torch.nn.Module):
             sig_size = signal.shape[0] * signal.shape[1]
             div_req = self.feature_batch
             div_reminder = sig_size % div_req
+            signal = signal.flatten()
             if div_reminder != 0:
-                signal = signal.flatten()
                 if div_reminder < int(div_req / 2):
                     signal = signal[:-div_reminder]
                 else:
-                    #signal = signal[:-div_reminder]
                     signal = torch.cat([signal, torch.zeros(div_req - div_reminder, device=signal.device)])
             signal = torch.reshape(signal, (self.feature_batch, -1))
+
+        tsamples = signal.shape[1]
 
         # signal = torch.nn.functional.pad(signal.unsqueeze(1), (extend, extend), mode='constant', value=0.0).squeeze(1)
         signal = torch.nn.functional.pad(signal.unsqueeze(1), (extend, extend), mode='reflect').squeeze(1)
@@ -371,7 +372,7 @@ class fdlp_spectrogram(torch.nn.Module):
             idx += frate_samples
 
         frames = torch.cat(frames, dim=1)
-        return frames
+        return tsamples, frames
 
     def __warp_func_bark(self, x, warp_fact=1):
         import numpy as np
@@ -451,15 +452,19 @@ class fdlp_spectrogram(torch.nn.Module):
 
         """
 
-        t_samples = input.shape[1]
         num_batch = input.shape[0]
-        print('gola')
+        print('num_batch')
         print(num_batch)
         sys.stdout.flush()
         # First divide the signal into frames
 
-        frames = self.get_frames(input)
+        t_samples, frames = self.get_frames(input)
         num_frames = frames.shape[1]
+        print('t_samples')
+        print(t_samples)
+        print('num_frames')
+        print(num_frames)
+        sys.stdout.flush()
 
         # Compute DCT (olens remains the same)
         if self.complex_modulation:
@@ -548,17 +553,9 @@ class fdlp_spectrogram(torch.nn.Module):
         modspec = modspec[:, :, :, 0:self.cut] * han_weight / ham_weight
         modspec = torch.transpose(modspec, 2, 3)  # (batch x num_frames x int(self.fduration * self.frate) x n_filters)
 
-
         # OVERLAP AND ADD
-        print('ola')
-        print(int(np.ceil((t_samples * num_batch / self.feature_batch))))
-        sys.stdout.flush()
 
-        if self.feature_batch is not None:
-            modspec = self.OLA(modspec=modspec, t_samples=int(np.ceil((t_samples * num_batch / self.feature_batch))),
-                               dtype=input.dtype, device=input.device)
-        else:
-            modspec = self.OLA(modspec=modspec, t_samples=t_samples, dtype=input.dtype, device=input.device)
+        modspec = self.OLA(modspec=modspec, t_samples=t_samples, dtype=input.dtype, device=input.device)
 
         if self.feature_batch is not None:
             # Might not be equally divisible, deal with that
