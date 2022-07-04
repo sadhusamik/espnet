@@ -1169,7 +1169,7 @@ class fdlp_spectrogram_dropout(fdlp_spectrogram):
         num_batch = input.shape[0]
 
         # First divide the signal into frames
-        frames = self.get_frames(input)
+        t_samples, frames = self.get_frames(input)
         num_frames = frames.shape[1]
 
         # Get ids of frames to mask in each batch
