@@ -453,8 +453,8 @@ class fdlp_spectrogram(torch.nn.Module):
 
         t_samples = input.shape[1]
         num_batch = input.shape[0]
-        print(num_batch)
-        sys.stdout.flush()
+        #print(num_batch)
+        #sys.stdout.flush()
         # First divide the signal into frames
 
         frames = self.get_frames(input)
