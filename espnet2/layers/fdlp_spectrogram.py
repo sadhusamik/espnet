@@ -453,8 +453,9 @@ class fdlp_spectrogram(torch.nn.Module):
 
         t_samples = input.shape[1]
         num_batch = input.shape[0]
-        #print(num_batch)
-        #sys.stdout.flush()
+        print('gola')
+        print(num_batch)
+        sys.stdout.flush()
         # First divide the signal into frames
 
         frames = self.get_frames(input)
@@ -549,6 +550,10 @@ class fdlp_spectrogram(torch.nn.Module):
 
 
         # OVERLAP AND ADD
+        print('ola')
+        print(int(np.ceil((t_samples * num_batch / self.feature_batch))))
+        sys.stdout.flush()
+
         if self.feature_batch is not None:
             modspec = self.OLA(modspec=modspec, t_samples=int(np.ceil((t_samples * num_batch / self.feature_batch))),
                                dtype=input.dtype, device=input.device)
