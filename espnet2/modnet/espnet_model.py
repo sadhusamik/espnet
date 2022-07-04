@@ -136,6 +136,40 @@ class ModNet(AbsESPnetModel):
 
         return feats_dropout + encoder_out, encoder_out_lens, feats_original, dropout_mask
 
+    def analyze(
+            self, speech: torch.Tensor, speech_lengths: torch.Tensor
+    ):
+        """Frontend + Encoder. Note that this method is used by asr_inference.py
+
+        Args:
+            speech: (Batch, Length, ...)
+            speech_lengths: (Batch, )
+        """
+        with autocast(False):
+            # 1. Extract feats
+            feats_dropout, feats_original, feats_lengths, dropout_mask = self._extract_feats(speech, speech,
+                                                                                             speech_lengths)
+
+        # 2. Forward encoder
+        # feats: (Batch, Length, Dim)
+        # -> encoder_out: (Batch, Length2, Dim2)
+
+        encoder_out, encoder_out_lens, _ = self.encoder(feats_dropout, feats_lengths)
+
+        encoder_out, encoder_out_lens = self.projector(encoder_out, encoder_out_lens)
+
+        assert encoder_out.size(0) == speech.size(0), (
+            encoder_out.size(),
+            speech.size(0),
+        )
+        assert encoder_out.size(1) <= encoder_out_lens.max(), (
+            encoder_out.size(),
+            encoder_out_lens.max(),
+        )
+
+        return {'feats_dropout': feats_dropout, 'feats_original': feats_original, 'encoder_out': encoder_out,
+                'dropout_mask': dropout_mask}
+
     def asr_feats_encode(
             self, speech: torch.Tensor, speech_lengths: torch.Tensor,
     ) -> Tuple[torch.Tensor, torch.Tensor]:
