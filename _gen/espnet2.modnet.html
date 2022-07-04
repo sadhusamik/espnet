@@ -199,6 +199,20 @@
 <dd><p>Bases: <a class="reference internal" href="espnet2.train.html#espnet2.train.abs_espnet_model.AbsESPnetModel" title="espnet2.train.abs_espnet_model.AbsESPnetModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">espnet2.train.abs_espnet_model.AbsESPnetModel</span></code></a></p>
 <p>Self-supervised Modulation Net</p>
 <dl class="method">
+<dt id="espnet2.modnet.espnet_model.ModNet.analyze">
+<code class="sig-name descname">analyze</code><span class="sig-paren">(</span><em class="sig-param">speech: torch.Tensor</em>, <em class="sig-param">speech_lengths: torch.Tensor</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/modnet/espnet_model.html#ModNet.analyze"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.modnet.espnet_model.ModNet.analyze" title="Permalink to this definition">¶</a></dt>
+<dd><p>Frontend + Encoder. Note that this method is used by asr_inference.py</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>speech</strong> – (Batch, Length, …)</p></li>
+<li><p><strong>speech_lengths</strong> – (Batch, )</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="espnet2.modnet.espnet_model.ModNet.asr_feats_encode">
 <code class="sig-name descname">asr_feats_encode</code><span class="sig-paren">(</span><em class="sig-param">speech: torch.Tensor</em>, <em class="sig-param">speech_lengths: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, torch.Tensor]<a class="reference internal" href="../_modules/espnet2/modnet/espnet_model.html#ModNet.asr_feats_encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.modnet.espnet_model.ModNet.asr_feats_encode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Frontend + Encoder. Note that this method is used by asr_inference.py</p>
