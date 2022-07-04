@@ -453,18 +453,10 @@ class fdlp_spectrogram(torch.nn.Module):
         """
 
         num_batch = input.shape[0]
-        print('num_batch')
-        print(num_batch)
-        sys.stdout.flush()
         # First divide the signal into frames
 
         t_samples, frames = self.get_frames(input)
         num_frames = frames.shape[1]
-        print('t_samples')
-        print(t_samples)
-        print('num_frames')
-        print(num_frames)
-        sys.stdout.flush()
 
         # Compute DCT (olens remains the same)
         if self.complex_modulation:
