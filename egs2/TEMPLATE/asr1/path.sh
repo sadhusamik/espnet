@@ -1,5 +1,6 @@
 MAIN_ROOT=$PWD/../../..
 KALDI_ROOT=$MAIN_ROOT/tools/kaldi
+export LD_PRELOAD=/usr/lib64/libgfortran.so.3
 
 export PATH=$PWD/utils/:$KALDI_ROOT/tools/openfst/bin:$PATH
 [ ! -f $KALDI_ROOT/tools/config/common_path.sh ] && echo >&2 "The standard file $KALDI_ROOT/tools/config/common_path.sh is not present -> Exit!" && exit 1
