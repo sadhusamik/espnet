@@ -40,7 +40,7 @@ expdir=exp           # Directory to save experiments.
 python=python3       # Specify python to execute espnet commands.
 
 # Front-end related
-asr_train_bin='espnet2.bin.modnet_train'
+asr_train_bin='espnet2.bin.asr_train'
 
 # Data preparation related
 local_data_opts= # The options given to local/data.sh.
@@ -147,6 +147,9 @@ local_score_opts=          # The options given to local/score.sh.
 asr_speech_fold_length=800 # fold_length for speech data during ASR training.
 asr_text_fold_length=150   # fold_length for text data during ASR training.
 lm_fold_length=150         # fold_length for LM training.
+
+#feature_specific
+fdlp_conf=conf/fdlp_conf
 
 help_message=$(cat << EOF
 Usage: $0 --train-set "<train_set_name>" --valid-set "<valid_set_name>" --test_sets "<test_set_names>"
@@ -508,7 +511,7 @@ if ! "${skip_data_prep}"; then
 
                 echo "${feats_type}" > "${data_feats}${_suf}/${dset}/feats_type"
             done
-        elif [ "${feats_type}" = fdlp ]; then
+              elif [ "${feats_type}" = fdlp ]; then
             log "[Require fdlp_spectrogram] Stage 3: ${feats_type} extract: data/ -> ${data_feats}"
 
             for dset in "${train_set}" "${valid_set}" ${test_sets}; do
@@ -522,7 +525,7 @@ if ! "${skip_data_prep}"; then
 
                 # 2. Feature extract
                 _nj=$(min "${nj}" "$(<"${data_feats}${_suf}/${dset}/utt2spk" wc -l)")
-                fdlp_steps/make_modulation_feats.sh --nj "${_nj}" --cmd "${train_cmd}" "${data_feats}${_suf}/${dset}" "${data_feats}${_suf}/${dset}/data"
+                fdlp_steps/make_modulation_feats.sh --nj "${_nj}" --cmd "${train_cmd}" --conf_file ${fdlp_conf} "${data_feats}${_suf}/${dset}" "${data_feats}${_suf}/${dset}/data"
                 utils/fix_data_dir.sh "${data_feats}${_suf}/${dset}"
 
                 # 3. Derive the the frame length and feature dimension
@@ -1004,10 +1007,16 @@ if ! "${skip_train}"; then
             ${python} -m ${asr_train_bin} \
                 --collect_stats true \
                 --use_preprocessor true \
+                --bpemodel "${bpemodel}" \
+                --token_type "${token_type}" \
+                --token_list "${token_list}" \
+                --non_linguistic_symbols "${nlsyms_txt}" \
+                --cleaner "${cleaner}" \
+                --g2p "${g2p}" \
                 --train_data_path_and_name_and_type "${_asr_train_dir}/${_scp},speech,${_type}" \
-                --train_data_path_and_name_and_type "${_asr_train_dir}/${_scp},speech_original,${_type}" \
+                --train_data_path_and_name_and_type "${_asr_train_dir}/text,text,text" \
                 --valid_data_path_and_name_and_type "${_asr_valid_dir}/${_scp},speech,${_type}" \
-                --valid_data_path_and_name_and_type "${_asr_valid_dir}/${_scp},speech_original,${_type}" \
+                --valid_data_path_and_name_and_type "${_asr_valid_dir}/text,text,text" \
                 --train_shape_file "${_logdir}/train.JOB.scp" \
                 --valid_shape_file "${_logdir}/valid.JOB.scp" \
                 --output_dir "${_logdir}/stats.JOB" \
@@ -1063,6 +1072,10 @@ if ! "${skip_train}"; then
             _opts+="--input_size=${_input_size} "
 
         fi
+        if [ "${feats_normalize}" = global_mvn ]; then
+            # Default normalization is utterance_mvn and changes to global_mvn
+            _opts+="--normalize=global_mvn --normalize_conf stats_file=${asr_stats_dir}/train/feats_stats.npz "
+        fi
 
         if [ "${num_splits_asr}" -gt 1 ]; then
             # If you met a memory error when parsing text files, this option may help you.
@@ -1086,14 +1099,16 @@ if ! "${skip_train}"; then
             fi
 
             _opts+="--train_data_path_and_name_and_type ${_split_dir}/${_scp},speech,${_type} "
+            _opts+="--train_data_path_and_name_and_type ${_split_dir}/text,text,text "
             _opts+="--train_shape_file ${_split_dir}/speech_shape "
+            _opts+="--train_shape_file ${_split_dir}/text_shape.${token_type} "
             _opts+="--multiple_iterator true "
 
         else
             _opts+="--train_data_path_and_name_and_type ${_asr_train_dir}/${_scp},speech,${_type} "
-            _opts+="--train_data_path_and_name_and_type ${_asr_train_dir}/${_scp},speech_original,${_type} "
+            _opts+="--train_data_path_and_name_and_type ${_asr_train_dir}/text,text,text "
             _opts+="--train_shape_file ${asr_stats_dir}/train/speech_shape "
-            _opts+="--train_shape_file ${asr_stats_dir}/train/speech_original_shape "
+            _opts+="--train_shape_file ${asr_stats_dir}/train/text_shape.${token_type} "
         fi
 
         log "Generate '${asr_exp}/run.sh'. You can resume the process from stage 11 using this script"
@@ -1118,10 +1133,16 @@ if ! "${skip_train}"; then
             --multiprocessing_distributed true -- \
             ${python} -m ${asr_train_bin} \
                 --use_preprocessor true \
+                --bpemodel "${bpemodel}" \
+                --token_type "${token_type}" \
+                --token_list "${token_list}" \
+                --non_linguistic_symbols "${nlsyms_txt}" \
+                --cleaner "${cleaner}" \
+                --g2p "${g2p}" \
                 --valid_data_path_and_name_and_type "${_asr_valid_dir}/${_scp},speech,${_type}" \
-                --valid_data_path_and_name_and_type "${_asr_valid_dir}/${_scp},speech_original,${_type}" \
+                --valid_data_path_and_name_and_type "${_asr_valid_dir}/text,text,text" \
                 --valid_shape_file "${asr_stats_dir}/valid/speech_shape" \
-                --valid_shape_file "${asr_stats_dir}/valid/speech_original_shape" \
+                --valid_shape_file "${asr_stats_dir}/valid/text_shape.${token_type}" \
                 --resume true \
                 --init_param ${pretrained_model} \
                 --ignore_init_mismatch ${ignore_init_mismatch} \
@@ -1167,7 +1188,6 @@ if [ -n "${download_model}" ]; then
 
 fi
 
-exit 0;
 
 if ! "${skip_eval}"; then
     if [ ${stage} -le 12 ] && [ ${stop_stage} -ge 12 ]; then
