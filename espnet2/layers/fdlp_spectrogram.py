@@ -49,6 +49,7 @@ class fdlp_spectrogram(torch.nn.Module):
             concat_utts_before_frames: bool = False,
             feature_batch: int = None,
             fbank_config: str = '1,1,2.5',  # om_w,alpha,beta
+            spectral_substraction_vector: str = None,
             device: str = 'auto',
     ):
         assert check_argument_types()
@@ -181,6 +182,11 @@ class fdlp_spectrogram(torch.nn.Module):
                 self.lifter.requires_grad = True
 
         self.feature_batch = feature_batch
+        if spectral_substraction_vector is not None:
+            # Loading spectral substration vector
+            self.spectral_substraction_vector = pkl.load(open(spectral_substraction_vector, 'rb'))
+        else:
+            self.spectral_substraction_vector
 
     def dct_type2(self, input: torch.Tensor) -> torch.Tensor:
         """
@@ -433,7 +439,7 @@ class fdlp_spectrogram(torch.nn.Module):
                 ptr = int(ptr + self.cut_overlap - self.cut_half)
             else:
                 ptr = int(ptr + self.cut_overlap + randrange(2))
-                #ptr = int(ptr + self.cut_overlap + 1)
+                # ptr = int(ptr + self.cut_overlap + 1)
 
         feats = torch.log(torch.clip(feats, max=None, min=0.0000001))
         feats = torch.nan_to_num(feats, nan=0.0000001, posinf=0.0000001, neginf=0.0000001)  # Probably not the best idea
@@ -457,6 +463,8 @@ class fdlp_spectrogram(torch.nn.Module):
 
         t_samples, frames = self.get_frames(input)
         num_frames = frames.shape[1]
+        if self.spectral_substraction_vector is not None:
+            frames = self.spectral_substraction_preprocessing(frames)
 
         # Compute DCT (olens remains the same)
         if self.complex_modulation:
@@ -572,6 +580,22 @@ class fdlp_spectrogram(torch.nn.Module):
             olens = None
 
         return modspec, olens
+
+    def spectral_substraction_preprocessing(self, frames):
+        ori_len = frames.shape[-1]
+        if self.spectral_substraction_vector.shape[0] > frames.shape[-1]:
+            frames = np.concatenate([frames, np.zeros(
+                (frames.shape[0], frames.shape[1], self.spectral_substraction_vector.shape[0] - frames.shape[-1]))],
+                                    axis=-1)
+        else:
+            frames = frames[:, :0:self.spectral_substraction_vector.shape[0]]
+
+        frames_fft = torch.log(torch.fft.fft(frames))
+        #frames_fft_ph = np.unwrap(np.imag(frames_fft))
+        #frames_fft = np.real(frames_fft) + 1j * frames_fft_ph
+        frames_fft = torch.real(torch.fft.ifft(np.exp(frames_fft - self.spectral_substraction_vector)))
+
+        return frames_fft[:, :, :ori_len]
 
     def forward(self, input: torch.Tensor, ilens: torch.Tensor = None
                 ) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
