@@ -184,9 +184,9 @@ class fdlp_spectrogram(torch.nn.Module):
         self.feature_batch = feature_batch
         if spectral_substraction_vector is not None:
             # Loading spectral substration vector
-            self.spectral_substraction_vector = pkl.load(open(spectral_substraction_vector, 'rb'))
+            self.spectral_substraction_vector = torch.tensor(pkl.load(open(spectral_substraction_vector, 'rb')))
         else:
-            self.spectral_substraction_vector
+            self.spectral_substraction_vector = None
 
     def dct_type2(self, input: torch.Tensor) -> torch.Tensor:
         """
@@ -464,6 +464,7 @@ class fdlp_spectrogram(torch.nn.Module):
         t_samples, frames = self.get_frames(input)
         num_frames = frames.shape[1]
         if self.spectral_substraction_vector is not None:
+            self.spectral_substraction_vector = self.spectral_substraction_vector.to(input.device)
             frames = self.spectral_substraction_preprocessing(frames)
 
         # Compute DCT (olens remains the same)
@@ -591,8 +592,8 @@ class fdlp_spectrogram(torch.nn.Module):
             frames = frames[:, :0:self.spectral_substraction_vector.shape[0]]
 
         frames_fft = torch.log(torch.fft.fft(frames))
-        #frames_fft_ph = np.unwrap(np.imag(frames_fft))
-        #frames_fft = np.real(frames_fft) + 1j * frames_fft_ph
+        # frames_fft_ph = np.unwrap(np.imag(frames_fft))
+        # frames_fft = np.real(frames_fft) + 1j * frames_fft_ph
         frames_fft = torch.real(torch.fft.ifft(np.exp(frames_fft - self.spectral_substraction_vector)))
 
         return frames_fft[:, :, :ori_len]
