@@ -65,6 +65,7 @@ class RobustFrontend(AbsFrontend):
             freeze_lifter_finetune_updates: int = None,
             fbank_config: str = '1,1,2.5',
             feature_batch: int = None,
+            spectral_substraction_vector: str =None,
             fs: Union[int, str] = 16000,
             frontend_conf: Optional[dict] = get_default_kwargs(Frontend),
     ):
@@ -150,6 +151,7 @@ class RobustFrontend(AbsFrontend):
                                                      lifter_nonlinear_transformation=lifter_nonlinear_transformation,
                                                      fbank_config=fbank_config,
                                                      feature_batch=feature_batch,
+                                                     spectral_substraction_vector=spectral_substraction_vector,
                                                      do_bwe=do_bwe, bwe_factor=bwe_factor, bwe_iter_num=bwe_iter_num,
                                                      precision_lpc=precision_lpc, device=device)
 
