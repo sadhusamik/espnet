@@ -465,7 +465,7 @@ class fdlp_spectrogram(torch.nn.Module):
         num_frames = frames.shape[1]
         if self.spectral_substraction_vector is not None:
             self.spectral_substraction_vector = self.spectral_substraction_vector.to(input.device)
-            logging.info('Substracting spectral vector')
+            #logging.info('Substracting spectral vector')
             frames = self.spectral_substraction_preprocessing(frames)
 
         # Compute DCT (olens remains the same)
