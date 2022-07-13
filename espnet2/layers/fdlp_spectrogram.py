@@ -595,7 +595,7 @@ class fdlp_spectrogram(torch.nn.Module):
         frames_fft = torch.log(torch.fft.fft(frames))
         # frames_fft_ph = np.unwrap(np.imag(frames_fft))
         # frames_fft = np.real(frames_fft) + 1j * frames_fft_ph
-        frames_fft = torch.real(torch.fft.ifft(np.exp(frames_fft - self.spectral_substraction_vector)))
+        frames_fft = torch.real(torch.fft.ifft(torch.exp(frames_fft - self.spectral_substraction_vector)))
 
         return frames_fft[:, :, :ori_len]
 
