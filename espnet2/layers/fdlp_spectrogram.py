@@ -587,7 +587,7 @@ class fdlp_spectrogram(torch.nn.Module):
         ori_len = frames.shape[-1]
         if self.spectral_substraction_vector.shape[0] > frames.shape[-1]:
             frames = torch.cat((frames, torch.zeros(
-                frames.shape[0], frames.shape[1], self.spectral_substraction_vector.shape[0] - frames.shape[-1])),
+                frames.shape[0], frames.shape[1], self.spectral_substraction_vector.shape[0] - frames.shape[-1],device=frames.device)),
                                dim=-1)
         else:
             frames = frames[:, :0:self.spectral_substraction_vector.shape[0]]
