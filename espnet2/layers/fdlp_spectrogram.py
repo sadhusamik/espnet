@@ -477,6 +477,8 @@ class fdlp_spectrogram(torch.nn.Module):
             self.spectral_substraction_vector = self.spectral_substraction_vector.to(input.device)
             # logging.info('Substracting spectral vector')
             frames = self.spectral_substraction_preprocessing(frames)
+        print('ssv')
+        print(self.spectral_substraction_vector)
 
         print('after')
         print(torch.min(frames))
