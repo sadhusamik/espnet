@@ -66,6 +66,7 @@ class RobustFrontend(AbsFrontend):
             fbank_config: str = '1,1,2.5',
             feature_batch: int = None,
             spectral_substraction_vector: str =None,
+            dereverb_whole_sentence: bool = False,
             fs: Union[int, str] = 16000,
             frontend_conf: Optional[dict] = get_default_kwargs(Frontend),
     ):
@@ -152,6 +153,7 @@ class RobustFrontend(AbsFrontend):
                                                      fbank_config=fbank_config,
                                                      feature_batch=feature_batch,
                                                      spectral_substraction_vector=spectral_substraction_vector,
+                                                     dereverb_whole_sentence=dereverb_whole_sentence,
                                                      do_bwe=do_bwe, bwe_factor=bwe_factor, bwe_iter_num=bwe_iter_num,
                                                      precision_lpc=precision_lpc, device=device)
 

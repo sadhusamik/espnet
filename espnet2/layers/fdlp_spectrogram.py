@@ -50,6 +50,7 @@ class fdlp_spectrogram(torch.nn.Module):
             feature_batch: int = None,
             fbank_config: str = '1,1,2.5',  # om_w,alpha,beta
             spectral_substraction_vector: str = None,
+            dereverb_whole_sentence: bool = False,
             device: str = 'auto',
     ):
         assert check_argument_types()
@@ -446,6 +447,18 @@ class fdlp_spectrogram(torch.nn.Module):
 
         return feats
 
+    def dereverb_whole_sentence(self, signal, rir_mag):
+        sig_shape = signal.shape[1]
+
+        # Make noise the same shape as speech
+        if rir_mag.shape[0] > signal.shape[1]:
+            signal = torch.cat([signal, torch.zeros(signal.shape[0], rir_mag.shape[0] - signal.shape[1])],
+                               device=signal.device)
+        else:
+            signal = signal[:, 0:rir_mag.shape[0]]
+
+        return torch.real(torch.fft.ifft(torch.exp(np.log(torch.fft.fft(signal)) - rir_mag)))[:, :sig_shape]
+
     def compute_spectrogram(self, input: torch.Tensor, ilens: torch.Tensor = None) -> Tuple[
         torch.Tensor, Optional[torch.Tensor]]:
         """Compute FDLP-Spectrogram With Matrices.
@@ -461,11 +474,13 @@ class fdlp_spectrogram(torch.nn.Module):
         num_batch = input.shape[0]
         # First divide the signal into frames
 
+        if self.spectral_substraction_vector is not None and self.dereverb_whole_sentence:
+            input = self.dereverb_whole_sentence(input, self.spectral_substraction_vector)
         t_samples, frames = self.get_frames(input)
         num_frames = frames.shape[1]
-        if self.spectral_substraction_vector is not None:
+        if self.spectral_substraction_vector is not None and not self.dereverb_whole_sentence:
             self.spectral_substraction_vector = self.spectral_substraction_vector.to(input.device)
-            #logging.info('Substracting spectral vector')
+            # logging.info('Substracting spectral vector')
             frames = self.spectral_substraction_preprocessing(frames)
 
         # Compute DCT (olens remains the same)
@@ -587,7 +602,8 @@ class fdlp_spectrogram(torch.nn.Module):
         ori_len = frames.shape[-1]
         if self.spectral_substraction_vector.shape[0] > frames.shape[-1]:
             frames = torch.cat((frames, torch.zeros(
-                frames.shape[0], frames.shape[1], self.spectral_substraction_vector.shape[0] - frames.shape[-1],device=frames.device)),
+                frames.shape[0], frames.shape[1], self.spectral_substraction_vector.shape[0] - frames.shape[-1],
+                device=frames.device)),
                                dim=-1)
         else:
             frames = frames[:, :0:self.spectral_substraction_vector.shape[0]]
