@@ -58,6 +58,7 @@ class fdlp_spectrogram(torch.nn.Module):
         # if device == 'auto':
         #    self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         # else:
+        self.dereverb_whole_sentence = dereverb_whole_sentence
         self.device = torch.device("cpu")
         self.concat_utts_before_frames = concat_utts_before_frames
         self.precision_lpc = precision_lpc
