@@ -65,7 +65,7 @@ class RobustFrontend(AbsFrontend):
             freeze_lifter_finetune_updates: int = None,
             fbank_config: str = '1,1,2.5',
             feature_batch: int = None,
-            spectral_substraction_vector: str =None,
+            spectral_substraction_vector: str = None,
             dereverb_whole_sentence: bool = False,
             fs: Union[int, str] = 16000,
             frontend_conf: Optional[dict] = get_default_kwargs(Frontend),
