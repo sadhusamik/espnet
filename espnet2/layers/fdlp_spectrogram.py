@@ -609,8 +609,9 @@ class fdlp_spectrogram(torch.nn.Module):
                                      dtype=signal.dtype)), dim=-1)
         else:
             signal = signal[:, 0:rir_mag.shape[0]]
+        signal = torch.real(torch.fft.ifft(torch.exp(torch.log(torch.fft.fft(signal)) - rir_mag))).type(torch.float32)
 
-        return torch.real(torch.fft.ifft(torch.exp(torch.log(torch.fft.fft(signal)) - rir_mag)))[:, :sig_shape]
+        return signal[:, :sig_shape]
 
     def spectral_substraction_preprocessing(self, frames):
 
