@@ -464,6 +464,10 @@ class fdlp_spectrogram(torch.nn.Module):
 
         if self.spectral_substraction_vector is not None and self.dereverb_whole_sentence:
             input = self.dereverb_whole_sentence(input, self.spectral_substraction_vector)
+
+        print(input.type)
+        print(input.shape)
+        sys.stdout.flush()
         t_samples, frames = self.get_frames(input)
         num_frames = frames.shape[1]
         if self.spectral_substraction_vector is not None and not self.dereverb_whole_sentence:
