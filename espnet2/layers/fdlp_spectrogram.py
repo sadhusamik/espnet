@@ -473,7 +473,9 @@ class fdlp_spectrogram(torch.nn.Module):
             self.spectral_substraction_vector = self.spectral_substraction_vector.to(input.device)
             # logging.info('Substracting spectral vector')
             frames = self.spectral_substraction_preprocessing(frames)
-
+        print(torch.min(frames))
+        print(torch.max(frames))
+        sys.stdout.flush()
         # Compute DCT (olens remains the same)
         if self.complex_modulation:
             frames = torch.fft.ifft(frames) * int(self.srate * self.fduration)
