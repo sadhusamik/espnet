@@ -464,7 +464,7 @@ class fdlp_spectrogram(torch.nn.Module):
         # First divide the signal into frames
 
         if self.spectral_substraction_vector is not None and self.dereverb_whole_sentence:
-            input = self.dereverb_whole_sentence(input, self.spectral_substraction_vector)
+            input = self.dereverb_whole(input, self.spectral_substraction_vector)
 
         print(input.type)
         print(input.shape)
@@ -591,7 +591,7 @@ class fdlp_spectrogram(torch.nn.Module):
 
         return modspec, olens
 
-    def dereverb_whole_sentence(self, signal, rir_mag):
+    def dereverb_whole(self, signal, rir_mag):
         sig_shape = signal.shape[1]
         print(signal.shape)
         print(rir_mag.shape)
