@@ -618,12 +618,13 @@
         <span class="n">num_batch</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="c1"># First divide the signal into frames</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_substraction_vector</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">dereverb_whole_sentence</span><span class="p">:</span>
-            <span class="nb">input</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dereverb_whole</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_substraction_vector</span><span class="p">)</span>
+        <span class="c1">#if self.spectral_substraction_vector is not None and self.dereverb_whole_sentence:</span>
+        <span class="c1">#    input = self.dereverb_whole(input, self.spectral_substraction_vector)</span>
 
         <span class="n">t_samples</span><span class="p">,</span> <span class="n">frames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_frames</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
         <span class="n">num_frames</span> <span class="o">=</span> <span class="n">frames</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_substraction_vector</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dereverb_whole_sentence</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_substraction_vector</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="c1"># and not self.dereverb_whole_sentence:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spectral_substraction_vector</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_substraction_vector</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
             <span class="c1"># logging.info(&#39;Substracting spectral vector&#39;)</span>
             <span class="n">frames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_substraction_preprocessing</span><span class="p">(</span><span class="n">frames</span><span class="p">)</span>
@@ -745,9 +746,6 @@
 
 <div class="viewcode-block" id="fdlp_spectrogram.dereverb_whole"><a class="viewcode-back" href="../../../_gen/espnet2.layers.html#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram.dereverb_whole">[docs]</a>    <span class="k">def</span> <span class="nf">dereverb_whole</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signal</span><span class="p">,</span> <span class="n">rir_mag</span><span class="p">):</span>
         <span class="n">sig_shape</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">rir_mag</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 
         <span class="c1"># Make noise the same shape as speech</span>
         <span class="k">if</span> <span class="n">rir_mag</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">signal</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
