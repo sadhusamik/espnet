@@ -590,9 +590,6 @@ class fdlp_spectrogram(torch.nn.Module):
 
     def dereverb_whole(self, signal, rir_mag):
         sig_shape = signal.shape[1]
-        print(signal.shape)
-        print(rir_mag.shape)
-        sys.stdout.flush()
 
         # Make noise the same shape as speech
         if rir_mag.shape[0] > signal.shape[1]:
