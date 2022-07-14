@@ -187,6 +187,7 @@ class fdlp_spectrogram(torch.nn.Module):
         if spectral_substraction_vector is not None:
             # Loading spectral substration vector
             self.spectral_substraction_vector = torch.tensor(pkl.load(open(spectral_substraction_vector, 'rb')))
+            self.spectral_substraction_vector[0] = 0 + 1j * torch.imag(self.spectral_substraction_vector[0])
         else:
             self.spectral_substraction_vector = None
 
@@ -463,7 +464,7 @@ class fdlp_spectrogram(torch.nn.Module):
         num_batch = input.shape[0]
         # First divide the signal into frames
 
-        #if self.spectral_substraction_vector is not None and self.dereverb_whole_sentence:
+        # if self.spectral_substraction_vector is not None and self.dereverb_whole_sentence:
         #    input = self.dereverb_whole(input, self.spectral_substraction_vector)
 
         t_samples, frames = self.get_frames(input)
@@ -473,7 +474,7 @@ class fdlp_spectrogram(torch.nn.Module):
         print(torch.max(frames))
         sys.stdout.flush()
 
-        if self.spectral_substraction_vector is not None: # and not self.dereverb_whole_sentence:
+        if self.spectral_substraction_vector is not None:  # and not self.dereverb_whole_sentence:
             self.spectral_substraction_vector = self.spectral_substraction_vector.to(input.device)
             # logging.info('Substracting spectral vector')
             frames = self.spectral_substraction_preprocessing(frames)
@@ -613,18 +614,18 @@ class fdlp_spectrogram(torch.nn.Module):
         return torch.real(torch.fft.ifft(torch.exp(torch.log(torch.fft.fft(signal)) - rir_mag)))[:, :sig_shape]
 
     def spectral_substraction_preprocessing(self, frames):
+
         ori_len = frames.shape[-1]
+
         if self.spectral_substraction_vector.shape[0] > frames.shape[-1]:
+
             frames = torch.cat((frames, torch.zeros(
                 frames.shape[0], frames.shape[1], self.spectral_substraction_vector.shape[0] - frames.shape[-1],
-                device=frames.device)),
-                               dim=-1)
+                device=frames.device)), dim=-1)
         else:
             frames = frames[:, :0:self.spectral_substraction_vector.shape[0]]
 
         frames_fft = torch.log(torch.fft.fft(frames))
-        # frames_fft_ph = np.unwrap(np.imag(frames_fft))
-        # frames_fft = np.real(frames_fft) + 1j * frames_fft_ph
         frames_fft = torch.real(torch.fft.ifft(torch.exp(frames_fft - self.spectral_substraction_vector)))
 
         return frames_fft[:, :, :ori_len]
