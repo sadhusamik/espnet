@@ -600,8 +600,8 @@ class fdlp_spectrogram(torch.nn.Module):
         # Make noise the same shape as speech
         if rir_mag.shape[0] > signal.shape[1]:
             signal = torch.cat(
-                (signal, torch.zeros(signal.shape[0], rir_mag.shape[0] - signal.shape[1], device=signal.device)),
-                dim=-1)
+                (signal, torch.zeros(signal.shape[0], rir_mag.shape[0] - signal.shape[1], device=signal.device,
+                                     dtype=signal.dtype)), dim=-1)
         else:
             signal = signal[:, 0:rir_mag.shape[0]]
 
