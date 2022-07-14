@@ -463,10 +463,15 @@ class fdlp_spectrogram(torch.nn.Module):
 
         num_batch = input.shape[0]
         # First divide the signal into frames
-
+        print('before')
+        print(input.dtype)
+        sys.stdout.flush()
         if self.spectral_substraction_vector is not None and self.dereverb_whole_sentence:
             input = self.dereverb_whole(input, self.spectral_substraction_vector)
 
+        print('after')
+        print(input.dtype)
+        sys.stdout.flush()
         t_samples, frames = self.get_frames(input)
         num_frames = frames.shape[1]
 
