@@ -468,11 +468,17 @@ class fdlp_spectrogram(torch.nn.Module):
 
         t_samples, frames = self.get_frames(input)
         num_frames = frames.shape[1]
+        print('before')
+        print(torch.min(frames))
+        print(torch.max(frames))
+        sys.stdout.flush()
 
         if self.spectral_substraction_vector is not None: # and not self.dereverb_whole_sentence:
             self.spectral_substraction_vector = self.spectral_substraction_vector.to(input.device)
             # logging.info('Substracting spectral vector')
             frames = self.spectral_substraction_preprocessing(frames)
+
+        print('after')
         print(torch.min(frames))
         print(torch.max(frames))
         sys.stdout.flush()
