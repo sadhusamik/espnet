@@ -464,27 +464,17 @@ class fdlp_spectrogram(torch.nn.Module):
         num_batch = input.shape[0]
         # First divide the signal into frames
 
-        # if self.spectral_substraction_vector is not None and self.dereverb_whole_sentence:
-        #    input = self.dereverb_whole(input, self.spectral_substraction_vector)
+        if self.spectral_substraction_vector is not None and self.dereverb_whole_sentence:
+            input = self.dereverb_whole(input, self.spectral_substraction_vector)
 
         t_samples, frames = self.get_frames(input)
         num_frames = frames.shape[1]
-        print('before')
-        print(torch.min(frames))
-        print(torch.max(frames))
-        sys.stdout.flush()
 
-        if self.spectral_substraction_vector is not None:  # and not self.dereverb_whole_sentence:
+        if self.spectral_substraction_vector is not None and not self.dereverb_whole_sentence:
             self.spectral_substraction_vector = self.spectral_substraction_vector.to(input.device)
             # logging.info('Substracting spectral vector')
             frames = self.spectral_substraction_preprocessing(frames)
-        print('ssv')
-        print(self.spectral_substraction_vector)
 
-        print('after')
-        print(torch.min(frames))
-        print(torch.max(frames))
-        sys.stdout.flush()
         # Compute DCT (olens remains the same)
         if self.complex_modulation:
             frames = torch.fft.ifft(frames) * int(self.srate * self.fduration)
