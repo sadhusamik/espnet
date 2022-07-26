@@ -67,7 +67,9 @@ class ModNet(AbsESPnetModel):
             speech_lengths: (Batch, )
 
         """
-
+        print(speech.shape)
+        print(speech_original.shape)
+        sys.stdout.flush()
         batch_size = speech.shape[0]
 
         # 1. Encoder
