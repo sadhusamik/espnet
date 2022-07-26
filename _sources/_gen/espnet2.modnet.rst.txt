@@ -26,6 +26,17 @@ espnet2.modnet.__init__
     :show-inheritance:
 
 
+.. _espnet2.modnet.projector.projector:
+
+espnet2.modnet.projector.projector
+----------------------------------
+
+.. automodule:: espnet2.modnet.projector.projector
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
 .. _espnet2.modnet.projector.abs_projector:
 
 espnet2.modnet.projector.abs_projector
@@ -43,17 +54,6 @@ espnet2.modnet.projector.__init__
 ---------------------------------
 
 .. automodule:: espnet2.modnet.projector.__init__
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
-.. _espnet2.modnet.projector.projector:
-
-espnet2.modnet.projector.projector
-----------------------------------
-
-.. automodule:: espnet2.modnet.projector.projector
     :members:
     :undoc-members:
     :show-inheritance:
