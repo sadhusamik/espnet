@@ -67,7 +67,7 @@ class ModNet(AbsESPnetModel):
             speech_lengths: (Batch, )
 
         """
-        speech = speech[:, :, 0]
+        #speech = speech[:, :, 0]
 
         batch_size = speech.shape[0]
 
