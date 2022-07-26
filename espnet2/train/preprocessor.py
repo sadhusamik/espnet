@@ -504,6 +504,7 @@ class CommonPreprocessorPairedSpeech(AbsPreprocessor):
                         speech = speech + scale * noise
 
                 speech = speech.T
+                speech = speech[:, 0]
                 ma = np.max(np.abs(speech))
                 if ma > 1.0:
                     speech /= ma
