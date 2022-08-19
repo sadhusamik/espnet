@@ -213,6 +213,17 @@ espnet2.asr.encoder.contextual_block_conformer_encoder
     :show-inheritance:
 
 
+.. _espnet2.asr.encoder.modnet_encoder:
+
+espnet2.asr.encoder.modnet_encoder
+----------------------------------
+
+.. automodule:: espnet2.asr.encoder.modnet_encoder
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
 .. _espnet2.asr.encoder.vgg_rnn_encoder:
 
 espnet2.asr.encoder.vgg_rnn_encoder
