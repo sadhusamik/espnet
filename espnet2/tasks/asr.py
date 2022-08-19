@@ -80,6 +80,8 @@ from espnet2.utils.types import int_or_none
 from espnet2.utils.types import str2bool
 from espnet2.utils.types import str_or_none
 
+from espnet2.asr.encoder.modnet_encoder import ModnetEncoder
+
 frontend_choices = ClassChoices(
     name="frontend",
     classes=dict(
@@ -139,6 +141,7 @@ encoder_choices = ClassChoices(
         contextual_block_conformer=ContextualBlockConformerEncoder,
         vgg_rnn=VGGRNNEncoder,
         rnn=RNNEncoder,
+        modnet=ModnetEncoder,
         wav2vec2=FairSeqWav2Vec2Encoder,
         hubert=FairseqHubertEncoder,
         hubert_pretrain=FairseqHubertPretrainEncoder,
