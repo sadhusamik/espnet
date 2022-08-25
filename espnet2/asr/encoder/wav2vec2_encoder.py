@@ -4,6 +4,7 @@
 """Encoder definition."""
 import contextlib
 import copy
+import numpy as np
 from filelock import FileLock
 import logging
 import os
@@ -32,13 +33,16 @@ class FairSeqWav2Vec2Encoder(AbsEncoder):
     """
 
     def __init__(
-        self,
-        input_size: int,
-        w2v_url: str,
-        w2v_dir_path: str = "./",
-        output_size: int = 256,
-        normalize_before: bool = False,
-        freeze_finetune_updates: int = 0,
+            self,
+            input_size: int,
+            w2v_url: str,
+            w2v_dir_path: str = "./",
+            output_size: int = 256,
+            normalize_before: bool = False,
+            freeze_finetune_updates: int = 0,
+            freeze: bool = False,
+            freeze_encoder: bool = True,
+            freeze_first_n: int = None,
     ):
         assert check_argument_types()
         super().__init__()
@@ -92,15 +96,29 @@ class FairSeqWav2Vec2Encoder(AbsEncoder):
 
         self.freeze_finetune_updates = freeze_finetune_updates
         self.register_buffer("num_updates", torch.LongTensor([0]))
+        self.freeze = freeze
+        if self.freeze:
+            logging.info("Wav2vec parameters are frozen.")
+        else:
+            logging.info("Updating wav2vec parameters")
+        if freeze_encoder:
+            logging.info("Freezing CNN encoder - will only update transformer layers")
+            self.encoders.feature_extractor.requires_grad_(False)
+        if freeze_first_n:
+            self.encoders.post_extract_proj.requires_grad_(False)
+            self.encoders.quantizer.requires_grad_(False)
+            self.encoders.project_q.requires_grad_(False)
+            for i in range(freeze_first_n):
+                self.encoders.encoder.layers[i].requires_grad_(False)
 
     def output_size(self) -> int:
         return self._output_size
 
     def forward(
-        self,
-        xs_pad: torch.Tensor,
-        ilens: torch.Tensor,
-        prev_states: torch.Tensor = None,
+            self,
+            xs_pad: torch.Tensor,
+            ilens: torch.Tensor,
+            prev_states: torch.Tensor = None,
     ) -> Tuple[torch.Tensor, torch.Tensor, Optional[torch.Tensor]]:
         """Forward FairSeqWav2Vec2 Encoder.
 
@@ -118,14 +136,22 @@ class FairSeqWav2Vec2Encoder(AbsEncoder):
             self.num_updates += 1
         elif ft and self.num_updates == self.freeze_finetune_updates + 1:
             self.num_updates += 1
-            logging.info("Start fine-tuning wav2vec parameters!")
+            # logging.info("Start fine-tuning wav2vec parameters!")
 
-        with torch.no_grad() if not ft else contextlib.nullcontext():
-            enc_outputs = self.encoders(
-                xs_pad,
-                masks,
-                features_only=True,
-            )
+        if self.freeze:
+            with torch.no_grad():  # if not ft else contextlib.nullcontext():
+                enc_outputs = self.encoders(
+                    xs_pad,
+                    masks,
+                    features_only=True,
+                )
+        else:
+            with contextlib.nullcontext():
+                enc_outputs = self.encoders(
+                    xs_pad,
+                    masks,
+                    features_only=True,
+                )
 
         xs_pad = enc_outputs["x"]  # (B,T,C),
         bs = xs_pad.shape[0]
