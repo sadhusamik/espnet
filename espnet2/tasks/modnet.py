@@ -211,7 +211,7 @@ class ModnetTask(AbsTask):
         assert check_argument_types()
         if args.use_preprocessor:
             retval = CommonPreprocessorPairedSpeech(
-                train=train,
+                train=True,
                 # NOTE(kamo): Check attribute existence for backward compatibility
                 rir_scp=args.rir_scp if hasattr(args, "rir_scp") else None,
                 rir_apply_prob=args.rir_apply_prob
