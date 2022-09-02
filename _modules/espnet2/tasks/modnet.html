@@ -366,7 +366,7 @@
         <span class="k">assert</span> <span class="n">check_argument_types</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">use_preprocessor</span><span class="p">:</span>
             <span class="n">retval</span> <span class="o">=</span> <span class="n">CommonPreprocessorPairedSpeech</span><span class="p">(</span>
-                <span class="n">train</span><span class="o">=</span><span class="n">train</span><span class="p">,</span>
+                <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="c1"># NOTE(kamo): Check attribute existence for backward compatibility</span>
                 <span class="n">rir_scp</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">rir_scp</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s2">&quot;rir_scp&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="n">rir_apply_prob</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">rir_apply_prob</span>
