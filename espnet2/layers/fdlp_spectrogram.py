@@ -441,7 +441,7 @@ class fdlp_spectrogram(torch.nn.Module):
             if j == 0:
                 ptr = int(ptr + self.cut_overlap - self.cut_half)
             else:
-                #ptr = int(ptr + self.cut_overlap + randrange(2))
+                # ptr = int(ptr + self.cut_overlap + randrange(2))
                 ptr = int(ptr + self.cut_overlap + 1)
 
         feats = torch.log(torch.clip(feats, max=None, min=0.0000001))
@@ -1592,6 +1592,160 @@ class fdlp_spectrogram_update(fdlp_spectrogram):
 
         return modspec, olens
 
+
+class fdlp_spectrogram_modnet(fdlp_spectrogram):
+
+    def __init__(self,
+                 dropout_frame_num: int = 2,
+                 dropout_while_eval: bool = False,
+                 pause_dropout_after_steps: int = None,
+                 **kwargs
+                 ):
+        assert check_argument_types()
+        super().__init__(**kwargs)
+
+        self.dropout_frame_num = dropout_frame_num
+        self.fixed_dropout_lb = None
+        self.fixed_dropout_ub = None
+        self.dropout_while_eval = dropout_while_eval
+        self.pause_dropout_after_steps = pause_dropout_after_steps
+
+    def _generate_zero_dropout_lifter(self, num_batch, num_frames, device):
+
+        lifter = np.zeros(self.coeff_num)
+        lifter = torch.tensor(lifter, dtype=self.datatype, device=device)
+        lifter = lifter.unsqueeze(0).unsqueeze(0).unsqueeze(0).repeat(num_batch, num_frames, self.n_filters, 1)
+        lifter = lifter.to(device)
+
+        return lifter
+
+    def compute_spectrogram(self, input: torch.Tensor, ilens: torch.Tensor = None) :
+        """Compute FDLP-Spectrogram With Matrices.
+
+        Args:
+            input: (Batch, Nsamples) or (Batch, Nsample)
+            ilens: (Batch)
+        Returns:
+            output: (Batch, Frames, Freq) or (Batch, Frames, Freq)
+
+        """
+
+        t_samples = input.shape[1]
+        num_batch = input.shape[0]
+
+        # First divide the signal into frames
+        t_samples, frames = self.get_frames(input)
+        num_frames = frames.shape[1]
+
+        # Get ids of frames to mask in each batch. These are the features that will be dropped
+        random_frame_idx = []
+        batch_idx = np.arange(num_batch)
+
+        if self.dropout_frame_num > num_frames:
+            dpfn = num_frames
+        else:
+            dpfn = self.dropout_frame_num
+
+        for idx in batch_idx:
+            random_frame_idx.append(np.random.permutation(num_frames)[:dpfn])
+
+        if self.complex_modulation:
+            frames = torch.fft.ifft(frames) * int(self.srate * self.fduration)
+        else:
+            frames = self.dct_type2(frames) / np.sqrt(2 * int(self.srate * self.fduration))
+
+        # Put fbank, mask and lifter into proper device if they are already not there
+        if self.fbank.device.type != input.device.type:
+            print('Transferring fbank, mask and lifter to {:s}'.format(input.device.type))
+            self.fbank = self.fbank.to(input.device)
+            self.lifter = self.lifter.to(input.device)
+            self.mask = self.mask.to(input.device)
+
+        # Compute features
+        frames = frames.unsqueeze(2).repeat(1, 1, self.n_filters, 1)
+        frames = frames * self.fbank[:, 0:-1]  # batch x num_frames x n_filters x frame_dim of 1.5 secs
+
+        han_weight = torch.hann_window(self.cut, dtype=input.dtype, device=input.device)
+        ham_weight = torch.hamming_window(self.cut, dtype=input.dtype, device=input.device)
+
+        ### Compute all LPC in all bands and all frames parallely to make it fast
+
+        frames, gain = self.compute_lpc(frames, self.order)  # batch x num_frames x n_filters x lpc_coeff
+
+        if self.do_bwe:
+            frames = self.bwe_lpc_stabilizer(frames)
+
+        frames = self.compute_modspec_from_lpc(gain, frames,
+                                               self.coeff_num)  # batch x num_frames x n_filters x num_modspec
+        modspec = frames
+        modspec = modspec * self.mask  # (batch x num_frames x n_filters x num_modspec)
+
+        # Original modulation spectrum
+        modspec_ori = modspec * self.lifter  # (batch x num_frames x n_filters x num_modspec)
+        if self.complex_modulation:
+            modspec_ori = torch.fft.fft(modspec_ori, 1 * int(
+                self.fduration * self.frate))  # (batch x num_frames x n_filters x int(self.fduration * self.frate))
+        else:
+            modspec_ori = torch.fft.fft(modspec_ori, 2 * int(
+                self.fduration * self.frate))  # (batch x num_frames x n_filters x int(self.fduration * self.frate))
+        modspec_ori = torch.abs(torch.exp(modspec_ori))
+        modspec_ori = modspec_ori[:, :, :, 0:self.cut] * han_weight / ham_weight
+        modspec_ori = torch.transpose(modspec_ori, 2,
+                                      3)  # (batch x num_frames x int(self.fduration * self.frate) x n_filters)
+
+        if self.training or self.dropout_while_eval:
+            # Do masking only during training
+            lifter_mask = self._generate_zero_dropout_lifter(num_batch,
+                                                             dpfn,
+                                                             device=input.device)  # (batch x num_frames_reduced x n_filters x num_modspec)
+            # Masked modulation spectrum
+            for p, q in zip(batch_idx, random_frame_idx):
+                modspec[p, q, :, :] = modspec[p, q, :, :] * lifter_mask[p, :, :, :]
+
+        if self.complex_modulation:
+            modspec = torch.fft.fft(modspec, 1 * int(
+                self.fduration * self.frate))  # (batch x num_frames x n_filters x int(self.fduration * self.frate))
+        else:
+            modspec = torch.fft.fft(modspec, 2 * int(
+                self.fduration * self.frate))  # (batch x num_frames x n_filters x int(self.fduration * self.frate))
+        modspec = torch.abs(torch.exp(modspec))
+        modspec = modspec[:, :, :, 0:self.cut] * han_weight / ham_weight
+        modspec = torch.transpose(modspec, 2, 3)  # (batch x num_frames x int(self.fduration * self.frate) x n_filters)
+
+        feats = self.OLA(modspec=modspec, t_samples=t_samples, dtype=input.dtype, device=input.device)
+
+        if ilens is not None:
+            olens = torch.floor(ilens * self.frate / self.srate)
+            olens = olens.to(ilens.dtype)
+            feats.masked_fill_(make_pad_mask(olens, feats, 1), 0.0000001)
+            feats = feats[:, :torch.max(olens), :]
+        else:
+            olens = None
+
+        return {'feats': feats, 'feats_original': modspec_ori, 'random_frame_idx': random_frame_idx}, olens
+
+    def forward(self, input: torch.Tensor, ilens: torch.Tensor = None
+                ):
+        """Compute FDLP-Spectrogram forward function.
+
+        Args:
+            input: (Batch, Nsamples) or (Batch, Nsample, Channels)
+            ilens: (Batch)
+        Returns:
+            output: (Batch, Frames, Freq) or (Batch, Frames, Channels, Freq)
+
+        """
+        bs = input.size(0)
+        if input.dim() == 3:
+            multi_channel = True
+            # input: (Batch, Nsample, Channels) -> (Batch * Channels, Nsample)
+            input = input.transpose(1, 2).reshape(-1, input.size(1))
+        else:
+            multi_channel = False
+
+        output, olens = self.compute_spectrogram(input, ilens)
+
+        return output, olens
 
 class mvector(fdlp_spectrogram):
 
