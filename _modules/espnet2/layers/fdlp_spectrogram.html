@@ -102,6 +102,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../_gen/espnet2.torch_utils.html">espnet2.torch_utils package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../_gen/espnet2.fileio.html">espnet2.fileio package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../_gen/espnet2.cepnet.html">espnet2.cepnet package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_gen/espnet2.modnet_v2.html">espnet2.modnet_v2 package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../_gen/espnet2.diar.html">espnet2.diar package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../_gen/espnet2.main_funcs.html">espnet2.main_funcs package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../_gen/espnet2.train.html">espnet2.train package</a></li>
@@ -596,7 +597,7 @@
             <span class="k">if</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">ptr</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ptr</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">cut_overlap</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">cut_half</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="c1">#ptr = int(ptr + self.cut_overlap + randrange(2))</span>
+                <span class="c1"># ptr = int(ptr + self.cut_overlap + randrange(2))</span>
                 <span class="n">ptr</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ptr</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">cut_overlap</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
         <span class="n">feats</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">feats</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mf">0.0000001</span><span class="p">))</span>
@@ -1747,6 +1748,160 @@
 
         <span class="k">return</span> <span class="n">modspec</span><span class="p">,</span> <span class="n">olens</span></div></div>
 
+
+<div class="viewcode-block" id="fdlp_spectrogram_modnet"><a class="viewcode-back" href="../../../_gen/espnet2.layers.html#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_modnet">[docs]</a><span class="k">class</span> <span class="nc">fdlp_spectrogram_modnet</span><span class="p">(</span><span class="n">fdlp_spectrogram</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">dropout_frame_num</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+                 <span class="n">dropout_while_eval</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">pause_dropout_after_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span>
+                 <span class="p">):</span>
+        <span class="k">assert</span> <span class="n">check_argument_types</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout_frame_num</span> <span class="o">=</span> <span class="n">dropout_frame_num</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fixed_dropout_lb</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fixed_dropout_ub</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout_while_eval</span> <span class="o">=</span> <span class="n">dropout_while_eval</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pause_dropout_after_steps</span> <span class="o">=</span> <span class="n">pause_dropout_after_steps</span>
+
+    <span class="k">def</span> <span class="nf">_generate_zero_dropout_lifter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_batch</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+
+        <span class="n">lifter</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coeff_num</span><span class="p">)</span>
+        <span class="n">lifter</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">lifter</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">datatype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">lifter</span> <span class="o">=</span> <span class="n">lifter</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">num_batch</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_filters</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">lifter</span> <span class="o">=</span> <span class="n">lifter</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">lifter</span>
+
+<div class="viewcode-block" id="fdlp_spectrogram_modnet.compute_spectrogram"><a class="viewcode-back" href="../../../_gen/espnet2.layers.html#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_modnet.compute_spectrogram">[docs]</a>    <span class="k">def</span> <span class="nf">compute_spectrogram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">ilens</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Compute FDLP-Spectrogram With Matrices.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            input: (Batch, Nsamples) or (Batch, Nsample)</span>
+<span class="sd">            ilens: (Batch)</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            output: (Batch, Frames, Freq) or (Batch, Frames, Freq)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">t_samples</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">num_batch</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># First divide the signal into frames</span>
+        <span class="n">t_samples</span><span class="p">,</span> <span class="n">frames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_frames</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+        <span class="n">num_frames</span> <span class="o">=</span> <span class="n">frames</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># Get ids of frames to mask in each batch. These are the features that will be dropped</span>
+        <span class="n">random_frame_idx</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">batch_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_batch</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout_frame_num</span> <span class="o">&gt;</span> <span class="n">num_frames</span><span class="p">:</span>
+            <span class="n">dpfn</span> <span class="o">=</span> <span class="n">num_frames</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dpfn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout_frame_num</span>
+
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">batch_idx</span><span class="p">:</span>
+            <span class="n">random_frame_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">num_frames</span><span class="p">)[:</span><span class="n">dpfn</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">complex_modulation</span><span class="p">:</span>
+            <span class="n">frames</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifft</span><span class="p">(</span><span class="n">frames</span><span class="p">)</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">srate</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fduration</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">frames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dct_type2</span><span class="p">(</span><span class="n">frames</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">srate</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fduration</span><span class="p">))</span>
+
+        <span class="c1"># Put fbank, mask and lifter into proper device if they are already not there</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fbank</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="nb">input</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Transferring fbank, mask and lifter to </span><span class="si">{:s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">type</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fbank</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fbank</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lifter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lifter</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="c1"># Compute features</span>
+        <span class="n">frames</span> <span class="o">=</span> <span class="n">frames</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_filters</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">frames</span> <span class="o">=</span> <span class="n">frames</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fbank</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># batch x num_frames x n_filters x frame_dim of 1.5 secs</span>
+
+        <span class="n">han_weight</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">hann_window</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cut</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">input</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="nb">input</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">ham_weight</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">hamming_window</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cut</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">input</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="nb">input</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="c1">### Compute all LPC in all bands and all frames parallely to make it fast</span>
+
+        <span class="n">frames</span><span class="p">,</span> <span class="n">gain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_lpc</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">)</span>  <span class="c1"># batch x num_frames x n_filters x lpc_coeff</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_bwe</span><span class="p">:</span>
+            <span class="n">frames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bwe_lpc_stabilizer</span><span class="p">(</span><span class="n">frames</span><span class="p">)</span>
+
+        <span class="n">frames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_modspec_from_lpc</span><span class="p">(</span><span class="n">gain</span><span class="p">,</span> <span class="n">frames</span><span class="p">,</span>
+                                               <span class="bp">self</span><span class="o">.</span><span class="n">coeff_num</span><span class="p">)</span>  <span class="c1"># batch x num_frames x n_filters x num_modspec</span>
+        <span class="n">modspec</span> <span class="o">=</span> <span class="n">frames</span>
+        <span class="n">modspec</span> <span class="o">=</span> <span class="n">modspec</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span>  <span class="c1"># (batch x num_frames x n_filters x num_modspec)</span>
+
+        <span class="c1"># Original modulation spectrum</span>
+        <span class="n">modspec_ori</span> <span class="o">=</span> <span class="n">modspec</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">lifter</span>  <span class="c1"># (batch x num_frames x n_filters x num_modspec)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">complex_modulation</span><span class="p">:</span>
+            <span class="n">modspec_ori</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">modspec_ori</span><span class="p">,</span> <span class="mi">1</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fduration</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">frate</span><span class="p">))</span>  <span class="c1"># (batch x num_frames x n_filters x int(self.fduration * self.frate))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">modspec_ori</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">modspec_ori</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fduration</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">frate</span><span class="p">))</span>  <span class="c1"># (batch x num_frames x n_filters x int(self.fduration * self.frate))</span>
+        <span class="n">modspec_ori</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">modspec_ori</span><span class="p">))</span>
+        <span class="n">modspec_ori</span> <span class="o">=</span> <span class="n">modspec_ori</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">cut</span><span class="p">]</span> <span class="o">*</span> <span class="n">han_weight</span> <span class="o">/</span> <span class="n">ham_weight</span>
+        <span class="n">modspec_ori</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">modspec_ori</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span>
+                                      <span class="mi">3</span><span class="p">)</span>  <span class="c1"># (batch x num_frames x int(self.fduration * self.frate) x n_filters)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">training</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout_while_eval</span><span class="p">:</span>
+            <span class="c1"># Do masking only during training</span>
+            <span class="n">lifter_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_zero_dropout_lifter</span><span class="p">(</span><span class="n">num_batch</span><span class="p">,</span>
+                                                             <span class="n">dpfn</span><span class="p">,</span>
+                                                             <span class="n">device</span><span class="o">=</span><span class="nb">input</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>  <span class="c1"># (batch x num_frames_reduced x n_filters x num_modspec)</span>
+            <span class="c1"># Masked modulation spectrum</span>
+            <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">batch_idx</span><span class="p">,</span> <span class="n">random_frame_idx</span><span class="p">):</span>
+                <span class="n">modspec</span><span class="p">[</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">modspec</span><span class="p">[</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">*</span> <span class="n">lifter_mask</span><span class="p">[</span><span class="n">p</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">complex_modulation</span><span class="p">:</span>
+            <span class="n">modspec</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">modspec</span><span class="p">,</span> <span class="mi">1</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fduration</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">frate</span><span class="p">))</span>  <span class="c1"># (batch x num_frames x n_filters x int(self.fduration * self.frate))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">modspec</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">modspec</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fduration</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">frate</span><span class="p">))</span>  <span class="c1"># (batch x num_frames x n_filters x int(self.fduration * self.frate))</span>
+        <span class="n">modspec</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">modspec</span><span class="p">))</span>
+        <span class="n">modspec</span> <span class="o">=</span> <span class="n">modspec</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">cut</span><span class="p">]</span> <span class="o">*</span> <span class="n">han_weight</span> <span class="o">/</span> <span class="n">ham_weight</span>
+        <span class="n">modspec</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">modspec</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>  <span class="c1"># (batch x num_frames x int(self.fduration * self.frate) x n_filters)</span>
+
+        <span class="n">feats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">OLA</span><span class="p">(</span><span class="n">modspec</span><span class="o">=</span><span class="n">modspec</span><span class="p">,</span> <span class="n">t_samples</span><span class="o">=</span><span class="n">t_samples</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">input</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="nb">input</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">ilens</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">olens</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">ilens</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">frate</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">srate</span><span class="p">)</span>
+            <span class="n">olens</span> <span class="o">=</span> <span class="n">olens</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">ilens</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="n">feats</span><span class="o">.</span><span class="n">masked_fill_</span><span class="p">(</span><span class="n">make_pad_mask</span><span class="p">(</span><span class="n">olens</span><span class="p">,</span> <span class="n">feats</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="mf">0.0000001</span><span class="p">)</span>
+            <span class="n">feats</span> <span class="o">=</span> <span class="n">feats</span><span class="p">[:,</span> <span class="p">:</span><span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">olens</span><span class="p">),</span> <span class="p">:]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">olens</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;feats&#39;</span><span class="p">:</span> <span class="n">feats</span><span class="p">,</span> <span class="s1">&#39;feats_original&#39;</span><span class="p">:</span> <span class="n">modspec_ori</span><span class="p">,</span> <span class="s1">&#39;random_frame_idx&#39;</span><span class="p">:</span> <span class="n">random_frame_idx</span><span class="p">},</span> <span class="n">olens</span></div>
+
+<div class="viewcode-block" id="fdlp_spectrogram_modnet.forward"><a class="viewcode-back" href="../../../_gen/espnet2.layers.html#espnet2.layers.fdlp_spectrogram.fdlp_spectrogram_modnet.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">ilens</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute FDLP-Spectrogram forward function.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            input: (Batch, Nsamples) or (Batch, Nsample, Channels)</span>
+<span class="sd">            ilens: (Batch)</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            output: (Batch, Frames, Freq) or (Batch, Frames, Channels, Freq)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">bs</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">input</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">multi_channel</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="c1"># input: (Batch, Nsample, Channels) -&gt; (Batch * Channels, Nsample)</span>
+            <span class="nb">input</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">input</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">multi_channel</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="n">output</span><span class="p">,</span> <span class="n">olens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_spectrogram</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">ilens</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">output</span><span class="p">,</span> <span class="n">olens</span></div></div>
 
 <div class="viewcode-block" id="mvector"><a class="viewcode-back" href="../../../_gen/espnet2.layers.html#espnet2.layers.fdlp_spectrogram.mvector">[docs]</a><span class="k">class</span> <span class="nc">mvector</span><span class="p">(</span><span class="n">fdlp_spectrogram</span><span class="p">):</span>
 
