@@ -90,7 +90,10 @@ class ModNet(AbsESPnetModel):
 
         # Make the frame sizes uniform
         encoder_out = torch.fft.fft(torch.view_as_complex(encoder_out),
-                                    2 * int(self.frontend.fduration * self.frontend.frate))
+                                    1 * int(self.frontend.fduration * self.frontend.frate))
+        encoder_out = torch.abs(encoder_out)
+        #encoder_out=encoder_out[]
+
         loss = torch.Tensor([0])
         for idx, frame_idx in random_frame_idx:
             for frame_number in frame_idx:
