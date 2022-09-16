@@ -14,7 +14,7 @@ from typeguard import check_argument_types
 
 from espnet2.asr.encoder.abs_encoder import AbsEncoder
 from espnet2.asr.frontend.abs_frontend import AbsFrontend
-from espnet2.modnet.projector.abs_projector import AbsProjector
+from espnet2.modnet_v2.projector.abs_projector import AbsProjector
 from espnet2.torch_utils.device_funcs import force_gatherable
 from espnet2.train.abs_espnet_model import AbsESPnetModel
 
