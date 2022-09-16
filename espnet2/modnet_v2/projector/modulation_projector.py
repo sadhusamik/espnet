@@ -4,7 +4,7 @@
 
 """Linear Projection."""
 
-from espnet2.modnet.projector.abs_projector import AbsProjector
+from espnet2.modnet_v2.projector.abs_projector import AbsProjector
 from typeguard import check_argument_types
 from typing import Tuple
 
