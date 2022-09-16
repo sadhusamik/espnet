@@ -248,7 +248,7 @@ class ModnetTask_v2(AbsTask):
         return retval
 
     @classmethod
-    def build_model(cls, args: argparse.Namespace) -> ModNet:
+    def build_model(cls, args: argparse.Namespace) -> ModNet_v2:
         assert check_argument_types()
 
         # 1. frontend
