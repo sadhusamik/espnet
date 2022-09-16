@@ -13,7 +13,7 @@ from typeguard import check_argument_types
 from espnet.nets.pytorch_backend.frontends.frontend import Frontend
 from espnet2.asr.frontend.abs_frontend import AbsFrontend
 from espnet2.layers.fdlp_spectrogram import fdlp_spectrogram, fdlp_spectrogram_update, fdlp_spectrogram_dropout, \
-    fdlp_spectrogram_with_mmh
+    fdlp_spectrogram_with_mmh, fdlp_spectrogram_modnet
 from espnet2.utils.get_default_kwargs import get_default_kwargs
 
 
@@ -82,27 +82,22 @@ class RobustFrontend(AbsFrontend):
         self.modulation_dropout = modulation_dropout
         self.num_modulation_head = num_modulation_head
 
-
         if modnet:
-            self.fdlp_spectrogram = fdlp_spectrogram_dropout(dropout_num=dropout_num,
-                                                             dropout_frame_num=dropout_frame_num,
-                                                             return_nondropout_spectrogram=return_nondropout_spectrogram,
-                                                             return_dropout_mask=return_dropout_mask,
-                                                             fixed_dropout=fixed_dropout,
-                                                             dropout_while_eval=dropout_while_eval,
-                                                             pause_dropout_after_steps=pause_dropout_after_steps,
-                                                             n_filters=n_filters, coeff_num=coeff_num,
-                                                             coeff_range=coeff_range, order=order,
-                                                             fduration=fduration, frate=frate,
-                                                             overlap_fraction=overlap_fraction,
-                                                             srate=srate, update_fbank=update_fbank,
-                                                             update_lifter=update_lifter,
-                                                             update_lifter_multiband=update_lifter_multiband,
-                                                             lifter_nonlinear_transformation=lifter_nonlinear_transformation,
-                                                             do_bwe=do_bwe, bwe_factor=bwe_factor,
-                                                             bwe_iter_num=bwe_iter_num,
-                                                             complex_modulation=complex_modulation,
-                                                             precision_lpc=precision_lpc, device=device)
+            self.fdlp_spectrogram = fdlp_spectrogram_modnet(dropout_frame_num=dropout_frame_num,
+                                                            dropout_while_eval=dropout_while_eval,
+                                                            pause_dropout_after_steps=pause_dropout_after_steps,
+                                                            n_filters=n_filters, coeff_num=coeff_num,
+                                                            coeff_range=coeff_range, order=order,
+                                                            fduration=fduration, frate=frate,
+                                                            overlap_fraction=overlap_fraction,
+                                                            srate=srate, update_fbank=update_fbank,
+                                                            update_lifter=update_lifter,
+                                                            update_lifter_multiband=update_lifter_multiband,
+                                                            lifter_nonlinear_transformation=lifter_nonlinear_transformation,
+                                                            do_bwe=do_bwe, bwe_factor=bwe_factor,
+                                                            bwe_iter_num=bwe_iter_num,
+                                                            complex_modulation=complex_modulation,
+                                                            precision_lpc=precision_lpc, device=device)
         elif num_modulation_head:
             self.fdlp_spectrogram = fdlp_spectrogram_with_mmh(n_filters=n_filters, coeff_num=coeff_num,
                                                               coeff_range=coeff_range, order=order,
