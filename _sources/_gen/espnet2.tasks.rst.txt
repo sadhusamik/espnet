@@ -125,6 +125,17 @@ espnet2.tasks.__init__
     :show-inheritance:
 
 
+.. _espnet2.tasks.modnet_v2:
+
+espnet2.tasks.modnet_v2
+-----------------------
+
+.. automodule:: espnet2.tasks.modnet_v2
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
 .. _espnet2.tasks.enh_s2t:
 
 espnet2.tasks.enh_s2t

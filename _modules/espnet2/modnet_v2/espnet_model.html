@@ -246,7 +246,10 @@
 
         <span class="c1"># Make the frame sizes uniform</span>
         <span class="n">encoder_out</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">view_as_complex</span><span class="p">(</span><span class="n">encoder_out</span><span class="p">),</span>
-                                    <span class="mi">2</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frontend</span><span class="o">.</span><span class="n">fduration</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">frontend</span><span class="o">.</span><span class="n">frate</span><span class="p">))</span>
+                                    <span class="mi">1</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frontend</span><span class="o">.</span><span class="n">fduration</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">frontend</span><span class="o">.</span><span class="n">frate</span><span class="p">))</span>
+        <span class="n">encoder_out</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">encoder_out</span><span class="p">)</span>
+        <span class="c1">#encoder_out=encoder_out[]</span>
+
         <span class="n">loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span>
         <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">frame_idx</span> <span class="ow">in</span> <span class="n">random_frame_idx</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">frame_number</span> <span class="ow">in</span> <span class="n">frame_idx</span><span class="p">:</span>
