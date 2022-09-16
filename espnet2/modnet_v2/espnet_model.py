@@ -146,10 +146,10 @@ class ModNet_v2(AbsESPnetModel):
             encoder_out.size(),
             speech.size(0),
         )
-        assert encoder_out.size(1) <= encoder_out_lens.max(), (
-            encoder_out.size(),
-            encoder_out_lens.max(),
-        )
+        #assert encoder_out.size(1) <= encoder_out_lens.max(), (
+        #    encoder_out.size(),
+        #    encoder_out_lens.max(),
+        #)
 
         return encoder_out, encoder_out_lens, feats_original, feats_dropout
 
