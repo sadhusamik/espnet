@@ -169,7 +169,7 @@
 <span class="kn">from</span> <span class="nn">espnet.nets.pytorch_backend.frontends.frontend</span> <span class="kn">import</span> <span class="n">Frontend</span>
 <span class="kn">from</span> <span class="nn">espnet2.asr.frontend.abs_frontend</span> <span class="kn">import</span> <span class="n">AbsFrontend</span>
 <span class="kn">from</span> <span class="nn">espnet2.layers.fdlp_spectrogram</span> <span class="kn">import</span> <span class="n">fdlp_spectrogram</span><span class="p">,</span> <span class="n">fdlp_spectrogram_update</span><span class="p">,</span> <span class="n">fdlp_spectrogram_dropout</span><span class="p">,</span> \
-    <span class="n">fdlp_spectrogram_with_mmh</span>
+    <span class="n">fdlp_spectrogram_with_mmh</span><span class="p">,</span> <span class="n">fdlp_spectrogram_modnet</span>
 <span class="kn">from</span> <span class="nn">espnet2.utils.get_default_kwargs</span> <span class="kn">import</span> <span class="n">get_default_kwargs</span>
 
 
@@ -238,27 +238,22 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">modulation_dropout</span> <span class="o">=</span> <span class="n">modulation_dropout</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_modulation_head</span> <span class="o">=</span> <span class="n">num_modulation_head</span>
 
-
         <span class="k">if</span> <span class="n">modnet</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fdlp_spectrogram</span> <span class="o">=</span> <span class="n">fdlp_spectrogram_dropout</span><span class="p">(</span><span class="n">dropout_num</span><span class="o">=</span><span class="n">dropout_num</span><span class="p">,</span>
-                                                             <span class="n">dropout_frame_num</span><span class="o">=</span><span class="n">dropout_frame_num</span><span class="p">,</span>
-                                                             <span class="n">return_nondropout_spectrogram</span><span class="o">=</span><span class="n">return_nondropout_spectrogram</span><span class="p">,</span>
-                                                             <span class="n">return_dropout_mask</span><span class="o">=</span><span class="n">return_dropout_mask</span><span class="p">,</span>
-                                                             <span class="n">fixed_dropout</span><span class="o">=</span><span class="n">fixed_dropout</span><span class="p">,</span>
-                                                             <span class="n">dropout_while_eval</span><span class="o">=</span><span class="n">dropout_while_eval</span><span class="p">,</span>
-                                                             <span class="n">pause_dropout_after_steps</span><span class="o">=</span><span class="n">pause_dropout_after_steps</span><span class="p">,</span>
-                                                             <span class="n">n_filters</span><span class="o">=</span><span class="n">n_filters</span><span class="p">,</span> <span class="n">coeff_num</span><span class="o">=</span><span class="n">coeff_num</span><span class="p">,</span>
-                                                             <span class="n">coeff_range</span><span class="o">=</span><span class="n">coeff_range</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
-                                                             <span class="n">fduration</span><span class="o">=</span><span class="n">fduration</span><span class="p">,</span> <span class="n">frate</span><span class="o">=</span><span class="n">frate</span><span class="p">,</span>
-                                                             <span class="n">overlap_fraction</span><span class="o">=</span><span class="n">overlap_fraction</span><span class="p">,</span>
-                                                             <span class="n">srate</span><span class="o">=</span><span class="n">srate</span><span class="p">,</span> <span class="n">update_fbank</span><span class="o">=</span><span class="n">update_fbank</span><span class="p">,</span>
-                                                             <span class="n">update_lifter</span><span class="o">=</span><span class="n">update_lifter</span><span class="p">,</span>
-                                                             <span class="n">update_lifter_multiband</span><span class="o">=</span><span class="n">update_lifter_multiband</span><span class="p">,</span>
-                                                             <span class="n">lifter_nonlinear_transformation</span><span class="o">=</span><span class="n">lifter_nonlinear_transformation</span><span class="p">,</span>
-                                                             <span class="n">do_bwe</span><span class="o">=</span><span class="n">do_bwe</span><span class="p">,</span> <span class="n">bwe_factor</span><span class="o">=</span><span class="n">bwe_factor</span><span class="p">,</span>
-                                                             <span class="n">bwe_iter_num</span><span class="o">=</span><span class="n">bwe_iter_num</span><span class="p">,</span>
-                                                             <span class="n">complex_modulation</span><span class="o">=</span><span class="n">complex_modulation</span><span class="p">,</span>
-                                                             <span class="n">precision_lpc</span><span class="o">=</span><span class="n">precision_lpc</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fdlp_spectrogram</span> <span class="o">=</span> <span class="n">fdlp_spectrogram_modnet</span><span class="p">(</span><span class="n">dropout_frame_num</span><span class="o">=</span><span class="n">dropout_frame_num</span><span class="p">,</span>
+                                                            <span class="n">dropout_while_eval</span><span class="o">=</span><span class="n">dropout_while_eval</span><span class="p">,</span>
+                                                            <span class="n">pause_dropout_after_steps</span><span class="o">=</span><span class="n">pause_dropout_after_steps</span><span class="p">,</span>
+                                                            <span class="n">n_filters</span><span class="o">=</span><span class="n">n_filters</span><span class="p">,</span> <span class="n">coeff_num</span><span class="o">=</span><span class="n">coeff_num</span><span class="p">,</span>
+                                                            <span class="n">coeff_range</span><span class="o">=</span><span class="n">coeff_range</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
+                                                            <span class="n">fduration</span><span class="o">=</span><span class="n">fduration</span><span class="p">,</span> <span class="n">frate</span><span class="o">=</span><span class="n">frate</span><span class="p">,</span>
+                                                            <span class="n">overlap_fraction</span><span class="o">=</span><span class="n">overlap_fraction</span><span class="p">,</span>
+                                                            <span class="n">srate</span><span class="o">=</span><span class="n">srate</span><span class="p">,</span> <span class="n">update_fbank</span><span class="o">=</span><span class="n">update_fbank</span><span class="p">,</span>
+                                                            <span class="n">update_lifter</span><span class="o">=</span><span class="n">update_lifter</span><span class="p">,</span>
+                                                            <span class="n">update_lifter_multiband</span><span class="o">=</span><span class="n">update_lifter_multiband</span><span class="p">,</span>
+                                                            <span class="n">lifter_nonlinear_transformation</span><span class="o">=</span><span class="n">lifter_nonlinear_transformation</span><span class="p">,</span>
+                                                            <span class="n">do_bwe</span><span class="o">=</span><span class="n">do_bwe</span><span class="p">,</span> <span class="n">bwe_factor</span><span class="o">=</span><span class="n">bwe_factor</span><span class="p">,</span>
+                                                            <span class="n">bwe_iter_num</span><span class="o">=</span><span class="n">bwe_iter_num</span><span class="p">,</span>
+                                                            <span class="n">complex_modulation</span><span class="o">=</span><span class="n">complex_modulation</span><span class="p">,</span>
+                                                            <span class="n">precision_lpc</span><span class="o">=</span><span class="n">precision_lpc</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">num_modulation_head</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fdlp_spectrogram</span> <span class="o">=</span> <span class="n">fdlp_spectrogram_with_mmh</span><span class="p">(</span><span class="n">n_filters</span><span class="o">=</span><span class="n">n_filters</span><span class="p">,</span> <span class="n">coeff_num</span><span class="o">=</span><span class="n">coeff_num</span><span class="p">,</span>
                                                               <span class="n">coeff_range</span><span class="o">=</span><span class="n">coeff_range</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>

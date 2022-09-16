@@ -170,7 +170,7 @@
 
 <span class="kn">from</span> <span class="nn">espnet2.asr.encoder.abs_encoder</span> <span class="kn">import</span> <span class="n">AbsEncoder</span>
 <span class="kn">from</span> <span class="nn">espnet2.asr.frontend.abs_frontend</span> <span class="kn">import</span> <span class="n">AbsFrontend</span>
-<span class="kn">from</span> <span class="nn">espnet2.modnet.projector.abs_projector</span> <span class="kn">import</span> <span class="n">AbsProjector</span>
+<span class="kn">from</span> <span class="nn">espnet2.modnet_v2.projector.abs_projector</span> <span class="kn">import</span> <span class="n">AbsProjector</span>
 <span class="kn">from</span> <span class="nn">espnet2.torch_utils.device_funcs</span> <span class="kn">import</span> <span class="n">force_gatherable</span>
 <span class="kn">from</span> <span class="nn">espnet2.train.abs_espnet_model</span> <span class="kn">import</span> <span class="n">AbsESPnetModel</span>
 
@@ -183,7 +183,7 @@
         <span class="k">yield</span>
 
 
-<div class="viewcode-block" id="ModNet"><a class="viewcode-back" href="../../../_gen/espnet2.modnet_v2.html#espnet2.modnet_v2.espnet_model.ModNet">[docs]</a><span class="k">class</span> <span class="nc">ModNet</span><span class="p">(</span><span class="n">AbsESPnetModel</span><span class="p">):</span>
+<div class="viewcode-block" id="ModNet_v2"><a class="viewcode-back" href="../../../_gen/espnet2.modnet_v2.html#espnet2.modnet_v2.espnet_model.ModNet_v2">[docs]</a><span class="k">class</span> <span class="nc">ModNet_v2</span><span class="p">(</span><span class="n">AbsESPnetModel</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Self-supervised Modulation Net&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -209,7 +209,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">extract_feats_in_collect_stats</span> <span class="o">=</span> <span class="n">extract_feats_in_collect_stats</span>
 
-<div class="viewcode-block" id="ModNet.forward"><a class="viewcode-back" href="../../../_gen/espnet2.modnet_v2.html#espnet2.modnet_v2.espnet_model.ModNet.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+<div class="viewcode-block" id="ModNet_v2.forward"><a class="viewcode-back" href="../../../_gen/espnet2.modnet_v2.html#espnet2.modnet_v2.espnet_model.ModNet_v2.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">speech</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
             <span class="n">speech_original</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
@@ -259,7 +259,7 @@
 
         <span class="k">return</span> <span class="n">loss</span>
 
-<div class="viewcode-block" id="ModNet.collect_feats"><a class="viewcode-back" href="../../../_gen/espnet2.modnet_v2.html#espnet2.modnet_v2.espnet_model.ModNet.collect_feats">[docs]</a>    <span class="k">def</span> <span class="nf">collect_feats</span><span class="p">(</span>
+<div class="viewcode-block" id="ModNet_v2.collect_feats"><a class="viewcode-back" href="../../../_gen/espnet2.modnet_v2.html#espnet2.modnet_v2.espnet_model.ModNet_v2.collect_feats">[docs]</a>    <span class="k">def</span> <span class="nf">collect_feats</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">speech</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
             <span class="n">speech_original</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
@@ -278,7 +278,7 @@
             <span class="n">feats</span><span class="p">,</span> <span class="n">feats_lengths</span> <span class="o">=</span> <span class="n">speech</span><span class="p">,</span> <span class="n">speech_lengths</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;feats&quot;</span><span class="p">:</span> <span class="n">feats</span><span class="p">,</span> <span class="s2">&quot;feats_lengths&quot;</span><span class="p">:</span> <span class="n">feats_lengths</span><span class="p">}</span></div>
 
-<div class="viewcode-block" id="ModNet.encode"><a class="viewcode-back" href="../../../_gen/espnet2.modnet_v2.html#espnet2.modnet_v2.espnet_model.ModNet.encode">[docs]</a>    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span>
+<div class="viewcode-block" id="ModNet_v2.encode"><a class="viewcode-back" href="../../../_gen/espnet2.modnet_v2.html#espnet2.modnet_v2.espnet_model.ModNet_v2.encode">[docs]</a>    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">speech</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">speech_original</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">speech_lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Frontend + Encoder. Note that this method is used by asr_inference.py</span>
 
@@ -309,7 +309,7 @@
 
         <span class="k">return</span> <span class="n">encoder_out</span><span class="p">,</span> <span class="n">encoder_out_lens</span><span class="p">,</span> <span class="n">feats_original</span><span class="p">,</span> <span class="n">feats_dropout</span></div>
 
-<div class="viewcode-block" id="ModNet.analyze"><a class="viewcode-back" href="../../../_gen/espnet2.modnet_v2.html#espnet2.modnet_v2.espnet_model.ModNet.analyze">[docs]</a>    <span class="k">def</span> <span class="nf">analyze</span><span class="p">(</span>
+<div class="viewcode-block" id="ModNet_v2.analyze"><a class="viewcode-back" href="../../../_gen/espnet2.modnet_v2.html#espnet2.modnet_v2.espnet_model.ModNet_v2.analyze">[docs]</a>    <span class="k">def</span> <span class="nf">analyze</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">speech</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">speech_lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Frontend + Encoder. Note that this method is used by asr_inference.py</span>
@@ -343,7 +343,7 @@
         <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;feats_dropout&#39;</span><span class="p">:</span> <span class="n">feats_dropout</span><span class="p">,</span> <span class="s1">&#39;feats_original&#39;</span><span class="p">:</span> <span class="n">feats_original</span><span class="p">,</span> <span class="s1">&#39;encoder_out&#39;</span><span class="p">:</span> <span class="n">encoder_out</span><span class="p">,</span>
                 <span class="s1">&#39;dropout_mask&#39;</span><span class="p">:</span> <span class="n">dropout_mask</span><span class="p">}</span></div>
 
-<div class="viewcode-block" id="ModNet.asr_feats_encode"><a class="viewcode-back" href="../../../_gen/espnet2.modnet_v2.html#espnet2.modnet_v2.espnet_model.ModNet.asr_feats_encode">[docs]</a>    <span class="k">def</span> <span class="nf">asr_feats_encode</span><span class="p">(</span>
+<div class="viewcode-block" id="ModNet_v2.asr_feats_encode"><a class="viewcode-back" href="../../../_gen/espnet2.modnet_v2.html#espnet2.modnet_v2.espnet_model.ModNet_v2.asr_feats_encode">[docs]</a>    <span class="k">def</span> <span class="nf">asr_feats_encode</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">speech</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">speech_lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Frontend + Encoder. Note that this method is used by asr_inference.py</span>
