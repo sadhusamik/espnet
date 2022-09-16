@@ -91,7 +91,7 @@ projector_choices = ClassChoices(
 )
 
 
-class ModnetTask(AbsTask):
+class ModnetTask_v2(AbsTask):
     # If you need more than one optimizers, change this value
     num_optimizers: int = 1
 
