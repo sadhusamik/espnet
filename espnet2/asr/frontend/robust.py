@@ -198,6 +198,7 @@ class RobustFrontend(AbsFrontend):
     def forward(
             self, input: torch.Tensor, input_lengths: torch.Tensor
     ) -> Tuple[torch.Tensor, torch.Tensor]:
+
         # 1. Compute FDLP spectrogram
         if self.modulation_dropout:
             if self.return_dropout_mask and self.return_nondropout_spectrogram:
@@ -207,18 +208,19 @@ class RobustFrontend(AbsFrontend):
             else:
                 input_spec, feats_lens = self.fdlp_spectrogram(input, input_lengths)
         else:
+
             input_spec, feats_lens = self.fdlp_spectrogram(input, input_lengths)
 
         # 3. [Multi channel case]: Select a channel
-        if input_spec.dim() == 4:
-            # h: (B, T, C, F) -> h: (B, T, F)
-            if self.training:
-                # Select 1ch randomly
-                ch = np.random.randint(input_spec.size(2))
-                input_spec = input_spec[:, :, ch, :]
-            else:
-                # Use the first channel
-                input_spec = input_spec[:, :, 0, :]
+        #if input_spec.dim() == 4:
+        #    # h: (B, T, C, F) -> h: (B, T, F)
+        #    if self.training:
+        #        # Select 1ch randomly
+        #        ch = np.random.randint(input_spec.size(2))
+        #        input_spec = input_spec[:, :, ch, :]
+        #    else:
+        #        # Use the first channel
+        #        input_spec = input_spec[:, :, 0, :]
 
         if self.modulation_dropout:
             if self.return_dropout_mask and self.return_nondropout_spectrogram:
