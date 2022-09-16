@@ -27,7 +27,7 @@ else:
         yield
 
 
-class ModNet(AbsESPnetModel):
+class ModNet_v2(AbsESPnetModel):
     """Self-supervised Modulation Net"""
 
     def __init__(

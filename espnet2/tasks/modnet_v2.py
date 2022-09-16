@@ -42,7 +42,7 @@ from espnet2.asr.frontend.abs_frontend import AbsFrontend
 from espnet2.asr.frontend.robust import RobustFrontend
 from espnet2.modnet_v2.projector.abs_projector import AbsProjector
 from espnet2.modnet_v2.projector.modulation_projector import ModulationProjector
-from espnet2.modnet.espnet_model import ModNet
+from espnet2.modnet_v2.espnet_model import ModNet_v2
 
 from espnet2.tasks.abs_task import AbsTask
 from espnet2.torch_utils.initialize import initialize
@@ -275,7 +275,7 @@ class ModnetTask_v2(AbsTask):
                                     coeff_num=args.frontend_conf['coeff_num'])
 
         # 8. Build model
-        model = ModNet(
+        model = ModNet_v2(
             frontend=frontend,
             encoder=encoder,
             projector=projector,
