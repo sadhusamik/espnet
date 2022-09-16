@@ -117,7 +117,7 @@ class ModnetTask_v2(AbsTask):
         group.add_argument(
             "--model_conf",
             action=NestedDictAction,
-            default=get_default_kwargs(ModNet),
+            default=get_default_kwargs(ModNet_v2),
             help="The keyword arguments for model class.",
         )
 
