@@ -202,6 +202,17 @@ espnet2.bin.lm_calc_perplexity
     :show-inheritance:
 
 
+.. _espnet2.bin.modnet_train_v2:
+
+espnet2.bin.modnet_train_v2
+---------------------------
+
+.. automodule:: espnet2.bin.modnet_train_v2
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
 .. _espnet2.bin.aggregate_stats_dirs:
 
 espnet2.bin.aggregate_stats_dirs
