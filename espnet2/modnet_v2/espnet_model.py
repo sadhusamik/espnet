@@ -94,6 +94,10 @@ class ModNet_v2(AbsESPnetModel):
         encoder_out = torch.abs(encoder_out)
         # encoder_out=encoder_out[]
 
+        print(encoder_out.shape)
+        print(feats_original.shape)
+        sys.stdout.flush()
+
         num_batch = encoder_out.shape[0]
         batch_idx = np.arange(num_batch)
         loss = torch.Tensor([0])
