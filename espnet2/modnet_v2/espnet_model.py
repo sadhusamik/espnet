@@ -92,6 +92,7 @@ class ModNet_v2(AbsESPnetModel):
         encoder_out = torch.fft.fft(torch.view_as_complex(encoder_out),
                                     1 * int(self.frontend.fduration * self.frontend.frate))
         encoder_out = torch.abs(encoder_out)
+        encoder_out = torch.transpose(encoder_out, 2, 3)
         # encoder_out=encoder_out[]
 
         print(encoder_out.shape)
