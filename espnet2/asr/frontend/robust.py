@@ -81,6 +81,8 @@ class RobustFrontend(AbsFrontend):
         self.return_dropout_mask = return_dropout_mask
         self.modulation_dropout = modulation_dropout
         self.num_modulation_head = num_modulation_head
+        self.fduration=fduration
+        self.frate=frate
 
         if modnet:
             self.fdlp_spectrogram = fdlp_spectrogram_modnet(dropout_frame_num=dropout_frame_num,
