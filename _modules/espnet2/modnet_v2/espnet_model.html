@@ -248,14 +248,18 @@
         <span class="n">encoder_out</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">view_as_complex</span><span class="p">(</span><span class="n">encoder_out</span><span class="p">),</span>
                                     <span class="mi">1</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frontend</span><span class="o">.</span><span class="n">fduration</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">frontend</span><span class="o">.</span><span class="n">frate</span><span class="p">))</span>
         <span class="n">encoder_out</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">encoder_out</span><span class="p">)</span>
-        <span class="c1">#encoder_out=encoder_out[]</span>
+        <span class="c1"># encoder_out=encoder_out[]</span>
 
+        <span class="nb">print</span><span class="p">(</span><span class="n">encoder_out</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">feats_original</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+        <span class="n">num_batch</span> <span class="o">=</span> <span class="n">encoder_out</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">batch_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_batch</span><span class="p">)</span>
         <span class="n">loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span>
-        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">frame_idx</span> <span class="ow">in</span> <span class="n">random_frame_idx</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">frame_number</span> <span class="ow">in</span> <span class="n">frame_idx</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">freq_band</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">feats_original</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span>
-                    <span class="n">loss</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prediction_loss</span><span class="p">(</span><span class="n">feats_original</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="n">frame_number</span><span class="p">,</span> <span class="n">freq_band</span><span class="p">,</span> <span class="p">:],</span>
-                                                 <span class="n">encoder_out</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="n">frame_number</span><span class="p">,</span> <span class="n">freq_band</span><span class="p">,</span> <span class="p">:])</span>
+        <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">batch_idx</span><span class="p">,</span> <span class="n">random_frame_idx</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">freq_band</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">feats_original</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span>
+                <span class="n">loss</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prediction_loss</span><span class="p">(</span><span class="n">feats_original</span><span class="p">[</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">freq_band</span><span class="p">,</span> <span class="p">:],</span> <span class="n">encoder_out</span><span class="p">[</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">freq_band</span><span class="p">,</span> <span class="p">:])</span>
 
         <span class="k">return</span> <span class="n">loss</span>
 
@@ -302,10 +306,10 @@
             <span class="n">encoder_out</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span>
             <span class="n">speech</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
         <span class="p">)</span>
-        <span class="c1">#assert encoder_out.size(1) &lt;= encoder_out_lens.max(), (</span>
+        <span class="c1"># assert encoder_out.size(1) &lt;= encoder_out_lens.max(), (</span>
         <span class="c1">#    encoder_out.size(),</span>
         <span class="c1">#    encoder_out_lens.max(),</span>
-        <span class="c1">#)</span>
+        <span class="c1"># )</span>
 
         <span class="k">return</span> <span class="n">encoder_out</span><span class="p">,</span> <span class="n">encoder_out_lens</span><span class="p">,</span> <span class="n">feats_original</span><span class="p">,</span> <span class="n">feats_dropout</span></div>
 
