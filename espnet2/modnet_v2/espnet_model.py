@@ -92,14 +92,14 @@ class ModNet_v2(AbsESPnetModel):
         encoder_out = torch.fft.fft(torch.view_as_complex(encoder_out),
                                     1 * int(self.frontend.fduration * self.frontend.frate))
         encoder_out = torch.abs(encoder_out)
-        #encoder_out=encoder_out[]
+        # encoder_out=encoder_out[]
 
+        num_batch = encoder_out.shape[0]
+        batch_idx = np.arange(num_batch)
         loss = torch.Tensor([0])
-        for idx, frame_idx in random_frame_idx:
-            for frame_number in frame_idx:
-                for freq_band in range(feats_original.shape[2]):
-                    loss += self.prediction_loss(feats_original[idx, frame_number, freq_band, :],
-                                                 encoder_out[idx, frame_number, freq_band, :])
+        for p, q in zip(batch_idx, random_frame_idx):
+            for freq_band in range(feats_original.shape[2]):
+                loss += self.prediction_loss(feats_original[p, q, freq_band, :], encoder_out[p, q, freq_band, :])
 
         return loss
 
@@ -146,10 +146,10 @@ class ModNet_v2(AbsESPnetModel):
             encoder_out.size(),
             speech.size(0),
         )
-        #assert encoder_out.size(1) <= encoder_out_lens.max(), (
+        # assert encoder_out.size(1) <= encoder_out_lens.max(), (
         #    encoder_out.size(),
         #    encoder_out_lens.max(),
-        #)
+        # )
 
         return encoder_out, encoder_out_lens, feats_original, feats_dropout
 
