@@ -81,8 +81,8 @@ class RobustFrontend(AbsFrontend):
         self.return_dropout_mask = return_dropout_mask
         self.modulation_dropout = modulation_dropout
         self.num_modulation_head = num_modulation_head
-        self.fduration=fduration
-        self.frate=frate
+        self.fduration = fduration
+        self.frate = frate
 
         if modnet:
             self.fdlp_spectrogram = fdlp_spectrogram_modnet(dropout_frame_num=dropout_frame_num,
@@ -214,7 +214,7 @@ class RobustFrontend(AbsFrontend):
             input_spec, feats_lens = self.fdlp_spectrogram(input, input_lengths)
 
         # 3. [Multi channel case]: Select a channel
-        #if input_spec.dim() == 4:
+        # if input_spec.dim() == 4:
         #    # h: (B, T, C, F) -> h: (B, T, F)
         #    if self.training:
         #        # Select 1ch randomly

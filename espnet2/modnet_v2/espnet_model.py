@@ -99,6 +99,7 @@ class ModNet_v2(AbsESPnetModel):
         encoder_out = torch.abs(torch.exp(encoder_out))
         encoder_out = encoder_out * han_weight / ham_weight
         encoder_out = torch.transpose(encoder_out, 2, 3)
+
         # encoder_out=encoder_out[]
 
         # print(encoder_out.shape)
@@ -113,7 +114,7 @@ class ModNet_v2(AbsESPnetModel):
         for p, q in zip(batch_idx, random_frame_idx):
             for freq_band in range(feats_original.shape[2]):
                 count += 1
-                loss += self.prediction_loss(feats_original[p, q, freq_band, :], encoder_out[p, q, freq_band, :])
+                loss += self.prediction_loss(torch.log(feats_original[p, q, freq_band, :]), torch.log(encoder_out[p, q, freq_band, :]))
 
         return loss / count
 
