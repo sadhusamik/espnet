@@ -455,7 +455,7 @@ class fdlp_spectrogram(torch.nn.Module):
         x_ph = torch.arange(phase.shape[0], device=frames.device)
         y_ph = phase[0] + x_ph * phi
         ph_corrected = y_ph - phase
-        ph_corrected = ph_corrected * phase_max_cap / np.max(ph_corrected)
+        ph_corrected = ph_corrected * phase_max_cap / torch.max(ph_corrected)
 
         ssv = logmag + 1j * ph_corrected
 
