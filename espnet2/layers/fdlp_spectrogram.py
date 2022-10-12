@@ -383,6 +383,90 @@ class fdlp_spectrogram(torch.nn.Module):
         frames = torch.cat(frames, dim=1)
         return tsamples, frames
 
+    def get_normalizing_vector(self, signal, fduration, overlap_fraction, append_len=500000, discont=np.pi,
+                               no_window=True, phase_max_cap=200):
+
+        overlap_fraction = 1 - overlap_fraction
+        lfr = 1 / (overlap_fraction * fduration)
+        flength_samples = int(self.srate * fduration)
+        frate_samples = int(self.srate / lfr)
+
+        if flength_samples % 2 == 0:
+            sp_b = int(flength_samples / 2) - 1
+            sp_f = int(flength_samples / 2)
+            extend = int(flength_samples / 2) - 1
+        else:
+            sp_b = int((flength_samples - 1) / 2)
+            sp_f = int((flength_samples - 1) / 2)
+            extend = int((flength_samples - 1) / 2)
+
+        if self.feature_batch is not None:
+            # Reshape to have longer utterances, helps in feature extraction
+            # Might not be equally divisible, deal with that
+            sig_size = signal.shape[0] * signal.shape[1]
+            div_req = self.feature_batch
+            div_reminder = sig_size % div_req
+            signal = signal.flatten()
+            if div_reminder != 0:
+                if div_reminder < int(div_req / 2):
+                    signal = signal[:-div_reminder]
+                else:
+                    signal = torch.cat([signal, torch.zeros(div_req - div_reminder, device=signal.device)])
+            signal = torch.reshape(signal, (self.feature_batch, -1))
+
+        tsamples = signal.shape[1]
+
+        # signal = torch.nn.functional.pad(signal.unsqueeze(1), (extend, extend), mode='constant', value=0.0).squeeze(1)
+        signal = torch.nn.functional.pad(signal.unsqueeze(1), (extend, extend), mode='constant', value=0.0).squeeze(1)
+
+        signal_length = signal.shape[1]
+
+        win = torch.hamming_window(flength_samples, dtype=signal.dtype, device=signal.device)
+
+        idx = sp_b
+        frames = []
+        while (idx + sp_f) < signal_length:
+            if no_window:
+                frames.append(signal[:, idx - sp_b:idx + sp_f + 1].unsqueeze(1))
+            else:
+                frames.append(signal[:, idx - sp_b:idx + sp_f + 1].unsqueeze(1) * win)
+            idx += frate_samples
+
+        frames = torch.cat(frames, dim=1)
+
+        frames = torch.cat([frames, torch.zeros(frames.shape[0], frames.shape[1], append_len - frames.shape[2],
+                                                dtype=frames.dtype, device=frames.device)], dim=-1)
+        frames = frames[:, :, 0:append_len]
+        frames = torch.log(torch.fft.fft(frames, axis=-1))
+        frames = torch.reshape(frames, (frames.shape[0] * frames.shape[1], -1))
+
+        total_num_frames = frames.shape[0]
+        phase = self.phase_unwrap(torch.imag(frames), discont=discont)
+        logmag = torch.real(frames)
+
+        phase = torch.sum(phase, dim=0) / total_num_frames
+        logmag = torch.sum(logmag, dim=0) / total_num_frames
+
+        ## Adjust the phase
+        phi = (phase[-1] - phase[0]) / phase.shape[0]
+        x_ph = torch.arange(phase.shape[0], dtype=frames.dtype, device=frames.device)
+        y_ph = phase[0] + x_ph * phi
+        ph_corrected = y_ph - phase
+        ph_corrected = ph_corrected * phase_max_cap / np.max(ph_corrected)
+
+        ssv = logmag + 1j * ph_corrected
+
+        return ssv
+
+    def phase_unwrap(self, phase, discont=np.pi):
+
+        phase_numpy = phase.cpu().detach().numpy()
+        phase_numpy = np.unwrap(np.imag(phase_numpy), discont=discont, axis=-1)
+        phase_numpy = torch.from_numpy(phase_numpy).to(phase.dtype)
+        phase = torch.from_numpy(phase_numpy).to(phase.device)
+
+        return phase
+
     def __warp_func_bark(self, x, warp_fact=1):
         import numpy as np
         return 6 * np.arcsinh((x / warp_fact) / 600)
@@ -460,6 +544,9 @@ class fdlp_spectrogram(torch.nn.Module):
             output: (Batch, Frames, Freq) or (Batch, Frames, Freq)
 
         """
+
+        if self.online_normalize:
+            self.spectral_substraction_vector=self.get_normalizing_vector(input, fduration=25, overlap_fraction=0.98, append_len=500000, discont=np.pi)
 
         num_batch = input.shape[0]
         # First divide the signal into frames
@@ -1619,7 +1706,7 @@ class fdlp_spectrogram_modnet(fdlp_spectrogram):
 
         return lifter
 
-    def compute_spectrogram(self, input: torch.Tensor, ilens: torch.Tensor = None) :
+    def compute_spectrogram(self, input: torch.Tensor, ilens: torch.Tensor = None):
         """Compute FDLP-Spectrogram With Matrices.
 
         Args:
@@ -1747,15 +1834,18 @@ class fdlp_spectrogram_modnet(fdlp_spectrogram):
 
         return output, olens
 
+
 class mvector(fdlp_spectrogram):
 
     def __init__(self,
                  lfr: float = 5,
+                 online_normalize: bool = False,
                  **kwargs
                  ):
         assert check_argument_types()
         super().__init__(**kwargs)
         self.lfr = lfr
+        self.online_normalize = online_normalize
 
     def compute_spectrogram(self, input: torch.Tensor, ilens: torch.Tensor = None) -> Tuple[
         torch.Tensor, Optional[torch.Tensor]]:
@@ -1768,9 +1858,19 @@ class mvector(fdlp_spectrogram):
             output: (Batch, Frames, Freq) or (Batch, Frames, Freq)
 
         """
+        num_batch = input.shape[0]
+        if self.online_normalize:
+            self.spectral_substraction_vector=self.get_normalizing_vector(input, fduration=25, overlap_fraction=0.98, append_len=500000, discont=np.pi)
 
         # First divide the signal into frames
         frames = self.get_frames(input)
+        num_frames = frames.shape[1]
+
+        if self.spectral_substraction_vector is not None:
+            self.spectral_substraction_vector = self.spectral_substraction_vector.to(input.device)
+            # logging.info('Substracting spectral vector')
+            frames = self.spectral_substraction_preprocessing(frames)
+
         if self.fbank.device.type != input.device.type:
             print('Transferring fbank to {:s}'.format(input.device.type))
             self.fbank = self.fbank.to(input.device)
