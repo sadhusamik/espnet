@@ -51,6 +51,7 @@ class fdlp_spectrogram(torch.nn.Module):
             fbank_config: str = '1,1,2.5',  # om_w,alpha,beta
             spectral_substraction_vector: str = None,
             dereverb_whole_sentence: bool = False,
+            online_normalize: bool = False,
             device: str = 'auto',
     ):
         assert check_argument_types()
@@ -190,6 +191,8 @@ class fdlp_spectrogram(torch.nn.Module):
             self.spectral_substraction_vector[0] = 0 + 1j * torch.imag(self.spectral_substraction_vector[0])
         else:
             self.spectral_substraction_vector = None
+
+        self.online_normalize = online_normalize
 
     def dct_type2(self, input: torch.Tensor) -> torch.Tensor:
         """
@@ -546,7 +549,8 @@ class fdlp_spectrogram(torch.nn.Module):
         """
 
         if self.online_normalize:
-            self.spectral_substraction_vector=self.get_normalizing_vector(input, fduration=25, overlap_fraction=0.98, append_len=500000, discont=np.pi)
+            self.spectral_substraction_vector = self.get_normalizing_vector(input, fduration=25, overlap_fraction=0.98,
+                                                                            append_len=500000, discont=np.pi)
 
         num_batch = input.shape[0]
         # First divide the signal into frames
@@ -1860,7 +1864,8 @@ class mvector(fdlp_spectrogram):
         """
         num_batch = input.shape[0]
         if self.online_normalize:
-            self.spectral_substraction_vector=self.get_normalizing_vector(input, fduration=25, overlap_fraction=0.98, append_len=500000, discont=np.pi)
+            self.spectral_substraction_vector = self.get_normalizing_vector(input, fduration=25, overlap_fraction=0.98,
+                                                                            append_len=500000, discont=np.pi)
 
         # First divide the signal into frames
         frames = self.get_frames(input)
