@@ -465,6 +465,7 @@ class fdlp_spectrogram(torch.nn.Module):
 
         phase_numpy = phase.cpu().detach().numpy()
         phase_numpy = np.unwrap(np.imag(phase_numpy), discont=discont, axis=-1)
+        phase_numpy = torch.from_numpy(phase_numpy)
         phase_numpy = torch.from_numpy(phase_numpy).to(phase.dtype)
         phase = torch.from_numpy(phase_numpy).to(phase.device)
 
