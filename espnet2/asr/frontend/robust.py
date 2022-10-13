@@ -70,6 +70,7 @@ class RobustFrontend(AbsFrontend):
             modnet: bool = False,
             online_normalize: bool = False,
             return_mvector: bool = False,
+            lfr: float = 5,
             fs: Union[int, str] = 16000,
             frontend_conf: Optional[dict] = get_default_kwargs(Frontend),
     ):
@@ -175,7 +176,7 @@ class RobustFrontend(AbsFrontend):
                                             freeze_lifter_finetune_updates=freeze_lifter_finetune_updates,
                                             lifter_nonlinear_transformation=lifter_nonlinear_transformation,
                                             fbank_config=fbank_config,
-                                            feature_batch=feature_batch,
+                                            feature_batch=feature_batch, lfr=lfr,
                                             spectral_substraction_vector=spectral_substraction_vector,
                                             dereverb_whole_sentence=dereverb_whole_sentence,
                                             do_bwe=do_bwe, bwe_factor=bwe_factor, bwe_iter_num=bwe_iter_num,
