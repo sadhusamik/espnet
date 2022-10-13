@@ -551,7 +551,7 @@ if ! "${skip_data_prep}"; then
 
                 # 2. Feature extract
                 _nj=$(min "${nj}" "$(<"${data_feats}${_suf}/${dset}/utt2spk" wc -l)")
-                fdlp_spectrogram/fdlp/fdlp_steps/make_modulation_feats.sh --nj "${_nj}" --cmd "${train_cmd}" "${data_feats}${_suf}/${dset}" "${data_feats}${_suf}/${dset}/featsdump"
+                fdlp_spectrogram/fdlp/fdlp_steps/make_modulation_feats.sh --nj "${_nj}" --cmd "${train_cmd}" --add_opts "--online_normalize" "${data_feats}${_suf}/${dset}" "${data_feats}${_suf}/${dset}/featsdump"
                 utils/fix_data_dir.sh "${data_feats}${_suf}/${dset}"
 
                 # 3. Derive the the frame length and feature dimension
