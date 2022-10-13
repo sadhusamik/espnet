@@ -13,7 +13,7 @@ from typeguard import check_argument_types
 from espnet.nets.pytorch_backend.frontends.frontend import Frontend
 from espnet2.asr.frontend.abs_frontend import AbsFrontend
 from espnet2.layers.fdlp_spectrogram import fdlp_spectrogram, fdlp_spectrogram_update, fdlp_spectrogram_dropout, \
-    fdlp_spectrogram_with_mmh, fdlp_spectrogram_modnet
+    fdlp_spectrogram_with_mmh, fdlp_spectrogram_modnet, mvector
 from espnet2.utils.get_default_kwargs import get_default_kwargs
 
 
@@ -84,6 +84,8 @@ class RobustFrontend(AbsFrontend):
         self.num_modulation_head = num_modulation_head
         self.fduration = fduration
         self.frate = frate
+        self.return_mvector = return_mvector
+        self.coeff_num = coeff_num
 
         if modnet:
             self.fdlp_spectrogram = fdlp_spectrogram_modnet(dropout_frame_num=dropout_frame_num,
@@ -155,6 +157,29 @@ class RobustFrontend(AbsFrontend):
                                                              bwe_iter_num=bwe_iter_num,
                                                              complex_modulation=complex_modulation,
                                                              precision_lpc=precision_lpc, device=device)
+        elif return_mvector:
+            self.fdlp_spectrogram = mvector(n_filters=n_filters, coeff_num=coeff_num,
+                                            coeff_range=coeff_range, order=order,
+                                            fduration=fduration, frate=frate,
+                                            overlap_fraction=overlap_fraction,
+                                            srate=srate, update_fbank=update_fbank,
+                                            use_complex_lifter=use_complex_lifter,
+                                            update_lifter=update_lifter,
+                                            update_lifter_multiband=update_lifter_multiband,
+                                            initialize_lifter=initialize_lifter,
+                                            complex_modulation=complex_modulation,
+                                            boost_lifter_lr=boost_lifter_lr,
+                                            num_chunks=num_chunks,
+                                            online_normalize=online_normalize,
+                                            scale_lifter_gradient=scale_lifter_gradient,
+                                            freeze_lifter_finetune_updates=freeze_lifter_finetune_updates,
+                                            lifter_nonlinear_transformation=lifter_nonlinear_transformation,
+                                            fbank_config=fbank_config,
+                                            feature_batch=feature_batch,
+                                            spectral_substraction_vector=spectral_substraction_vector,
+                                            dereverb_whole_sentence=dereverb_whole_sentence,
+                                            do_bwe=do_bwe, bwe_factor=bwe_factor, bwe_iter_num=bwe_iter_num,
+                                            precision_lpc=precision_lpc, device=device)
         else:
             self.fdlp_spectrogram = fdlp_spectrogram(n_filters=n_filters, coeff_num=coeff_num,
                                                      coeff_range=coeff_range, order=order,
@@ -187,7 +212,9 @@ class RobustFrontend(AbsFrontend):
             self.pretrained_params = None
 
     def output_size(self) -> int:
-        if self.num_modulation_head:
+        if self.return_mvector:
+            return self.n_filters * self.coeff_num * 2
+        elif self.num_modulation_head:
             return self.n_filters * self.num_modulation_head
         else:
             return self.n_filters

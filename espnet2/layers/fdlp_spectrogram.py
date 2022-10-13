@@ -1844,13 +1844,11 @@ class mvector(fdlp_spectrogram):
 
     def __init__(self,
                  lfr: float = 5,
-                 online_normalize: bool = False,
                  **kwargs
                  ):
         assert check_argument_types()
         super().__init__(**kwargs)
         self.lfr = lfr
-        self.online_normalize = online_normalize
 
     def compute_spectrogram(self, input: torch.Tensor, ilens: torch.Tensor = None) -> Tuple[
         torch.Tensor, Optional[torch.Tensor]]:
@@ -1906,7 +1904,10 @@ class mvector(fdlp_spectrogram):
                 frames[idx] = frames[idx].reshape(frames[idx].size(0), frames[idx].size(1),
                                                   -1)  # batch x num_frames x n_filters * num_modspec
                 if self.complex_modulation:
-                    frames[idx] = torch.abs(frames[idx])
+                    # frames[idx] = torch.log(torch.abs(frames[idx]))
+                    frames[idx] = torch.cat(
+                        [torch.view_as_real(frames[idx])[:, :, :, 0], torch.view_as_real(frames[idx])[:, :, :, 1]],
+                        dim=-1)
 
             frames = torch.cat(frames, dim=1)
         else:
@@ -1931,7 +1932,8 @@ class mvector(fdlp_spectrogram):
             frames = frames.reshape(frames.size(0), frames.size(1), -1)  # batch x num_frames x n_filters * num_modspec
 
             if self.complex_modulation:
-                frames = torch.abs(frames)
+                frames = torch.cat([torch.view_as_real(frames)[:, :, :, 0], torch.view_as_real(frames)[:, :, :, 1]],
+                                   dim=-1)
 
         if self.lfr != self.frate:
             # We have to bilinear interpolate features to frame rate
