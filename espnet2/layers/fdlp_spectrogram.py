@@ -459,12 +459,12 @@ class fdlp_spectrogram(torch.nn.Module):
 
         ssv = logmag + 1j * ph_corrected
 
-        return ssv
+        return logmag, phase, ph_corrected, ssv
 
     def phase_unwrap(self, phase, discont=np.pi):
 
         phase_numpy = phase.cpu().detach().numpy()
-        phase_numpy = np.unwrap(np.imag(phase_numpy), discont=discont, axis=-1)
+        phase_numpy = np.unwrap(phase_numpy, discont=discont, axis=-1)
         phase_numpy = torch.from_numpy(phase_numpy)
         phase_numpy = phase_numpy.to(phase.dtype)
         phase = phase_numpy.to(phase.device)
