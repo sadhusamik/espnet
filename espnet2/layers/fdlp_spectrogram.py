@@ -550,8 +550,9 @@ class fdlp_spectrogram(torch.nn.Module):
         """
 
         if self.online_normalize:
-            self.spectral_substraction_vector = self.get_normalizing_vector(input, fduration=25, overlap_fraction=0.98,
-                                                                            append_len=500000, discont=np.pi)
+            _, _, _, self.spectral_substraction_vector = self.get_normalizing_vector(input, fduration=25,
+                                                                                     overlap_fraction=0.98,
+                                                                                     append_len=500000, discont=np.pi)
 
         num_batch = input.shape[0]
         # First divide the signal into frames
