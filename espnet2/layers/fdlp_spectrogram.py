@@ -2029,6 +2029,8 @@ class mvector(fdlp_spectrogram):
         else:
             olens = None
 
+        frames
+
         return frames, olens
 
     def forward(self, input: torch.Tensor, ilens: torch.Tensor = None

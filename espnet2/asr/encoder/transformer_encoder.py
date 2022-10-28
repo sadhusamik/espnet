@@ -98,7 +98,7 @@ class TransformerEncoder(AbsEncoder):
         elif input_layer == "conv2d8":
             self.embed = Conv2dSubsampling8(input_size, output_size, dropout_rate)
         elif input_layer == "conv2dmultichannel":
-            self.embed = Conv2dMultichannel(input_size, output_size, dropout_rate, in_channels=20)
+            self.embed = Conv2dMultichannel(input_size, output_size, dropout_rate, in_channels=160)
         elif input_layer == "embed":
             self.embed = torch.nn.Sequential(
                 torch.nn.Embedding(input_size, output_size, padding_idx=padding_idx),

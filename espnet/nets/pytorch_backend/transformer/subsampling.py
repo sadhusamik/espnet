@@ -70,7 +70,7 @@ class Conv2dMultichannel(torch.nn.Module):
         """Subsample x.
 
         Args:
-            x (torch.Tensor): Input tensor (#batch, time, idim).
+            x (torch.Tensor): Input tensor (#batch, time, nfilters, num_channels).
             x_mask (torch.Tensor): Input mask (#batch, 1, time).
 
         Returns:
@@ -80,6 +80,8 @@ class Conv2dMultichannel(torch.nn.Module):
                 where time' = time // 4.
 
         """
+        x = x.transpose(1, 3)  # batch, num_channels , nfilters, time
+        x = x.transpose(2, 3)  # batch, num_channels , time, nfilters
         x = x.unsqueeze(1)  # (b, c, t, f)
         x = self.conv(x)
         b, c, t, f = x.size()
