@@ -536,7 +536,7 @@ class fdlp_spectrogram(torch.nn.Module):
             ph_corrected[i, :] = y_ph - phase
             ph_corrected[i, :] = ph_corrected[i, :] * phase_max_cap / torch.max(ph_corrected[i, :])
 
-        ssv = logmag + 1j * ph_corrected
+        ssv = logmag + 1j * ph_corrected  # num_batch x dimension
 
         return logmag, phase, ph_corrected, ssv
 
@@ -776,7 +776,7 @@ class fdlp_spectrogram(torch.nn.Module):
 
         return signal[:, :sig_shape]
 
-    def spectral_substraction_preprocessing(self, frames):
+    def spectral_substraction_preprocessing_old(self, frames):
 
         ori_len = frames.shape[-1]
 
@@ -790,6 +790,25 @@ class fdlp_spectrogram(torch.nn.Module):
 
         frames_fft = torch.log(torch.fft.fft(frames))
         frames_fft = torch.real(torch.fft.ifft(torch.exp(frames_fft - self.spectral_substraction_vector)))
+
+        return frames_fft[:, :, :ori_len]
+
+    def spectral_substraction_preprocessing(self, frames):
+
+        ori_len = frames.shape[-1]
+        frame_num = frames.shape[1]
+
+        if self.spectral_substraction_vector.shape[1] > frames.shape[-1]:
+
+            frames = torch.cat((frames, torch.zeros(
+                frames.shape[0], frames.shape[1], self.spectral_substraction_vector.shape[1] - frames.shape[-1],
+                device=frames.device)), dim=-1)
+        else:
+            frames = frames[:, :0:self.spectral_substraction_vector.shape[1]]
+
+        frames_fft = torch.log(torch.fft.fft(frames))  # batch x frame_num x length
+        frames_fft = torch.real(torch.fft.ifft(torch.exp(
+            frames_fft - self.spectral_substraction_vector.unsqueeze(1).repeat(1, frame_num, 1))))  # batch x x frame_num x length
 
         return frames_fft[:, :, :ori_len]
 
