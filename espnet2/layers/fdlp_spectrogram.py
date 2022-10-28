@@ -1965,7 +1965,7 @@ class mvector(fdlp_spectrogram):
         if self.online_normalize:
             _, _, _, self.spectral_substraction_vector = self.get_normalizing_vector(input, fduration=25,
                                                                                      overlap_fraction=0.98,
-                                                                                     append_len=500000, discont=np.pi)
+                                                                                     append_len=400000, discont=np.pi)
 
         # First divide the signal into frames
         tsamples, frames = self.get_frames(input)
