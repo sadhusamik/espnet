@@ -533,7 +533,7 @@ class fdlp_spectrogram(torch.nn.Module):
             phi = (phase[i, -1] - phase[i, 0]) / dim
             x_ph = torch.arange(dim, device=frames.device)
             y_ph = phase[i, 0] + x_ph * phi
-            ph_corrected[i, :] = y_ph - phase[i,:]
+            ph_corrected[i, :] = y_ph - phase[i, :]
             ph_corrected[i, :] = ph_corrected[i, :] * phase_max_cap / torch.max(ph_corrected[i, :])
 
         ssv = logmag + 1j * ph_corrected  # num_batch x dimension
@@ -808,7 +808,8 @@ class fdlp_spectrogram(torch.nn.Module):
 
         frames_fft = torch.log(torch.fft.fft(frames))  # batch x frame_num x length
         frames_fft = torch.real(torch.fft.ifft(torch.exp(
-            frames_fft - self.spectral_substraction_vector.unsqueeze(1).repeat(1, frame_num, 1))))  # batch x x frame_num x length
+            frames_fft - self.spectral_substraction_vector.unsqueeze(1).repeat(1, frame_num,
+                                                                               1))))  # batch x x frame_num x length
 
         return frames_fft[:, :, :ori_len]
 
@@ -1962,8 +1963,9 @@ class mvector(fdlp_spectrogram):
         """
         num_batch = input.shape[0]
         if self.online_normalize:
-            self.spectral_substraction_vector = self.get_normalizing_vector(input, fduration=25, overlap_fraction=0.98,
-                                                                            append_len=500000, discont=np.pi)
+            _, _, _, self.spectral_substraction_vector = self.get_normalizing_vector(input, fduration=25,
+                                                                                     overlap_fraction=0.98,
+                                                                                     append_len=500000, discont=np.pi)
 
         # First divide the signal into frames
         tsamples, frames = self.get_frames(input)
