@@ -82,7 +82,7 @@ class Conv2dMultichannel(torch.nn.Module):
         """
         x = x.transpose(1, 3)  # batch, num_channels , nfilters, time
         x = x.transpose(2, 3)  # batch, num_channels , time, nfilters
-        x = x.unsqueeze(1)  # (b, c, t, f)
+        #x = x.unsqueeze(1)  # (b, c, t, f)
         x = self.conv(x)
         b, c, t, f = x.size()
         x = self.out(x.transpose(1, 2).contiguous().view(b, t, c * f))
