@@ -155,9 +155,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-      <li>espnet2.layers.fdlp_spectrogram</li>
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">espnet2.layers.fdlp_spectrogram</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -2202,8 +2202,23 @@
             <span class="n">frames</span> <span class="o">=</span> <span class="n">frames</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">frames</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">frames</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># batch x num_frames x n_filters * num_modspec</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">complex_modulation</span><span class="p">:</span>
-                <span class="n">frames</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">torch</span><span class="o">.</span><span class="n">view_as_real</span><span class="p">(</span><span class="n">frames</span><span class="p">)[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">torch</span><span class="o">.</span><span class="n">view_as_real</span><span class="p">(</span><span class="n">frames</span><span class="p">)[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]],</span>
-                                   <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">frames</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">frames</span><span class="p">)</span>  <span class="c1"># batch x num_frames x n_filters * num_modspec</span>
+                <span class="c1"># frames = torch.cat([torch.view_as_real(frames)[:, :, :, 0], torch.view_as_real(frames)[:, :, :, 1]],</span>
+                <span class="c1">#                   dim=-1)    # batch x num_frames x n_filters * num_modspec * 2</span>
+
+        <span class="c1"># if self.feature_batch is not None:</span>
+        <span class="c1">#    # Might not be equally divisible, deal with that</span>
+        <span class="c1">#    modspec_size = modspec.shape[0] * modspec.shape[1] * modspec.shape[2]</span>
+        <span class="c1">#    div_req = num_batch * self.n_filters</span>
+        <span class="c1">#    div_reminder = modspec_size % div_req</span>
+        <span class="c1">#    if div_reminder != 0:</span>
+        <span class="c1">#        modspec = modspec.flatten()</span>
+        <span class="c1">#        if div_reminder &lt; int(div_req / 2):</span>
+        <span class="c1">#            modspec = modspec[:-div_reminder]</span>
+        <span class="c1">#        else:</span>
+        <span class="c1">#            modspec = torch.cat([modspec, torch.zeros(div_req - div_reminder, device=input.device)])</span>
+
+        <span class="c1">#    modspec = torch.reshape(modspec, (num_batch, -1, self.n_filters))</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lfr</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frate</span><span class="p">:</span>
             <span class="c1"># We have to bilinear interpolate features to frame rate</span>
