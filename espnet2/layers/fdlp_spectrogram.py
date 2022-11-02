@@ -2005,7 +2005,7 @@ class mvector(fdlp_spectrogram):
                 frames[idx] = frames[idx].reshape(frames[idx].size(0), frames[idx].size(1),
                                                   -1)  # batch x num_frames x n_filters * num_modspec
                 if self.complex_modulation:
-                    frames[idx] = torch.log(torch.abs(frames[idx]))
+                    frames[idx] = torch.abs(frames[idx])
                     #frames[idx] = torch.cat(
                     #    [torch.view_as_real(frames[idx])[:, :, :, 0], torch.view_as_real(frames[idx])[:, :, :, 1]],
                     #    dim=-1)
