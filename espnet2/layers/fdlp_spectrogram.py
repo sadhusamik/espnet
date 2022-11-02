@@ -2065,7 +2065,7 @@ class mvector(fdlp_spectrogram):
         else:
             olens = None
 
-        frames = torch.reshape(frames, (frames.shape[0], frames.shape[1], self.n_filters, self.coeff_num * 2))
+        frames = torch.reshape(frames, (frames.shape[0], frames.shape[1], self.n_filters, self.coeff_num ))
 
         return frames, olens
 
