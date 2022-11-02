@@ -2033,8 +2033,23 @@ class mvector(fdlp_spectrogram):
             frames = frames.reshape(frames.size(0), frames.size(1), -1)  # batch x num_frames x n_filters * num_modspec
 
             if self.complex_modulation:
-                frames = torch.cat([torch.view_as_real(frames)[:, :, :, 0], torch.view_as_real(frames)[:, :, :, 1]],
-                                   dim=-1)
+                frames = torch.abs(frames)  # batch x num_frames x n_filters * num_modspec
+                # frames = torch.cat([torch.view_as_real(frames)[:, :, :, 0], torch.view_as_real(frames)[:, :, :, 1]],
+                #                   dim=-1)    # batch x num_frames x n_filters * num_modspec * 2
+
+        # if self.feature_batch is not None:
+        #    # Might not be equally divisible, deal with that
+        #    modspec_size = modspec.shape[0] * modspec.shape[1] * modspec.shape[2]
+        #    div_req = num_batch * self.n_filters
+        #    div_reminder = modspec_size % div_req
+        #    if div_reminder != 0:
+        #        modspec = modspec.flatten()
+        #        if div_reminder < int(div_req / 2):
+        #            modspec = modspec[:-div_reminder]
+        #        else:
+        #            modspec = torch.cat([modspec, torch.zeros(div_req - div_reminder, device=input.device)])
+
+        #    modspec = torch.reshape(modspec, (num_batch, -1, self.n_filters))
 
         if self.lfr != self.frate:
             # We have to bilinear interpolate features to frame rate
