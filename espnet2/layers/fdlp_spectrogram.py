@@ -2054,7 +2054,7 @@ class mvector(fdlp_spectrogram):
         if self.lfr != self.frate:
             # We have to bilinear interpolate features to frame rate
             frames = frames.transpose(1, 2)
-            frames = torch.nn.functional.interpolate(frames, scale_factor=np.ceil(self.frate / self.lfr), mode='linear')
+            frames = torch.nn.functional.interpolate(frames, scale_factor=self.frate / self.lfr, mode='linear')
             frames = frames.transpose(1, 2)
 
         if ilens is not None:
