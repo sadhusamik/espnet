@@ -110,7 +110,7 @@ normalize_choices = ClassChoices(
         utterance_mvn=UtteranceMVN,
     ),
     type_check=AbsNormalize,
-    default="utterance_mvn",
+    default=None,
     optional=True,
 )
 model_choices = ClassChoices(
