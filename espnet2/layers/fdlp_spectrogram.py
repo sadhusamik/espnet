@@ -519,24 +519,24 @@ class fdlp_spectrogram(torch.nn.Module):
         # frames = torch.reshape(frames, (frames.shape[0] * frames.shape[1], -1))
 
         total_num_frames = frames.shape[1]
+        num_batch = frames.shape[0]
         phase = self.phase_unwrap(torch.imag(frames), discont=discont)  # num_batch x num_frames x dimension
         logmag = torch.real(frames)  # num_batch x num_frames x dimension
+
+        # Remove group delay from each phase
+        for i in range(num_batch):
+            for j in range(total_num_frames):
+                phs = phase[i, j]
+                phi = (phs[-1] - phs[0]) / phs.shape[0]
+                x_ph = np.arange(phs.shape[0])
+                y_ph = phs[0] + x_ph * phi
+                ph_corrected = phs - y_ph
+                phase[i, j] = ph_corrected
 
         phase = torch.sum(phase, dim=1) / total_num_frames  # num_batch x dimension
         logmag = torch.sum(logmag, dim=1) / total_num_frames  # num_batch x dimension
 
-        ## Adjust the phase
-        batch_num = logmag.shape[0]
-        dim = logmag.shape[1]
-        ph_corrected = torch.zeros(batch_num, dim, device=phase.device)
-        for i in range(batch_num):
-            phi = (phase[i, -1] - phase[i, 0]) / dim
-            x_ph = torch.arange(dim, device=frames.device)
-            y_ph = phase[i, 0] + x_ph * phi
-            ph_corrected[i, :] = y_ph - phase[i, :]
-            ph_corrected[i, :] = ph_corrected[i, :] * phase_max_cap / torch.max(ph_corrected[i, :])
-
-        ssv = logmag + 1j * ph_corrected  # num_batch x dimension
+        ssv = logmag + 1j * phase  # num_batch x dimension
 
         return logmag, phase, ph_corrected, ssv
 
@@ -807,9 +807,14 @@ class fdlp_spectrogram(torch.nn.Module):
             frames = frames[:, :0:self.spectral_substraction_vector.shape[1]]
 
         frames_fft = torch.log(torch.fft.fft(frames))  # batch x frame_num x length
+        temp = self.spectral_substraction_vector    # batch x length
+        temp_imag = torch.imag(temp)
+        temp_imag = np.pi * temp_imag / torch.max(temp_imag)
+        temp = torch.real(temp) + temp_imag
+        temp[:0] = temp[:-1]
         frames_fft = torch.real(torch.fft.ifft(torch.exp(
             frames_fft - self.spectral_substraction_vector.unsqueeze(1).repeat(1, frame_num,
-                                                                               1))))  # batch x x frame_num x length
+                                                                               1))))  # batch x frame_num x length
 
         return frames_fft[:, :, :ori_len]
 
@@ -2006,7 +2011,7 @@ class mvector(fdlp_spectrogram):
                                                   -1)  # batch x num_frames x n_filters * num_modspec
                 if self.complex_modulation:
                     frames[idx] = torch.abs(frames[idx])
-                    #frames[idx] = torch.cat(
+                    # frames[idx] = torch.cat(
                     #    [torch.view_as_real(frames[idx])[:, :, :, 0], torch.view_as_real(frames[idx])[:, :, :, 1]],
                     #    dim=-1)
 
@@ -2065,7 +2070,7 @@ class mvector(fdlp_spectrogram):
         else:
             olens = None
 
-        frames = torch.reshape(frames, (frames.shape[0], frames.shape[1], self.n_filters, self.coeff_num ))
+        frames = torch.reshape(frames, (frames.shape[0], frames.shape[1], self.n_filters, self.coeff_num))
 
         return frames, olens
 
