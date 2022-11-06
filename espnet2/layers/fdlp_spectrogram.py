@@ -528,7 +528,7 @@ class fdlp_spectrogram(torch.nn.Module):
             for j in range(total_num_frames):
                 phs = phase[i, j]
                 phi = (phs[-1] - phs[0]) / phs.shape[0]
-                x_ph = np.arange(phs.shape[0])
+                x_ph = torch.arange(phs.shape[0])
                 y_ph = phs[0] + x_ph * phi
                 ph_corrected = phs - y_ph
                 phase[i, j] = ph_corrected
