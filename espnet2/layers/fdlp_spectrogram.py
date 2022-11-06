@@ -813,7 +813,7 @@ class fdlp_spectrogram(torch.nn.Module):
         temp = torch.real(temp) + temp_imag
         temp[:0] = temp[:-1]
         frames_fft = torch.real(torch.fft.ifft(torch.exp(
-            frames_fft - self.spectral_substraction_vector.unsqueeze(1).repeat(1, frame_num,
+            frames_fft - temp.unsqueeze(1).repeat(1, frame_num,
                                                                                1))))  # batch x frame_num x length
 
         return frames_fft[:, :, :ori_len]
