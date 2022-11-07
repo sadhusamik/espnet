@@ -240,6 +240,8 @@
             <span class="n">online_normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
             <span class="n">return_mvector</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
             <span class="n">lfr</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+            <span class="n">log_magnitude_modulation</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="n">full_modulation_spectrum</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
             <span class="n">fs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="mi">16000</span><span class="p">,</span>
             <span class="n">frontend_conf</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_default_kwargs</span><span class="p">(</span><span class="n">Frontend</span><span class="p">),</span>
     <span class="p">):</span>
@@ -346,6 +348,8 @@
                                             <span class="n">lifter_nonlinear_transformation</span><span class="o">=</span><span class="n">lifter_nonlinear_transformation</span><span class="p">,</span>
                                             <span class="n">fbank_config</span><span class="o">=</span><span class="n">fbank_config</span><span class="p">,</span>
                                             <span class="n">feature_batch</span><span class="o">=</span><span class="n">feature_batch</span><span class="p">,</span> <span class="n">lfr</span><span class="o">=</span><span class="n">lfr</span><span class="p">,</span>
+                                            <span class="n">log_magnitude_modulation</span><span class="o">=</span><span class="n">log_magnitude_modulation</span><span class="p">,</span>
+                                            <span class="n">full_modulation_spectrum</span><span class="o">=</span><span class="n">full_modulation_spectrum</span><span class="p">,</span>
                                             <span class="n">spectral_substraction_vector</span><span class="o">=</span><span class="n">spectral_substraction_vector</span><span class="p">,</span>
                                             <span class="n">dereverb_whole_sentence</span><span class="o">=</span><span class="n">dereverb_whole_sentence</span><span class="p">,</span>
                                             <span class="n">do_bwe</span><span class="o">=</span><span class="n">do_bwe</span><span class="p">,</span> <span class="n">bwe_factor</span><span class="o">=</span><span class="n">bwe_factor</span><span class="p">,</span> <span class="n">bwe_iter_num</span><span class="o">=</span><span class="n">bwe_iter_num</span><span class="p">,</span>
