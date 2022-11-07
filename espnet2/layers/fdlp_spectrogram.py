@@ -811,7 +811,7 @@ class fdlp_spectrogram(torch.nn.Module):
         temp_imag = torch.imag(temp)
         temp_imag = np.pi * temp_imag / torch.max(temp_imag)
         temp = torch.real(temp) + temp_imag
-        temp[:0] = temp[:-1]
+        temp[:, 0] = temp[:, -1]
         frames_fft = torch.real(torch.fft.ifft(torch.exp(
             frames_fft - temp.unsqueeze(1).repeat(1, frame_num, 1))))  # batch x frame_num x length
 
