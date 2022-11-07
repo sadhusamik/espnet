@@ -2016,7 +2016,9 @@ class mvector(fdlp_spectrogram):
                     if self.log_magnitude_modulation:
                         frames[idx] = torch.log(torch.abs(frames[idx]))
                     elif self.full_modulation_spectrum:
-                        frames[idx] = torch.cat([torch.view_as_real(frames[idx])[:, :, :, 0], torch.view_as_real(frames[idx])[:, :, :, 1]],dim=-1)
+                        frames[idx] = torch.cat(
+                            [torch.view_as_real(frames[idx])[:, :, :, 0], torch.view_as_real(frames[idx])[:, :, :, 1]],
+                            dim=-1)
                     else:
                         frames[idx] = torch.abs(frames[idx])
 
@@ -2046,7 +2048,8 @@ class mvector(fdlp_spectrogram):
                 if self.log_magnitude_modulation:
                     frames = torch.log(torch.abs(frames))  # batch x num_frames x n_filters * num_modspec
                 elif self.full_modulation_spectrum:
-                    frames = torch.cat([torch.view_as_real(frames)[:, :, :, 0], torch.view_as_real(frames)[:, :, :, 1]],dim=-1)    # batch x num_frames x n_filters * num_modspec * 2
+                    frames = torch.cat([torch.view_as_real(frames)[:, :, :, 0], torch.view_as_real(frames)[:, :, :, 1]],
+                                       dim=-1)  # batch x num_frames x n_filters * num_modspec * 2
                 else:
                     frames = torch.abs(frames)
 
@@ -2078,7 +2081,10 @@ class mvector(fdlp_spectrogram):
         else:
             olens = None
 
-        frames = torch.reshape(frames, (frames.shape[0], frames.shape[1], self.n_filters, self.coeff_num))
+        if self.full_modulation_spectrum:
+            frames = torch.reshape(frames, (frames.shape[0], frames.shape[1], self.n_filters, 2 * self.coeff_num))
+        else:
+            frames = torch.reshape(frames, (frames.shape[0], frames.shape[1], self.n_filters, self.coeff_num))
 
         return frames, olens
 
