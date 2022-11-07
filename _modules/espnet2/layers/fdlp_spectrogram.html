@@ -2183,7 +2183,7 @@
                     <span class="c1">#    [torch.view_as_real(frames[idx])[:, :, :, 0], torch.view_as_real(frames[idx])[:, :, :, 1]],</span>
                     <span class="c1">#    dim=-1)</span>
 
-            <span class="n">frames</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">frames</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Compute DCT (olens remains the same)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">complex_modulation</span><span class="p">:</span>
@@ -2206,7 +2206,7 @@
             <span class="n">frames</span> <span class="o">=</span> <span class="n">frames</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">frames</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">frames</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># batch x num_frames x n_filters * num_modspec</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">complex_modulation</span><span class="p">:</span>
-                <span class="n">frames</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">frames</span><span class="p">)</span>  <span class="c1"># batch x num_frames x n_filters * num_modspec</span>
+                <span class="n">frames</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">frames</span><span class="p">))</span>  <span class="c1"># batch x num_frames x n_filters * num_modspec</span>
                 <span class="c1"># frames = torch.cat([torch.view_as_real(frames)[:, :, :, 0], torch.view_as_real(frames)[:, :, :, 1]],</span>
                 <span class="c1">#                   dim=-1)    # batch x num_frames x n_filters * num_modspec * 2</span>
 
