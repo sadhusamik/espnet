@@ -2014,7 +2014,7 @@ class mvector(fdlp_spectrogram):
                     #    [torch.view_as_real(frames[idx])[:, :, :, 0], torch.view_as_real(frames[idx])[:, :, :, 1]],
                     #    dim=-1)
 
-            frames = torch.cat(frames, dim=1)
+            frames = torch.log(torch.cat(frames, dim=1))
         else:
             # Compute DCT (olens remains the same)
             if self.complex_modulation:
@@ -2037,7 +2037,7 @@ class mvector(fdlp_spectrogram):
             frames = frames.reshape(frames.size(0), frames.size(1), -1)  # batch x num_frames x n_filters * num_modspec
 
             if self.complex_modulation:
-                frames = torch.abs(frames)  # batch x num_frames x n_filters * num_modspec
+                frames = torch.log(torch.abs(frames))  # batch x num_frames x n_filters * num_modspec
                 # frames = torch.cat([torch.view_as_real(frames)[:, :, :, 0], torch.view_as_real(frames)[:, :, :, 1]],
                 #                   dim=-1)    # batch x num_frames x n_filters * num_modspec * 2
 
