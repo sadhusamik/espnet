@@ -194,6 +194,7 @@ class TransformerEncoder(AbsEncoder):
             or isinstance(self.embed, Conv2dSubsampling6)
             or isinstance(self.embed, Conv2dSubsampling8)
             or isinstance(self.embed, Conv2dMultichannel)
+            or isinstance(self.embed, Conv2dMultichannel2Channel)
         ):
             short_status, limit_size = check_short_utt(self.embed, xs_pad.size(1))
             if short_status:
