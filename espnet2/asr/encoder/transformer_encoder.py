@@ -196,7 +196,10 @@ class TransformerEncoder(AbsEncoder):
             or isinstance(self.embed, Conv2dMultichannel)
             or isinstance(self.embed, Conv2dMultichannel2Channel)
         ):
-            short_status, limit_size = check_short_utt(self.embed, xs_pad.size(1))
+            if isinstance(xs_pad, list):
+                short_status, limit_size = check_short_utt(self.embed, xs_pad[0].size(1))
+            else:
+                short_status, limit_size = check_short_utt(self.embed, xs_pad.size(1))
             if short_status:
                 raise TooShortUttError(
                     f"has {xs_pad.size(1)} frames and is too short for subsampling "
