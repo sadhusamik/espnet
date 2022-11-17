@@ -2075,6 +2075,7 @@ class mvector(fdlp_spectrogram):
             # We have to bilinear interpolate features to frame rate
             if self.full_modulation_spectrum:
                 for f_idx in range(2):
+                    print(frames[f_idx].shape)
                     frames[f_idx] = (frames[f_idx]).transpose(1, 2)
                     frames[f_idx] = torch.nn.functional.interpolate(frames[f_idx], scale_factor=self.frate / self.lfr,
                                                                     mode='linear')
