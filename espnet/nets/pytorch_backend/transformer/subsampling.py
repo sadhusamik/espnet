@@ -123,15 +123,15 @@ class Conv2dMultichannel2Channel(torch.nn.Module):
             torch.nn.Conv2d(odim, odim, 3, 1, 1),
             torch.nn.ReLU(),
         )
-        #self.conv2 = torch.nn.Sequential(
-        #    torch.nn.Conv2d(in_channels, odim, 3, 1, 1),
-        #    torch.nn.ReLU(),
-        #    torch.nn.Conv2d(odim, odim, 3, 1, 1),
-        #    torch.nn.ReLU(),
-        #)
+        self.conv2 = torch.nn.Sequential(
+            torch.nn.Conv2d(in_channels, odim, 3, 1, 1),
+            torch.nn.ReLU(),
+            torch.nn.Conv2d(odim, odim, 3, 1, 1),
+            torch.nn.ReLU(),
+        )
 
         self.proj1 = torch.nn.Linear(odim * idim, odim)
-        self.proj2 = torch.nn.Linear(in_channels * idim, odim)
+        self.proj2 = torch.nn.Linear(odim * idim, odim)
 
         self.out = torch.nn.Sequential(
             torch.nn.Linear(2 * odim, odim),
@@ -159,10 +159,10 @@ class Conv2dMultichannel2Channel(torch.nn.Module):
 
         # x = x.unsqueeze(1)  # (b, c, t, f)
         x[0] = self.conv1(x[0])
-        #x[1] = self.conv2(x[1])
+        x[1] = self.conv2(x[1])
         b, c, t, f = x[0].size()
         x[0] = self.proj1(x[0].transpose(1, 2).contiguous().view(b, t, c * f))
-        b, c, t, f = x[1].size()
+        #b, c, t, f = x[1].size()
         x[1] = self.proj2(x[1].transpose(1, 2).contiguous().view(b, t, c * f))
 
         x = self.out(torch.cat(x, dim=-1))

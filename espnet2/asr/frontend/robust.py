@@ -73,6 +73,7 @@ class RobustFrontend(AbsFrontend):
             lfr: float = 5,
             log_magnitude_modulation: bool = False,
             full_modulation_spectrum: bool = False,
+            return_as_magnitude_phase: bool = False,
             fs: Union[int, str] = 16000,
             frontend_conf: Optional[dict] = get_default_kwargs(Frontend),
     ):

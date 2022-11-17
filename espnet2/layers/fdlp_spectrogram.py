@@ -1950,6 +1950,7 @@ class mvector(fdlp_spectrogram):
                  lfr: float = 5,
                  log_magnitude_modulation: bool = False,
                  full_modulation_spectrum: bool = False,
+                 return_as_magnitude_phase: bool = False,
                  **kwargs
                  ):
         assert check_argument_types()
@@ -1957,6 +1958,7 @@ class mvector(fdlp_spectrogram):
         self.lfr = lfr
         self.log_magnitude_modulation = log_magnitude_modulation
         self.full_modulation_spectrum = full_modulation_spectrum
+        self.return_as_magnitude_phase=return_as_magnitude_phase
 
     def compute_spectrogram(self, input: torch.Tensor, ilens: torch.Tensor = None) -> Tuple[
         torch.Tensor, Optional[torch.Tensor]]:
@@ -2025,7 +2027,10 @@ class mvector(fdlp_spectrogram):
 
             frames = torch.cat(frames, dim=1)
             if self.full_modulation_spectrum:
-                frames = [torch.log(torch.abs(frames)), torch.angle(frames)]
+                if self.return_as_magnitude_phase:
+                    frames = [torch.abs(frames), torch.angle(frames)]
+                else:
+                    frames = [torch.real(frames), torch.imag(frames)]
         else:
             # Compute DCT (olens remains the same)
             if self.complex_modulation:
@@ -2051,7 +2056,10 @@ class mvector(fdlp_spectrogram):
                 if self.log_magnitude_modulation:
                     frames = torch.log(torch.abs(frames))  # batch x num_frames x n_filters * num_modspec
                 elif self.full_modulation_spectrum:
-                    frames = [torch.log(torch.abs(frames)), torch.angle(frames)]  # log_magnitude, phase
+                    if self.return_as_magnitude_phase:
+                        frames = [torch.abs(frames), torch.angle(frames)]  # log_magnitude, phase
+                    else:
+                        frames = [torch.real(frames), torch.imag(frames)]
                     # frames = torch.cat(
                     ##    [torch.log(torch.abs(frames)).unsqueeze(-1), torch.view_as_real(frames)[:, :, :, 1]],
                     #   dim=-1)
