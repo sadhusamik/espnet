@@ -2015,14 +2015,17 @@ class mvector(fdlp_spectrogram):
                 if self.complex_modulation:
                     if self.log_magnitude_modulation:
                         frames[idx] = torch.log(torch.abs(frames[idx]))
-                    elif self.full_modulation_spectrum:
-                        frames[idx] = torch.cat(
-                            [torch.view_as_real(frames[idx])[:, :, :, 0], torch.view_as_real(frames[idx])[:, :, :, 1]],
-                            dim=-1)
-                    else:
+                    elif not self.full_modulation_spectrum:
+                        #frames[idx] = torch.abs(frames[idx])
                         frames[idx] = torch.abs(frames[idx])
+                    #    frames[idx] = torch.cat(
+                    #        [torch.view_as_real(frames[idx])[:, :, :, 0], torch.view_as_real(frames[idx])[:, :, :, 1]],
+                    #        dim=-1)
+                    #else:
 
             frames = torch.cat(frames, dim=1)
+            if self.full_modulation_spectrum:
+                frames = [torch.log(torch.abs(frames)), torch.angle(frames)]
         else:
             # Compute DCT (olens remains the same)
             if self.complex_modulation:
@@ -2075,6 +2078,7 @@ class mvector(fdlp_spectrogram):
             # We have to bilinear interpolate features to frame rate
             if self.full_modulation_spectrum:
                 for f_idx in range(2):
+                    print(frames[f_idx].shape)
                     print(frames[f_idx].shape)
                     frames[f_idx] = (frames[f_idx]).transpose(1, 2)
                     frames[f_idx] = torch.nn.functional.interpolate(frames[f_idx], scale_factor=self.frate / self.lfr,
