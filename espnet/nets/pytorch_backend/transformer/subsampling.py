@@ -161,8 +161,8 @@ class Conv2dMultichannel2Channel(torch.nn.Module):
         x[0] = self.conv1(x[0])
         #x[1] = self.conv2(x[1])
         b, c, t, f = x[0].size()
-
         x[0] = self.proj1(x[0].transpose(1, 2).contiguous().view(b, t, c * f))
+        b, c, t, f = x[1].size()
         x[1] = self.proj2(x[1].transpose(1, 2).contiguous().view(b, t, c * f))
 
         x = self.out(torch.cat(x, dim=-1))
