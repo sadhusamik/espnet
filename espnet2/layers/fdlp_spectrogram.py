@@ -2078,12 +2078,11 @@ class mvector(fdlp_spectrogram):
             # We have to bilinear interpolate features to frame rate
             if self.full_modulation_spectrum:
                 for f_idx in range(2):
-                    print(frames[f_idx].shape)
-                    print(frames[f_idx].shape)
-                    frames[f_idx] = (frames[f_idx]).transpose(1, 2)
+
+                    frames[f_idx] = frames[f_idx].transpose(1, 2)
                     frames[f_idx] = torch.nn.functional.interpolate(frames[f_idx], scale_factor=self.frate / self.lfr,
                                                                     mode='linear')
-                    frames[f_idx] = (frames[f_idx]).transpose(1, 2)
+                    frames[f_idx] = frames[f_idx].transpose(1, 2)
             else:
                 frames = frames.transpose(1, 2)
                 frames = torch.nn.functional.interpolate(frames, scale_factor=self.frate / self.lfr, mode='linear')
@@ -2092,8 +2091,13 @@ class mvector(fdlp_spectrogram):
         if ilens is not None:
             olens = torch.floor(ilens * self.frate / self.srate)
             olens = olens.to(ilens.dtype)
-            frames.masked_fill_(make_pad_mask(olens, frames, 1), 0.0000001)
-            frames = frames[:, :torch.max(olens), :]
+            if self.full_modulation_spectrum:
+                for f_idx in range(2):
+                    frames[f_idx].masked_fill_(make_pad_mask(olens, frames[f_idx], 1), 0.0000001)
+                    frames[f_idx] = frames[f_idx][:, :torch.max(olens), :]
+            else:
+                frames.masked_fill_(make_pad_mask(olens, frames, 1), 0.0000001)
+                frames = frames[:, :torch.max(olens), :]
         else:
             olens = None
 
