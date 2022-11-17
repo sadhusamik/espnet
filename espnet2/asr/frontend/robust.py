@@ -184,6 +184,7 @@ class RobustFrontend(AbsFrontend):
                                             full_modulation_spectrum=full_modulation_spectrum,
                                             spectral_substraction_vector=spectral_substraction_vector,
                                             dereverb_whole_sentence=dereverb_whole_sentence,
+                                            return_as_magnitude_phase=return_as_magnitude_phase,
                                             do_bwe=do_bwe, bwe_factor=bwe_factor, bwe_iter_num=bwe_iter_num,
                                             precision_lpc=precision_lpc, device=device)
         else:

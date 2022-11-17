@@ -1958,7 +1958,7 @@ class mvector(fdlp_spectrogram):
         self.lfr = lfr
         self.log_magnitude_modulation = log_magnitude_modulation
         self.full_modulation_spectrum = full_modulation_spectrum
-        self.return_as_magnitude_phase=return_as_magnitude_phase
+        self.return_as_magnitude_phase = return_as_magnitude_phase
 
     def compute_spectrogram(self, input: torch.Tensor, ilens: torch.Tensor = None) -> Tuple[
         torch.Tensor, Optional[torch.Tensor]]:
@@ -2018,12 +2018,12 @@ class mvector(fdlp_spectrogram):
                     if self.log_magnitude_modulation:
                         frames[idx] = torch.log(torch.abs(frames[idx]))
                     elif not self.full_modulation_spectrum:
-                        #frames[idx] = torch.abs(frames[idx])
+                        # frames[idx] = torch.abs(frames[idx])
                         frames[idx] = torch.abs(frames[idx])
                     #    frames[idx] = torch.cat(
                     #        [torch.view_as_real(frames[idx])[:, :, :, 0], torch.view_as_real(frames[idx])[:, :, :, 1]],
                     #        dim=-1)
-                    #else:
+                    # else:
 
             frames = torch.cat(frames, dim=1)
             if self.full_modulation_spectrum:
@@ -2086,7 +2086,6 @@ class mvector(fdlp_spectrogram):
             # We have to bilinear interpolate features to frame rate
             if self.full_modulation_spectrum:
                 for f_idx in range(2):
-
                     frames[f_idx] = frames[f_idx].transpose(1, 2)
                     frames[f_idx] = torch.nn.functional.interpolate(frames[f_idx], scale_factor=self.frate / self.lfr,
                                                                     mode='linear')
