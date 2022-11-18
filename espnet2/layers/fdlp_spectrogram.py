@@ -2018,15 +2018,10 @@ class mvector(fdlp_spectrogram):
                     if self.log_magnitude_modulation:
                         frames[idx] = torch.log(torch.abs(frames[idx]))
                     elif not self.full_modulation_spectrum:
-                        # frames[idx] = torch.abs(frames[idx])
                         frames[idx] = torch.abs(frames[idx])
-                    #    frames[idx] = torch.cat(
-                    #        [torch.view_as_real(frames[idx])[:, :, :, 0], torch.view_as_real(frames[idx])[:, :, :, 1]],
-                    #        dim=-1)
-                    # else:
 
             frames = torch.cat(frames, dim=1)
-            if self.full_modulation_spectrum:
+            if self.full_modulation_spectrum and self.complex_modulation:
                 if self.return_as_magnitude_phase:
                     frames = [torch.abs(frames), torch.angle(frames)]
                 else:
@@ -2060,11 +2055,6 @@ class mvector(fdlp_spectrogram):
                         frames = [torch.abs(frames), torch.angle(frames)]  # log_magnitude, phase
                     else:
                         frames = [torch.real(frames), torch.imag(frames)]
-                    # frames = torch.cat(
-                    ##    [torch.log(torch.abs(frames)).unsqueeze(-1), torch.view_as_real(frames)[:, :, :, 1]],
-                    #   dim=-1)
-                    # frames = torch.cat([torch.view_as_real(frames)[:, :, :, 0], torch.view_as_real(frames)[:, :, :, 1]],
-                    #                   dim=-1)  # batch x num_frames x n_filters * num_modspec * 2
                 else:
                     frames = torch.abs(frames)
 
@@ -2084,7 +2074,7 @@ class mvector(fdlp_spectrogram):
 
         if self.lfr != self.frate:
             # We have to bilinear interpolate features to frame rate
-            if self.full_modulation_spectrum:
+            if self.full_modulation_spectrum and self.complex_modulation:
                 for f_idx in range(2):
                     frames[f_idx] = frames[f_idx].transpose(1, 2)
                     frames[f_idx] = torch.nn.functional.interpolate(frames[f_idx], scale_factor=self.frate / self.lfr,
@@ -2098,7 +2088,7 @@ class mvector(fdlp_spectrogram):
         if ilens is not None:
             olens = torch.floor(ilens * self.frate / self.srate)
             olens = olens.to(ilens.dtype)
-            if self.full_modulation_spectrum:
+            if self.full_modulation_spectrum and self.complex_modulation:
                 for f_idx in range(2):
                     frames[f_idx].masked_fill_(make_pad_mask(olens, frames[f_idx], 1), 0.0000001)
                     frames[f_idx] = frames[f_idx][:, :torch.max(olens), :]
@@ -2108,7 +2098,7 @@ class mvector(fdlp_spectrogram):
         else:
             olens = None
 
-        if self.full_modulation_spectrum:
+        if self.full_modulation_spectrum and self.complex_modulation:
             for f_idx in range(2):
                 frames[f_idx] = torch.reshape(frames[f_idx], (
                     frames[f_idx].shape[0], frames[f_idx].shape[1], self.n_filters, self.coeff_num))
