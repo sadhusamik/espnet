@@ -26,7 +26,8 @@ from espnet.nets.pytorch_backend.transformer.subsampling import Conv2dSubsamplin
 from espnet.nets.pytorch_backend.transformer.subsampling import Conv2dSubsampling2
 from espnet.nets.pytorch_backend.transformer.subsampling import Conv2dSubsampling6
 from espnet.nets.pytorch_backend.transformer.subsampling import Conv2dSubsampling8
-from espnet.nets.pytorch_backend.transformer.subsampling import Conv2dMultichannel, Conv2dMultichannel2Channel
+from espnet.nets.pytorch_backend.transformer.subsampling import Conv2dMultichannel, Conv2dMultichannel2Channel, \
+    LinearMultichannel2Channel
 from espnet.nets.pytorch_backend.transformer.subsampling import TooShortUttError
 from espnet2.asr.ctc import CTC
 from espnet2.asr.encoder.abs_encoder import AbsEncoder
@@ -58,25 +59,25 @@ class TransformerEncoder(AbsEncoder):
     """
 
     def __init__(
-        self,
-        input_size: int,
-        output_size: int = 256,
-        attention_heads: int = 4,
-        linear_units: int = 2048,
-        num_blocks: int = 6,
-        dropout_rate: float = 0.1,
-        in_channels: int = 80,
-        positional_dropout_rate: float = 0.1,
-        attention_dropout_rate: float = 0.0,
-        input_layer: Optional[str] = "conv2d",
-        pos_enc_class=PositionalEncoding,
-        normalize_before: bool = True,
-        concat_after: bool = False,
-        positionwise_layer_type: str = "linear",
-        positionwise_conv_kernel_size: int = 1,
-        padding_idx: int = -1,
-        interctc_layer_idx: List[int] = [],
-        interctc_use_conditioning: bool = False,
+            self,
+            input_size: int,
+            output_size: int = 256,
+            attention_heads: int = 4,
+            linear_units: int = 2048,
+            num_blocks: int = 6,
+            dropout_rate: float = 0.1,
+            in_channels: int = 80,
+            positional_dropout_rate: float = 0.1,
+            attention_dropout_rate: float = 0.0,
+            input_layer: Optional[str] = "conv2d",
+            pos_enc_class=PositionalEncoding,
+            normalize_before: bool = True,
+            concat_after: bool = False,
+            positionwise_layer_type: str = "linear",
+            positionwise_conv_kernel_size: int = 1,
+            padding_idx: int = -1,
+            interctc_layer_idx: List[int] = [],
+            interctc_use_conditioning: bool = False,
     ):
         assert check_argument_types()
         super().__init__()
@@ -102,6 +103,8 @@ class TransformerEncoder(AbsEncoder):
             self.embed = Conv2dMultichannel(input_size, output_size, dropout_rate, in_channels=in_channels)
         elif input_layer == "conv2dmultichannel2C":
             self.embed = Conv2dMultichannel2Channel(input_size, output_size, dropout_rate, in_channels=in_channels)
+        elif input_layer == "linearmultichannel2C":
+            self.embed = LinearMultichannel2Channel(input_size, output_size, dropout_rate, in_channels=in_channels)
         elif input_layer == "embed":
             self.embed = torch.nn.Sequential(
                 torch.nn.Embedding(input_size, output_size, padding_idx=padding_idx),
@@ -166,11 +169,11 @@ class TransformerEncoder(AbsEncoder):
         return self._output_size
 
     def forward(
-        self,
-        xs_pad: torch.Tensor,
-        ilens: torch.Tensor,
-        prev_states: torch.Tensor = None,
-        ctc: CTC = None,
+            self,
+            xs_pad: torch.Tensor,
+            ilens: torch.Tensor,
+            prev_states: torch.Tensor = None,
+            ctc: CTC = None,
     ) -> Tuple[torch.Tensor, torch.Tensor, Optional[torch.Tensor]]:
         """Embed positions in tensor.
 
@@ -189,12 +192,13 @@ class TransformerEncoder(AbsEncoder):
         if self.embed is None:
             xs_pad = xs_pad
         elif (
-            isinstance(self.embed, Conv2dSubsampling)
-            or isinstance(self.embed, Conv2dSubsampling2)
-            or isinstance(self.embed, Conv2dSubsampling6)
-            or isinstance(self.embed, Conv2dSubsampling8)
-            or isinstance(self.embed, Conv2dMultichannel)
-            or isinstance(self.embed, Conv2dMultichannel2Channel)
+                isinstance(self.embed, Conv2dSubsampling)
+                or isinstance(self.embed, Conv2dSubsampling2)
+                or isinstance(self.embed, Conv2dSubsampling6)
+                or isinstance(self.embed, Conv2dSubsampling8)
+                or isinstance(self.embed, Conv2dMultichannel)
+                or isinstance(self.embed, Conv2dMultichannel2Channel)
+                or isinstance(self.embed, LinearMultichannel2Channel)
         ):
             if isinstance(xs_pad, list):
                 short_status, limit_size = check_short_utt(self.embed, xs_pad[0].size(1))
