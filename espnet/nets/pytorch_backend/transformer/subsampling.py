@@ -117,13 +117,13 @@ class LinearMultichannel2Channel(torch.nn.Module):
         super(LinearMultichannel2Channel, self).__init__()
 
         self.lin1 = torch.nn.Sequential(
-            torch.nn.Linear(idim, odim, 3, 1, 1),
+            torch.nn.Linear(idim, odim),
             torch.nn.LayerNorm(odim),
             torch.nn.Dropout(dropout_rate),
             torch.nn.ReLU(),
         )
         self.lin2 = torch.nn.Sequential(
-            torch.nn.Linear(idim, odim, 3, 1, 1),
+            torch.nn.Linear(idim, odim),
             torch.nn.LayerNorm(odim),
             torch.nn.Dropout(dropout_rate),
             torch.nn.ReLU(),
