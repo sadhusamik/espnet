@@ -856,7 +856,8 @@ class fdlp_spectrogram(torch.nn.Module):
             output = output.view(bs, -1, output.size(1), output.size(2)).transpose(
                 1, 2
             )
-
+        print(output.shape)
+        sys.stdout.flush()
         return output, olens
 
 
