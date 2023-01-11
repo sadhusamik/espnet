@@ -153,13 +153,13 @@ class fdlp_spectrogram(torch.nn.Module):
             if self.update_lifter_multiband:
                 if self.use_complex_lifter:
                     lifter = np.ones((self.n_filters, coeff_num, 2))
-                    lifter[:, :, 1] = 0
+                    #lifter[:, :, 1] = 0
                 else:
                     lifter = np.ones((self.n_filters, coeff_num))
             else:
                 if self.use_complex_lifter:
-                    lifter = np.ones(coeff_num, 2)
-                    lifter[:, 1] = 0
+                    lifter = np.ones((coeff_num, 2))
+                    #lifter[:, 1] = 0
                 else:
                     lifter = np.ones(coeff_num)
 
