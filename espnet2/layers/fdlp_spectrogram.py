@@ -833,8 +833,7 @@ class fdlp_spectrogram(torch.nn.Module):
         """
 
         bs = input.size(0)
-        print(input.shape)
-        sys.stdout.flush()
+        input=input[:,:,0]
         if self.freeze_lifter_finetune_updates:
             ft = self.freeze_lifter_finetune_updates <= self.num_updates  # Fine tune after ft is True
             if self.num_updates <= self.freeze_lifter_finetune_updates:
