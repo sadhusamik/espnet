@@ -627,7 +627,8 @@ class fdlp_spectrogram(torch.nn.Module):
             output: (Batch, Frames, Freq) or (Batch, Frames, Freq)
 
         """
-
+        print(input.shape)
+        sys.stdout.flush()
         if self.online_normalize:
             _, _, _, self.spectral_substraction_vector = self.get_normalizing_vector(input, fduration=25,
                                                                                      overlap_fraction=0.98,
@@ -695,6 +696,8 @@ class fdlp_spectrogram(torch.nn.Module):
             frames = self.compute_modspec_from_lpc(gain, frames,
                                                    self.coeff_num)  # batch x num_frames x n_filters x num_modspec
         modspec = frames
+        print(modspec.shape)
+        sys.stdout.flush()
 
         modspec = modspec * self.mask  # (batch x num_frames x n_filters x num_modspec)
         # logging.info('Boost rate {}'.format(self.boost_lifter_lr.data))
@@ -737,7 +740,8 @@ class fdlp_spectrogram(torch.nn.Module):
         # OVERLAP AND ADD
 
         modspec = self.OLA(modspec=modspec, t_samples=t_samples, dtype=input.dtype, device=input.device)
-
+        print(modspec.shape)
+        sys.stdout.flush()
         if self.feature_batch is not None:
             # Might not be equally divisible, deal with that
             modspec_size = modspec.shape[0] * modspec.shape[1] * modspec.shape[2]
