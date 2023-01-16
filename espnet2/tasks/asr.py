@@ -1,5 +1,6 @@
 import argparse
 import logging
+import sys
 from typing import Callable
 from typing import Collection
 from typing import Dict
@@ -441,6 +442,10 @@ class ASRTask(AbsTask):
             normalize = normalize_class(**args.normalize_conf)
         else:
             normalize = None
+
+        print('My normalization style is ')
+        print(args.normalize)
+        sys.stdout.flush()
 
         # 4. Pre-encoder input block
         # NOTE(kan-bayashi): Use getattr to keep the compatibility
