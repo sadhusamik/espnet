@@ -169,6 +169,7 @@
   <h1>Source code for espnet2.tasks.asr</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Collection</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
@@ -610,6 +611,10 @@
             <span class="n">normalize</span> <span class="o">=</span> <span class="n">normalize_class</span><span class="p">(</span><span class="o">**</span><span class="n">args</span><span class="o">.</span><span class="n">normalize_conf</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">normalize</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;My normalization style is &#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">normalize</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 
         <span class="c1"># 4. Pre-encoder input block</span>
         <span class="c1"># NOTE(kan-bayashi): Use getattr to keep the compatibility</span>
