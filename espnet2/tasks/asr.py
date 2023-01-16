@@ -443,10 +443,6 @@ class ASRTask(AbsTask):
         else:
             normalize = None
 
-        print('My normalization style is ')
-        print(args.normalize)
-        sys.stdout.flush()
-
         # 4. Pre-encoder input block
         # NOTE(kan-bayashi): Use getattr to keep the compatibility
         if getattr(args, "preencoder", None) is not None:
