@@ -612,10 +612,6 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">normalize</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;My normalization style is &#39;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">normalize</span><span class="p">)</span>
-        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
-
         <span class="c1"># 4. Pre-encoder input block</span>
         <span class="c1"># NOTE(kan-bayashi): Use getattr to keep the compatibility</span>
         <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s2">&quot;preencoder&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
