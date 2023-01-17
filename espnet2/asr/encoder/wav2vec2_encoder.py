@@ -37,7 +37,7 @@ class FairSeqWav2Vec2Encoder(AbsEncoder):
             input_size: int,
             w2v_url: str,
             w2v_dir_path: str = "./",
-            output_size: int = 256,
+            output_size: int = 768,
             normalize_before: bool = False,
             freeze_finetune_updates: int = 0,
             freeze: bool = False,
@@ -131,29 +131,29 @@ class FairSeqWav2Vec2Encoder(AbsEncoder):
         """
         masks = make_pad_mask(ilens).to(xs_pad.device)
 
-        ft = self.freeze_finetune_updates <= self.num_updates
-        if self.num_updates <= self.freeze_finetune_updates:
-            self.num_updates += 1
-        elif ft and self.num_updates == self.freeze_finetune_updates + 1:
-            self.num_updates += 1
-            # logging.info("Start fine-tuning wav2vec parameters!")
+        #ft = self.freeze_finetune_updates <= self.num_updates
+        #if self.num_updates <= self.freeze_finetune_updates:
+        #    self.num_updates += 1
+        #elif ft and self.num_updates == self.freeze_finetune_updates + 1:
+        #    self.num_updates += 1
+        #    # logging.info("Start fine-tuning wav2vec parameters!")
 
-        if self.freeze:
-            with torch.no_grad():  # if not ft else contextlib.nullcontext():
-                enc_outputs = self.encoders(
-                    xs_pad,
-                    masks,
-                    mask=False,
-                    features_only=True,
-                )
-        else:
-            with contextlib.nullcontext():
-                enc_outputs = self.encoders(
-                    xs_pad,
-                    masks,
-                    mask=False,
-                    features_only=True,
-                )
+        #if self.freeze:
+        #    with torch.no_grad():  # if not ft else contextlib.nullcontext():
+        #        enc_outputs = self.encoders(
+        #            xs_pad,
+        #            masks,
+        #            mask=False,
+        #            features_only=True,
+        #        )
+        #else:
+        #    with contextlib.nullcontext():
+        enc_outputs = self.encoders(
+            xs_pad,
+            masks,
+            mask=False,
+            features_only=True,
+        )
 
         xs_pad = enc_outputs["x"]  # (B,T,C),
         bs = xs_pad.shape[0]
@@ -166,8 +166,8 @@ class FairSeqWav2Vec2Encoder(AbsEncoder):
         if self.output_layer is not None:
             xs_pad = self.output_layer(xs_pad)
 
-        if self.normalize_before:
-            xs_pad = self.after_norm(xs_pad)
+        #if self.normalize_before:
+        #    xs_pad = self.after_norm(xs_pad)
 
         return xs_pad, olens, None
 
