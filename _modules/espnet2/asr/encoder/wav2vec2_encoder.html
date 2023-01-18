@@ -173,6 +173,8 @@
 <span class="sd">&quot;&quot;&quot;Encoder definition.&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">contextlib</span>
 <span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">filelock</span> <span class="kn">import</span> <span class="n">FileLock</span>
 <span class="kn">import</span> <span class="nn">logging</span>
@@ -300,12 +302,12 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">masks</span> <span class="o">=</span> <span class="n">make_pad_mask</span><span class="p">(</span><span class="n">ilens</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">xs_pad</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
 
-        <span class="c1">#ft = self.freeze_finetune_updates &lt;= self.num_updates</span>
+        <span class="c1">#ft = self.freeze_finetune_updates &gt;= self.num_updates</span>
         <span class="c1">#if self.num_updates &lt;= self.freeze_finetune_updates:</span>
         <span class="c1">#    self.num_updates += 1</span>
         <span class="c1">#elif ft and self.num_updates == self.freeze_finetune_updates + 1:</span>
         <span class="c1">#    self.num_updates += 1</span>
-        <span class="c1">#    # logging.info(&quot;Start fine-tuning wav2vec parameters!&quot;)</span>
+        <span class="c1">#    logging.info(&quot;Start fine-tuning wav2vec parameters!&quot;)</span>
 
         <span class="c1">#if self.freeze:</span>
         <span class="c1">#    with torch.no_grad():  # if not ft else contextlib.nullcontext():</span>
@@ -341,7 +343,11 @@
         <span class="k">return</span> <span class="n">xs_pad</span><span class="p">,</span> <span class="n">olens</span><span class="p">,</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="FairSeqWav2Vec2Encoder.reload_pretrained_parameters"><a class="viewcode-back" href="../../../../_gen/espnet2.asr.html#espnet2.asr.encoder.wav2vec2_encoder.FairSeqWav2Vec2Encoder.reload_pretrained_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">reload_pretrained_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encoders</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">self_attn</span><span class="o">.</span><span class="n">k_proj</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">encoders</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pretrained_params</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encoders</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">self_attn</span><span class="o">.</span><span class="n">k_proj</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Pretrained Wav2Vec model parameters reloaded!&quot;</span><span class="p">)</span></div></div>
 
 
