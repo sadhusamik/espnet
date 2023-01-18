@@ -133,12 +133,12 @@ class FairSeqWav2Vec2Encoder(AbsEncoder):
         """
         masks = make_pad_mask(ilens).to(xs_pad.device)
 
-        #ft = self.freeze_finetune_updates <= self.num_updates
+        #ft = self.freeze_finetune_updates >= self.num_updates
         #if self.num_updates <= self.freeze_finetune_updates:
         #    self.num_updates += 1
         #elif ft and self.num_updates == self.freeze_finetune_updates + 1:
         #    self.num_updates += 1
-        #    # logging.info("Start fine-tuning wav2vec parameters!")
+        #    logging.info("Start fine-tuning wav2vec parameters!")
 
         #if self.freeze:
         #    with torch.no_grad():  # if not ft else contextlib.nullcontext():
@@ -174,10 +174,10 @@ class FairSeqWav2Vec2Encoder(AbsEncoder):
         return xs_pad, olens, None
 
     def reload_pretrained_parameters(self):
-        print(self.encoders.encoder.layers[5])
+        print(self.encoders.encoder.layers[5].self_attn.k_proj)
 
         self.encoders.load_state_dict(self.pretrained_params)
-        print(self.encoders.encoder.layers[5])
+        print(self.encoders.encoder.layers[5].self_attn.k_proj)
         sys.stdout.flush()
         logging.info("Pretrained Wav2Vec model parameters reloaded!")
 
