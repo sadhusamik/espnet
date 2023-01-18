@@ -4,6 +4,8 @@
 """Encoder definition."""
 import contextlib
 import copy
+import sys
+
 import numpy as np
 from filelock import FileLock
 import logging
@@ -172,7 +174,11 @@ class FairSeqWav2Vec2Encoder(AbsEncoder):
         return xs_pad, olens, None
 
     def reload_pretrained_parameters(self):
+        print(self.encoders.encoder.layers[5])
+
         self.encoders.load_state_dict(self.pretrained_params)
+        print(self.encoders.encoder.layers[5])
+        sys.stdout.flush()
         logging.info("Pretrained Wav2Vec model parameters reloaded!")
 
 
