@@ -210,7 +210,7 @@
             <span class="n">w2v_dir_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;./&quot;</span><span class="p">,</span>
             <span class="n">output_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">768</span><span class="p">,</span>
             <span class="n">normalize_before</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-            <span class="n">freeze_finetune_updates</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="n">start_finetune_after</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
             <span class="n">freeze</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
             <span class="n">freeze_encoder</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
             <span class="n">freeze_first_n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -265,7 +265,8 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">output_layer</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">freeze_finetune_updates</span> <span class="o">=</span> <span class="n">freeze_finetune_updates</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_finetune_after</span> <span class="o">=</span> <span class="n">start_finetune_after</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Will start fine-tuning wav2vec after </span><span class="si">{:d}</span><span class="s2"> steps&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start_finetune_after</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;num_updates&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">LongTensor</span><span class="p">([</span><span class="mi">0</span><span class="p">]))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">freeze</span> <span class="o">=</span> <span class="n">freeze</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">freeze</span><span class="p">:</span>
@@ -302,29 +303,29 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">masks</span> <span class="o">=</span> <span class="n">make_pad_mask</span><span class="p">(</span><span class="n">ilens</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">xs_pad</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
 
-        <span class="c1">#ft = self.freeze_finetune_updates &gt;= self.num_updates</span>
-        <span class="c1">#if self.num_updates &lt;= self.freeze_finetune_updates:</span>
-        <span class="c1">#    self.num_updates += 1</span>
-        <span class="c1">#elif ft and self.num_updates == self.freeze_finetune_updates + 1:</span>
-        <span class="c1">#    self.num_updates += 1</span>
-        <span class="c1">#    logging.info(&quot;Start fine-tuning wav2vec parameters!&quot;)</span>
+        <span class="n">ft</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_finetune_after</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_updates</span>  <span class="c1"># Sets True when num_updates is above threshold</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_updates</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_finetune_after</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_updates</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">ft</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_updates</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_finetune_after</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_updates</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Start fine-tuning wav2vec parameters!&quot;</span><span class="p">)</span>
 
-        <span class="c1">#if self.freeze:</span>
-        <span class="c1">#    with torch.no_grad():  # if not ft else contextlib.nullcontext():</span>
-        <span class="c1">#        enc_outputs = self.encoders(</span>
-        <span class="c1">#            xs_pad,</span>
-        <span class="c1">#            masks,</span>
-        <span class="c1">#            mask=False,</span>
-        <span class="c1">#            features_only=True,</span>
-        <span class="c1">#        )</span>
-        <span class="c1">#else:</span>
-        <span class="c1">#    with contextlib.nullcontext():</span>
-        <span class="n">enc_outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoders</span><span class="p">(</span>
-            <span class="n">xs_pad</span><span class="p">,</span>
-            <span class="n">masks</span><span class="p">,</span>
-            <span class="n">mask</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">features_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">freeze</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">ft</span> <span class="p">:</span>
+            <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>  <span class="c1"># if not ft else contextlib.nullcontext():</span>
+                <span class="n">enc_outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoders</span><span class="p">(</span>
+                    <span class="n">xs_pad</span><span class="p">,</span>
+                    <span class="n">masks</span><span class="p">,</span>
+                    <span class="n">mask</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">features_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">contextlib</span><span class="o">.</span><span class="n">nullcontext</span><span class="p">():</span>
+                <span class="n">enc_outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoders</span><span class="p">(</span>
+                    <span class="n">xs_pad</span><span class="p">,</span>
+                    <span class="n">masks</span><span class="p">,</span>
+                    <span class="n">mask</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">features_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="p">)</span>
 
         <span class="n">xs_pad</span> <span class="o">=</span> <span class="n">enc_outputs</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span>  <span class="c1"># (B,T,C),</span>
         <span class="n">bs</span> <span class="o">=</span> <span class="n">xs_pad</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -337,17 +338,14 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_layer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">xs_pad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_layer</span><span class="p">(</span><span class="n">xs_pad</span><span class="p">)</span>
 
-        <span class="c1">#if self.normalize_before:</span>
-        <span class="c1">#    xs_pad = self.after_norm(xs_pad)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize_before</span><span class="p">:</span>
+            <span class="n">xs_pad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">after_norm</span><span class="p">(</span><span class="n">xs_pad</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">xs_pad</span><span class="p">,</span> <span class="n">olens</span><span class="p">,</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="FairSeqWav2Vec2Encoder.reload_pretrained_parameters"><a class="viewcode-back" href="../../../../_gen/espnet2.asr.html#espnet2.asr.encoder.wav2vec2_encoder.FairSeqWav2Vec2Encoder.reload_pretrained_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">reload_pretrained_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encoders</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">self_attn</span><span class="o">.</span><span class="n">k_proj</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">encoders</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pretrained_params</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encoders</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">self_attn</span><span class="o">.</span><span class="n">k_proj</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
-        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Pretrained Wav2Vec model parameters reloaded!&quot;</span><span class="p">)</span></div></div>
 
 
