@@ -42,7 +42,7 @@ class fdlp_spectrogram(torch.nn.Module):
             scale_lifter_gradient: float = None,
             boost_lifter_lr: float = 1,
             freeze_lifter_finetune_updates: int = None,
-            update_lifter_after_steps: int = 10000,
+            update_lifter_after_steps: int = None,
             initialize_lifter: str = None,
             lifter_nonlinear_transformation: str = None,
             complex_modulation: bool = False,
@@ -180,11 +180,18 @@ class fdlp_spectrogram(torch.nn.Module):
             # self.lifter = torch.tensor(lifter, dtype=self.datatype)
 
         self.updatable_params = self.lifter
-        if self.freeze_lifter_finetune_updates:  # We start with no updates of the lifter
+        if self.freeze_lifter_finetune_updates:
             if self.update_lifter or self.update_lifter_multiband:
                 logging.info('WILL FREEZE LIFTER WEIGHTS AFTER {:d} STEPS'.format(
                     self.freeze_lifter_finetune_updates))
-                self.lifter.requires_grad = True
+                #self.lifter.requires_grad = True
+
+        if self.update_lifter_after_steps:
+            if self.update_lifter or self.update_lifter_multiband:
+                logging.info('WILL UPDATE LIFTER WEIGHTS AFTER {:d} STEPS'.format(
+                    self.update_lifter_after_steps))
+                #self.lifter.requires_grad = True
+
 
         self.feature_batch = feature_batch
         if spectral_substraction_vector is not None:
