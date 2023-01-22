@@ -42,6 +42,7 @@ class fdlp_spectrogram(torch.nn.Module):
             scale_lifter_gradient: float = None,
             boost_lifter_lr: float = 1,
             freeze_lifter_finetune_updates: int = None,
+            update_lifter_after_steps: int = 10000,
             initialize_lifter: str = None,
             lifter_nonlinear_transformation: str = None,
             complex_modulation: bool = False,
@@ -100,8 +101,9 @@ class fdlp_spectrogram(torch.nn.Module):
         self.complex_modulation = complex_modulation
         self.scale_lifter_gradient = scale_lifter_gradient
         self.freeze_lifter_finetune_updates = freeze_lifter_finetune_updates
+        self.update_lifter_after_steps = update_lifter_after_steps
 
-        # self.num_updates = 0
+        #self.register_buffer("num_updates", torch.LongTensor([0]))
         # self.boost_lifter_lr = boost_lifter_lr
         self.register_buffer("boost_lifter_lr", torch.Tensor([boost_lifter_lr]))
         self.register_buffer("num_updates", torch.LongTensor([0]))
@@ -831,14 +833,25 @@ class fdlp_spectrogram(torch.nn.Module):
         bs = input.size(0)
         if input.dim() == 3:
             input = input[:, :, 0]
+
+        ft=True
         if self.freeze_lifter_finetune_updates:
-            ft = self.freeze_lifter_finetune_updates <= self.num_updates  # Fine tune after ft is True
+            ft = self.freeze_lifter_finetune_updates >= self.num_updates  # Sets to true when fine-tuning is allowed
             if self.num_updates <= self.freeze_lifter_finetune_updates:
+                if self.num_updates == self.freeze_lifter_finetune_updates:
+                    logging.info('STOP LIFTER WEIGHT UPDATES FROM THIS STEP')
                 self.num_updates += 1
 
-            if ft and self.lifter.requires_grad is True:
-                logging.info('STOP LIFTER WEIGHT UPDATES FROM THIS STEP')
-                self.lifter.requires_grad = False  # Turn off lifter updates
+            #if ft and self.lifter.requires_grad is True:
+
+            #self.lifter.requires_grad = False  # Turn off lifter updates
+
+        if self.update_lifter_after_steps:
+            ft = self.update_lifter_after_steps <= self.num_updates  # Sets to true when fine-tuning is allowed
+            if self.num_updates <= self.update_lifter_after_steps:
+                if self.num_updates == self.freeze_lifter_finetune_updates:
+                    logging.info('START UPDATING LIFTER FROM THIS STAGE')
+                self.num_updates += 1
 
         if input.dim() == 3:
             multi_channel = True
@@ -846,7 +859,12 @@ class fdlp_spectrogram(torch.nn.Module):
             input = input.transpose(1, 2).reshape(-1, input.size(1))
         else:
             multi_channel = False
-        output, olens = self.compute_spectrogram(input, ilens)
+        if ft :
+            output, olens = self.compute_spectrogram(input, ilens)
+        else:
+            with torch.no_grad():
+                output, olens = self.compute_spectrogram(input, ilens)
+
         if multi_channel:
             # output: (Batch * Channel, Frames, Freq, 2=real_imag)
             # -> (Batch, Frame, Channel, Freq, 2=real_imag)
