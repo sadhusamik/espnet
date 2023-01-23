@@ -856,7 +856,7 @@ class fdlp_spectrogram(torch.nn.Module):
         if self.update_lifter_after_steps:
             ft = self.update_lifter_after_steps <= self.num_updates  # Sets to true when fine-tuning is allowed
             if self.num_updates <= self.update_lifter_after_steps:
-                if self.num_updates == self.freeze_lifter_finetune_updates:
+                if self.num_updates == self.update_lifter_after_steps:
                     logging.info('START UPDATING LIFTER FROM THIS STAGE')
                 self.num_updates += 1
 
