@@ -90,6 +90,7 @@ projector_choices = ClassChoices(
     default="modulation",
 )
 
+
 class ModnetTask_v2(AbsTask):
     # If you need more than one optimizers, change this value
     num_optimizers: int = 1
@@ -272,7 +273,8 @@ class ModnetTask_v2(AbsTask):
         projector_class = projector_choices.get_class(args.projector)
         encoder_output_size = encoder.output_size()
         projector = projector_class(input_size=encoder_output_size, output_size=input_size,
-                                    coeff_num=args.frontend_conf['coeff_num'])
+                                    coeff_num=args.frontend_conf['coeff_num'],
+                                    n_filters=args.frontend_conf['n_filters'])
 
         # 8. Build model
         model = ModNet_v2(
