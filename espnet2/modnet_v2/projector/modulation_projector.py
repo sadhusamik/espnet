@@ -18,42 +18,65 @@ class ModulationProjector(AbsProjector):
             self,
             input_size: int,
             output_size: int,
-            coeff_num: int
+            coeff_num: int,
+            n_filters: int
     ):
         """Initialize the module."""
         assert check_argument_types()
         super().__init__()
 
         self.output_dim = output_size
+        self.coeff_num = coeff_num
+        self.n_filters = n_filters
 
-        self.conv = torch.nn.Sequential(
-            torch.nn.Conv1d(in_channels=1, out_channels=20, kernel_size=5, stride=5, padding=3),
-            torch.nn.ReLU(),
-            torch.nn.Conv1d(in_channels=20, out_channels=20, kernel_size=5, stride=5, padding=3),
-            torch.nn.ReLU(),
-            torch.nn.Conv1d(in_channels=20, out_channels=20, kernel_size=5, stride=3, padding=3)
-        )
-        self.final_linear_real = torch.nn.Linear(in_features=input_size, out_features=coeff_num)
-        self.final_linear_imag = torch.nn.Linear(in_features=input_size, out_features=coeff_num)
+        # self.convert_to_modulation_dimension = torch.nn.Linear(in_features=input_size, out_features=coeff_num)
+
+        # This will be assuming we need 39 factor down-sampling
+        self.conv = [torch.nn.Sequential(
+            torch.nn.Conv1d(in_channels=input_size, out_channels=coeff_num, padding=2, dilation=4, kernel_size=5,
+                            stride=13),
+            torch.nn.Tanh(),
+            torch.nn.Conv1d(in_channels=coeff_num, out_channels=coeff_num, padding=2, dilation=4, kernel_size=5,
+                            stride=13),
+            torch.nn.Tanh(),
+            torch.nn.Conv1d(in_channels=coeff_num, out_channels=coeff_num, padding=2, dilation=4, kernel_size=5,
+                            stride=13)
+        ) for i in range(n_filters)]
+
+        self.final_linear = torch.nn.Linear(in_features=coeff_num, out_features=coeff_num)
+        # self.final_linear_imag = torch.nn.Linear(in_features=input_size, out_features=coeff_num)
 
     def forward(
             self, input: torch.Tensor, input_lengths: torch.Tensor
     ):
         """Forward."""
 
-        batch_size = input.shape[0]
-        freq_dim = input.shape[-1]
+        # batch_size = input.shape[0]
+        # freq_dim = input.shape[-1]
 
-        input = torch.reshape(input, (batch_size * freq_dim, input.shape[1]))
-        input = input.unsqueeze(1)
+        # input = torch.reshape(input, (batch_size * freq_dim, input.shape[1]))
+        # input = input.unsqueeze(1)
+        # input=torch.transpose(input,input.shape[-1],input.shape[1]) # batch x 256
 
-        input = self.conv(input)
+        # input = self.convert_to_modulation_dimension(input)  # Convert from input dimension to coeff_num
+        input = torch.transpose(input, input.shape[-1], input.shape[1])  # batch x input_size(channels) x time
 
+        conv_outputs = []
+        for i in range(self.n_filters):
+            conv_outputs.append((self.conv[i](input)).unsqueeze(-1))  # batch x coeff_num(channels) x time (downsampled)
+        input = torch.cat(conv_outputs, dim=-1)  # batch x coeff_num(channels) x time (downsampled) x n_filters
+        input = torch.transpose(input, 1, 2)  # batch x time (downsampled) x coeff_num(channels) x n_filters
+        input = torch.transpose(input, 2, 3)  # batch x time (downsampled) x n_filters x coeff_num(channels)
+
+        # WE can treat these 'input' as modulation spectrum
+        # input = torch.transpose(input, input.shape[-1], input.shape[1])  # batch x time x coeff_num(channels)
+
+        # input = self.final_linear(input)  # batch x time x coeff_num(channels)
         # input = input[:, 0, :]
-        input = torch.reshape(input, (batch_size, -1, 20, freq_dim))
-        input_lengths = input.shape[1]
-        input = torch.cat([self.final_linear_real(input).unsqueeze(-1), self.final_linear_imag(input).unsqueeze(-1)],
-                          dim=-1)
+        # input = torch.reshape(input, (batch_size, -1, 20, freq_dim))
+        # input_lengths = input.shape[1]
+        # input = torch.cat([self.final_linear_real(input).unsqueeze(-1), self.final_linear_imag(input).unsqueeze(-1)],
+        #                  dim=-1)
 
         return input, input_lengths
 

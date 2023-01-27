@@ -103,7 +103,7 @@ class fdlp_spectrogram(torch.nn.Module):
         self.freeze_lifter_finetune_updates = freeze_lifter_finetune_updates
         self.update_lifter_after_steps = update_lifter_after_steps
 
-        #self.register_buffer("num_updates", torch.LongTensor([0]))
+        # self.register_buffer("num_updates", torch.LongTensor([0]))
         # self.boost_lifter_lr = boost_lifter_lr
         self.register_buffer("boost_lifter_lr", torch.Tensor([boost_lifter_lr]))
         self.register_buffer("num_updates", torch.LongTensor([0]))
@@ -184,14 +184,13 @@ class fdlp_spectrogram(torch.nn.Module):
             if self.update_lifter or self.update_lifter_multiband:
                 logging.info('WILL FREEZE LIFTER WEIGHTS AFTER {:d} STEPS'.format(
                     self.freeze_lifter_finetune_updates))
-                #self.lifter.requires_grad = True
+                # self.lifter.requires_grad = True
 
         if self.update_lifter_after_steps:
             if self.update_lifter or self.update_lifter_multiband:
                 logging.info('WILL UPDATE LIFTER WEIGHTS AFTER {:d} STEPS'.format(
                     self.update_lifter_after_steps))
-                #self.lifter.requires_grad = True
-
+                # self.lifter.requires_grad = True
 
         self.feature_batch = feature_batch
         if spectral_substraction_vector is not None:
@@ -841,7 +840,7 @@ class fdlp_spectrogram(torch.nn.Module):
         if input.dim() == 3:
             input = input[:, :, 0]
 
-        ft=True
+        ft = True
         if self.freeze_lifter_finetune_updates:
             ft = self.freeze_lifter_finetune_updates >= self.num_updates  # Sets to true when fine-tuning is allowed
             if self.num_updates <= self.freeze_lifter_finetune_updates:
@@ -849,9 +848,9 @@ class fdlp_spectrogram(torch.nn.Module):
                     logging.info('STOP LIFTER WEIGHT UPDATES FROM THIS STEP')
                 self.num_updates += 1
 
-            #if ft and self.lifter.requires_grad is True:
+            # if ft and self.lifter.requires_grad is True:
 
-            #self.lifter.requires_grad = False  # Turn off lifter updates
+            # self.lifter.requires_grad = False  # Turn off lifter updates
 
         if self.update_lifter_after_steps:
             ft = self.update_lifter_after_steps <= self.num_updates  # Sets to true when fine-tuning is allowed
@@ -866,7 +865,7 @@ class fdlp_spectrogram(torch.nn.Module):
             input = input.transpose(1, 2).reshape(-1, input.size(1))
         else:
             multi_channel = False
-        if ft :
+        if ft:
             output, olens = self.compute_spectrogram(input, ilens)
         else:
             with torch.no_grad():
@@ -1365,10 +1364,10 @@ class fdlp_spectrogram_dropout(fdlp_spectrogram):
                  ):
         assert check_argument_types()
         super().__init__(**kwargs)
-        dropout_range_hz = dropout_range_hz.strip().split(',')
-        t_res = 1 / (self.fduration * 2)
-        self.dropout_range_low = int(int(dropout_range_hz[0]) / t_res)
-        self.dropout_range_high = int(int(dropout_range_hz[1]) / t_res)
+        dropout_range_hz = [float(x) for x in dropout_range_hz.strip().split(',')]
+        t_res = 1 / self.fduration  # resolution of modulation features
+        self.dropout_range_low = int(dropout_range_hz[0] / t_res)
+        self.dropout_range_high = int(dropout_range_hz[1] / t_res)
 
         self.dropout_range = int(dropout_width_hz / t_res)
         self.dropout_num = dropout_num
@@ -1377,9 +1376,9 @@ class fdlp_spectrogram_dropout(fdlp_spectrogram):
         self.return_dropout_mask = return_dropout_mask
         if fixed_dropout:
             self.fixed_dropout = True
-            fd = fixed_dropout.strip().split(',')
-            self.fixed_dropout_lb = int(int(fd[0]) / t_res)
-            self.fixed_dropout_ub = int(int(fd[1]) / t_res)
+            fd = [float(x) for x in fixed_dropout.strip().split(',')]
+            self.fixed_dropout_lb = int(fd[0] / t_res)
+            self.fixed_dropout_ub = int(fd[1] / t_res)
             self.fixed_dropout_lifter = self._generate_fixed_dropout_lifter()
         else:
             self.fixed_dropout = False
@@ -1821,20 +1820,28 @@ class fdlp_spectrogram_modnet(fdlp_spectrogram):
                  dropout_frame_num: int = 2,
                  dropout_while_eval: bool = False,
                  pause_dropout_after_steps: int = None,
+                 fixed_dropout: str = '2,8',
                  **kwargs
                  ):
         assert check_argument_types()
         super().__init__(**kwargs)
 
+        if self.complex_modulation:
+            t_res = 1 / (self.fduration)
+        else:
+            t_res = 1 / (2 * self.fduration)
+
         self.dropout_frame_num = dropout_frame_num
-        self.fixed_dropout_lb = None
-        self.fixed_dropout_ub = None
+        fd = [float(x) for x in fixed_dropout.strip().split(',')]
+        self.fixed_dropout_lb = int(fd[0] / t_res)
+        self.fixed_dropout_ub = int(fd[1] / t_res)
         self.dropout_while_eval = dropout_while_eval
         self.pause_dropout_after_steps = pause_dropout_after_steps
 
-    def _generate_zero_dropout_lifter(self, num_batch, num_frames, device):
+    def _generate_fixed_dropout_lifter(self, num_batch, num_frames, device):
 
-        lifter = np.zeros(self.coeff_num)
+        lifter = np.ones(self.coeff_num)
+        lifter[self.fixed_dropout_lb:self.fixed_dropout_ub] = 0
         lifter = torch.tensor(lifter, dtype=self.datatype, device=device)
         lifter = lifter.unsqueeze(0).unsqueeze(0).unsqueeze(0).repeat(num_batch, num_frames, self.n_filters, 1)
         lifter = lifter.to(device)
@@ -1910,10 +1917,10 @@ class fdlp_spectrogram_modnet(fdlp_spectrogram):
         else:
             modspec_ori = torch.fft.fft(modspec_ori, 2 * int(
                 self.fduration * self.frate))  # (batch x num_frames x n_filters x int(self.fduration * self.frate))
-        modspec_ori = torch.abs(torch.exp(modspec_ori))
-        modspec_ori = modspec_ori[:, :, :, 0:self.cut] * han_weight / ham_weight
-        modspec_ori = torch.transpose(modspec_ori, 2,
-                                      3)  # (batch x num_frames x int(self.fduration * self.frate) x n_filters)
+        #modspec_ori = torch.abs(torch.exp(modspec_ori))
+        modspec_ori = modspec_ori[:, :, :, 0:self.cut] #* han_weight / ham_weight
+        #modspec_ori = torch.transpose(modspec_ori, 2,
+        #                              3)  # (batch x num_frames x int(self.fduration * self.frate) x n_filters)
 
         if self.training or self.dropout_while_eval:
             # Do masking only during training

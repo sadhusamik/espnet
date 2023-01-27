@@ -88,17 +88,22 @@ class ModNet_v2(AbsESPnetModel):
 
     def _calc_predictive_loss(self, feats_original, encoder_out, random_frame_idx):
 
-        han_weight = torch.hann_window(int(self.frontend.fduration * self.frontend.frate), dtype=encoder_out.dtype,
-                                       device=encoder_out.device)
-        ham_weight = torch.hamming_window(int(self.frontend.fduration * self.frontend.frate), dtype=encoder_out.dtype,
-                                          device=encoder_out.device)
+        # han_weight = torch.hann_window(int(self.frontend.fduration * self.frontend.frate), dtype=encoder_out.dtype,
+        #                               device=encoder_out.device)
+        # ham_weight = torch.hamming_window(int(self.frontend.fduration * self.frontend.frate), dtype=encoder_out.dtype,
+        #                                  device=encoder_out.device)
 
-        # Make the frame sizes uniform
-        encoder_out = torch.fft.fft(torch.view_as_complex(encoder_out),
-                                    1 * int(self.frontend.fduration * self.frontend.frate))
-        encoder_out = torch.abs(torch.exp(encoder_out))
-        encoder_out = encoder_out * han_weight / ham_weight
-        encoder_out = torch.transpose(encoder_out, 2, 3)
+        if self.frontend.complex_modulation:
+            encoder_out = torch.fft.fft(torch.view_as_complex(encoder_out),
+                                        1 * int(self.frontend.fduration * self.frontend.frate))
+        else:
+            encoder_out = torch.fft.fft(encoder_out, 2 * int(self.frontend.fduration * self.frontend.frate))
+
+        encoder_out = encoder_out[:, :, :, 0:int(
+            self.frontend.fduration * self.frontend.frate)]  # (batch x num_frames x n_filters x int(self.fduration * self.frate))
+        # encoder_out = torch.abs(torch.exp(encoder_out))
+        # encoder_out = encoder_out * han_weight / ham_weight
+        # encoder_out = torch.transpose(encoder_out, 2, 3)
 
         # encoder_out=encoder_out[]
 
@@ -112,9 +117,9 @@ class ModNet_v2(AbsESPnetModel):
         loss = loss.to(encoder_out.device)
         count = 0
         for p, q in zip(batch_idx, random_frame_idx):
-            for freq_band in range(feats_original.shape[2]):
-                count += 1
-                loss += self.prediction_loss(torch.log(feats_original[p, q, freq_band, :]), torch.log(encoder_out[p, q, freq_band, :]))
+            #for freq_band in range(feats_original.shape[2]):
+            count += 1
+            loss += self.prediction_loss(feats_original[p, q, :, :], encoder_out[p, q, :, :])
 
         return loss / count
 
