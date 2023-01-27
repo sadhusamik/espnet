@@ -59,6 +59,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebook/asr_cli.html">Speech Recognition (Recipe)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebook/asr_library.html">Speech Recognition (Library)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebook/espnet2_2pass_slu_demo.html">ESPNET 2 pass SLU Demonstration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebook/espnet2_asr_realtime_demo.html">ESPnet2-ASR realtime demonstration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebook/espnet2_asr_transfer_learning_demo.html"><strong>Use transfer learning for ASR in ESPnet2</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebook/espnet2_asr_transfer_learning_demo.html#Abstract">Abstract</a></li>
@@ -272,7 +273,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">freeze_lifter_finetune_updates</span> <span class="o">=</span> <span class="n">freeze_lifter_finetune_updates</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update_lifter_after_steps</span> <span class="o">=</span> <span class="n">update_lifter_after_steps</span>
 
-        <span class="c1">#self.register_buffer(&quot;num_updates&quot;, torch.LongTensor([0]))</span>
+        <span class="c1"># self.register_buffer(&quot;num_updates&quot;, torch.LongTensor([0]))</span>
         <span class="c1"># self.boost_lifter_lr = boost_lifter_lr</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;boost_lifter_lr&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">([</span><span class="n">boost_lifter_lr</span><span class="p">]))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;num_updates&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">LongTensor</span><span class="p">([</span><span class="mi">0</span><span class="p">]))</span>
@@ -353,14 +354,13 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_lifter</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_lifter_multiband</span><span class="p">:</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;WILL FREEZE LIFTER WEIGHTS AFTER </span><span class="si">{:d}</span><span class="s1"> STEPS&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">freeze_lifter_finetune_updates</span><span class="p">))</span>
-                <span class="c1">#self.lifter.requires_grad = True</span>
+                <span class="c1"># self.lifter.requires_grad = True</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_lifter_after_steps</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_lifter</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_lifter_multiband</span><span class="p">:</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;WILL UPDATE LIFTER WEIGHTS AFTER </span><span class="si">{:d}</span><span class="s1"> STEPS&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">update_lifter_after_steps</span><span class="p">))</span>
-                <span class="c1">#self.lifter.requires_grad = True</span>
-
+                <span class="c1"># self.lifter.requires_grad = True</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">feature_batch</span> <span class="o">=</span> <span class="n">feature_batch</span>
         <span class="k">if</span> <span class="n">spectral_substraction_vector</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1010,7 +1010,7 @@
         <span class="k">if</span> <span class="nb">input</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
             <span class="nb">input</span> <span class="o">=</span> <span class="nb">input</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span>
 
-        <span class="n">ft</span><span class="o">=</span><span class="kc">True</span>
+        <span class="n">ft</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">freeze_lifter_finetune_updates</span><span class="p">:</span>
             <span class="n">ft</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">freeze_lifter_finetune_updates</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_updates</span>  <span class="c1"># Sets to true when fine-tuning is allowed</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_updates</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">freeze_lifter_finetune_updates</span><span class="p">:</span>
@@ -1018,9 +1018,9 @@
                     <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;STOP LIFTER WEIGHT UPDATES FROM THIS STEP&#39;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">num_updates</span> <span class="o">+=</span> <span class="mi">1</span>
 
-            <span class="c1">#if ft and self.lifter.requires_grad is True:</span>
+            <span class="c1"># if ft and self.lifter.requires_grad is True:</span>
 
-            <span class="c1">#self.lifter.requires_grad = False  # Turn off lifter updates</span>
+            <span class="c1"># self.lifter.requires_grad = False  # Turn off lifter updates</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_lifter_after_steps</span><span class="p">:</span>
             <span class="n">ft</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_lifter_after_steps</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_updates</span>  <span class="c1"># Sets to true when fine-tuning is allowed</span>
@@ -1035,7 +1035,7 @@
             <span class="nb">input</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">input</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">multi_channel</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="n">ft</span> <span class="p">:</span>
+        <span class="k">if</span> <span class="n">ft</span><span class="p">:</span>
             <span class="n">output</span><span class="p">,</span> <span class="n">olens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_spectrogram</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">ilens</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
@@ -1534,10 +1534,10 @@
                  <span class="p">):</span>
         <span class="k">assert</span> <span class="n">check_argument_types</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">dropout_range_hz</span> <span class="o">=</span> <span class="n">dropout_range_hz</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
-        <span class="n">t_res</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fduration</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dropout_range_low</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">dropout_range_hz</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">t_res</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dropout_range_high</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">dropout_range_hz</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">t_res</span><span class="p">)</span>
+        <span class="n">dropout_range_hz</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">dropout_range_hz</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)]</span>
+        <span class="n">t_res</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">fduration</span>  <span class="c1"># resolution of modulation features</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout_range_low</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">dropout_range_hz</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">t_res</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout_range_high</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">dropout_range_hz</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">t_res</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">dropout_range</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">dropout_width_hz</span> <span class="o">/</span> <span class="n">t_res</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dropout_num</span> <span class="o">=</span> <span class="n">dropout_num</span>
@@ -1546,9 +1546,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">return_dropout_mask</span> <span class="o">=</span> <span class="n">return_dropout_mask</span>
         <span class="k">if</span> <span class="n">fixed_dropout</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fixed_dropout</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">fd</span> <span class="o">=</span> <span class="n">fixed_dropout</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fixed_dropout_lb</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">fd</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">t_res</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fixed_dropout_ub</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">fd</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">t_res</span><span class="p">)</span>
+            <span class="n">fd</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">fixed_dropout</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fixed_dropout_lb</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">t_res</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fixed_dropout_ub</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fd</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">t_res</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fixed_dropout_lifter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_fixed_dropout_lifter</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fixed_dropout</span> <span class="o">=</span> <span class="kc">False</span>
@@ -1990,20 +1990,28 @@
                  <span class="n">dropout_frame_num</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
                  <span class="n">dropout_while_eval</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                  <span class="n">pause_dropout_after_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">fixed_dropout</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;2,8&#39;</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span>
                  <span class="p">):</span>
         <span class="k">assert</span> <span class="n">check_argument_types</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">complex_modulation</span><span class="p">:</span>
+            <span class="n">t_res</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fduration</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">t_res</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fduration</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">dropout_frame_num</span> <span class="o">=</span> <span class="n">dropout_frame_num</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fixed_dropout_lb</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fixed_dropout_ub</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">fd</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">fixed_dropout</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fixed_dropout_lb</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">t_res</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fixed_dropout_ub</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fd</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">t_res</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dropout_while_eval</span> <span class="o">=</span> <span class="n">dropout_while_eval</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pause_dropout_after_steps</span> <span class="o">=</span> <span class="n">pause_dropout_after_steps</span>
 
-    <span class="k">def</span> <span class="nf">_generate_zero_dropout_lifter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_batch</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_generate_fixed_dropout_lifter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_batch</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
 
-        <span class="n">lifter</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coeff_num</span><span class="p">)</span>
+        <span class="n">lifter</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coeff_num</span><span class="p">)</span>
+        <span class="n">lifter</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">fixed_dropout_lb</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">fixed_dropout_ub</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">lifter</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">lifter</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">datatype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
         <span class="n">lifter</span> <span class="o">=</span> <span class="n">lifter</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">num_batch</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_filters</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">lifter</span> <span class="o">=</span> <span class="n">lifter</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
@@ -2079,10 +2087,10 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">modspec_ori</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">modspec_ori</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">fduration</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">frate</span><span class="p">))</span>  <span class="c1"># (batch x num_frames x n_filters x int(self.fduration * self.frate))</span>
-        <span class="n">modspec_ori</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">modspec_ori</span><span class="p">))</span>
-        <span class="n">modspec_ori</span> <span class="o">=</span> <span class="n">modspec_ori</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">cut</span><span class="p">]</span> <span class="o">*</span> <span class="n">han_weight</span> <span class="o">/</span> <span class="n">ham_weight</span>
-        <span class="n">modspec_ori</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">modspec_ori</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span>
-                                      <span class="mi">3</span><span class="p">)</span>  <span class="c1"># (batch x num_frames x int(self.fduration * self.frate) x n_filters)</span>
+        <span class="c1">#modspec_ori = torch.abs(torch.exp(modspec_ori))</span>
+        <span class="n">modspec_ori</span> <span class="o">=</span> <span class="n">modspec_ori</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">cut</span><span class="p">]</span> <span class="c1">#* han_weight / ham_weight</span>
+        <span class="c1">#modspec_ori = torch.transpose(modspec_ori, 2,</span>
+        <span class="c1">#                              3)  # (batch x num_frames x int(self.fduration * self.frate) x n_filters)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">training</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout_while_eval</span><span class="p">:</span>
             <span class="c1"># Do masking only during training</span>
