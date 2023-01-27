@@ -1924,7 +1924,7 @@ class fdlp_spectrogram_modnet(fdlp_spectrogram):
 
         if self.training or self.dropout_while_eval:
             # Do masking only during training
-            lifter_mask = self._generate_zero_dropout_lifter(num_batch,
+            lifter_mask = self._generate_fixed_dropout_lifter(num_batch,
                                                              dpfn,
                                                              device=input.device)  # (batch x num_frames_reduced x n_filters x num_modspec)
             # Masked modulation spectrum
