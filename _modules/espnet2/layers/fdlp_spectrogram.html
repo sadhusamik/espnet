@@ -2094,7 +2094,7 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">training</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout_while_eval</span><span class="p">:</span>
             <span class="c1"># Do masking only during training</span>
-            <span class="n">lifter_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_zero_dropout_lifter</span><span class="p">(</span><span class="n">num_batch</span><span class="p">,</span>
+            <span class="n">lifter_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_fixed_dropout_lifter</span><span class="p">(</span><span class="n">num_batch</span><span class="p">,</span>
                                                              <span class="n">dpfn</span><span class="p">,</span>
                                                              <span class="n">device</span><span class="o">=</span><span class="nb">input</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>  <span class="c1"># (batch x num_frames_reduced x n_filters x num_modspec)</span>
             <span class="c1"># Masked modulation spectrum</span>
