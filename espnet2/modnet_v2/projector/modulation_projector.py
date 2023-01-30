@@ -42,6 +42,16 @@ class ModulationProjector(AbsProjector):
             torch.nn.Conv1d(in_channels=coeff_num, out_channels=coeff_num, padding=2, dilation=4, kernel_size=5,
                             stride=13)
         ) for i in range(n_filters)]
+        self.conv2 = torch.nn.Sequential(
+            torch.nn.Conv1d(in_channels=input_size, out_channels=coeff_num, padding=2, dilation=4, kernel_size=5,
+                            stride=13),
+            torch.nn.Tanh(),
+            torch.nn.Conv1d(in_channels=coeff_num, out_channels=coeff_num, padding=2, dilation=4, kernel_size=5,
+                            stride=13),
+            torch.nn.Tanh(),
+            torch.nn.Conv1d(in_channels=coeff_num, out_channels=coeff_num, padding=2, dilation=4, kernel_size=5,
+                            stride=13)
+        )
 
         self.final_linear = torch.nn.Linear(in_features=coeff_num, out_features=coeff_num)
         # self.final_linear_imag = torch.nn.Linear(in_features=input_size, out_features=coeff_num)
@@ -60,12 +70,12 @@ class ModulationProjector(AbsProjector):
 
         # input = self.convert_to_modulation_dimension(input)  # Convert from input dimension to coeff_num
         input = torch.transpose(input, 2, 1)  # batch x input_size(channels) x time
-        print(input.device)
-        print(self.conv[0][0].device)
-        print(self.final_linear.device)
+        #print(input.device)
+        #print(self.conv[0][0].device)
+        #print(self.final_linear.device)
         conv_outputs = []
         for i in range(self.n_filters):
-            conv_outputs.append((self.conv[i](input)).unsqueeze(-1))  # batch x coeff_num(channels) x time (downsampled)
+            conv_outputs.append((self.conv2(input)).unsqueeze(-1))  # batch x coeff_num(channels) x time (downsampled)
         input = torch.cat(conv_outputs, dim=-1)  # batch x coeff_num(channels) x time (downsampled) x n_filters
         input = torch.transpose(input, 1, 2)  # batch x time (downsampled) x coeff_num(channels) x n_filters
         input = torch.transpose(input, 2, 3)  # batch x time (downsampled) x n_filters x coeff_num(channels)
