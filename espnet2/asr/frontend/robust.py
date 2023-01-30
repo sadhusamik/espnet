@@ -91,6 +91,7 @@ class RobustFrontend(AbsFrontend):
         self.frate = frate
         self.return_mvector = return_mvector
         self.coeff_num = coeff_num
+        self.complex_modulation = complex_modulation
 
         if modnet:
             self.fdlp_spectrogram = fdlp_spectrogram_modnet(dropout_frame_num=dropout_frame_num,
