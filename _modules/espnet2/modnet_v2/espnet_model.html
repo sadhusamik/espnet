@@ -286,6 +286,8 @@
         <span class="n">loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">loss</span> <span class="o">=</span> <span class="n">loss</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">encoder_out</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
         <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">encoder_out</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">feats_original</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">batch_idx</span><span class="p">,</span> <span class="n">random_frame_idx</span><span class="p">):</span>
             <span class="c1">#for freq_band in range(feats_original.shape[2]):</span>
             <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
