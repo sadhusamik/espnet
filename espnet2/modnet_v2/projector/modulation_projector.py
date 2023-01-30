@@ -68,7 +68,7 @@ class ModulationProjector(AbsProjector):
         # input = input.unsqueeze(1)
         # input=torch.transpose(input,input.shape[-1],input.shape[1]) # batch x 256
 
-        # input = self.convert_to_modulation_dimension(input)  # Convert from input dimension to coeff_num
+        input = self.convert_to_modulation_dimension(input)  # Convert from input dimension to coeff_num
         input = torch.transpose(input, 2, 1)  # batch x input_size(channels) x time
         print(input.shape)
         #print(self.conv[0][0].device)
