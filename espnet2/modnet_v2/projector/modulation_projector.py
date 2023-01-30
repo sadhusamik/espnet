@@ -29,19 +29,19 @@ class ModulationProjector(AbsProjector):
         self.coeff_num = coeff_num
         self.n_filters = n_filters
 
-        #self.convert_to_modulation_dimension = torch.nn.Linear(in_features=input_size, out_features=coeff_num)
+        # self.convert_to_modulation_dimension = torch.nn.Linear(in_features=input_size, out_features=coeff_num)
 
         # This will be assuming we need 39 factor down-sampling
-        self.conv = [torch.nn.Sequential(
-            torch.nn.Conv1d(in_channels=coeff_num, out_channels=coeff_num, padding=2, dilation=4, kernel_size=5,
-                            stride=13),
-            torch.nn.Tanh(),
-            torch.nn.Conv1d(in_channels=coeff_num, out_channels=coeff_num, padding=2, dilation=4, kernel_size=5,
-                            stride=13),
-            torch.nn.Tanh(),
-            torch.nn.Conv1d(in_channels=coeff_num, out_channels=coeff_num, padding=2, dilation=4, kernel_size=5,
-                            stride=13)
-        ) for i in range(n_filters)]
+        # self.conv = [torch.nn.Sequential(
+        #    torch.nn.Conv1d(in_channels=coeff_num, out_channels=coeff_num, padding=2, dilation=4, kernel_size=5,
+        #                    stride=13),
+        #    torch.nn.Tanh(),
+        #    torch.nn.Conv1d(in_channels=coeff_num, out_channels=coeff_num, padding=2, dilation=4, kernel_size=5,
+        #                    stride=13),
+        #    torch.nn.Tanh(),
+        #    torch.nn.Conv1d(in_channels=coeff_num, out_channels=coeff_num, padding=2, dilation=4, kernel_size=5,
+        #                    stride=13)
+        # ) for i in range(n_filters)]
         self.conv2 = torch.nn.Sequential(
             torch.nn.Conv1d(in_channels=input_size, out_channels=coeff_num, padding=2, dilation=1, kernel_size=5,
                             stride=3),
@@ -49,7 +49,7 @@ class ModulationProjector(AbsProjector):
             torch.nn.Conv1d(in_channels=coeff_num, out_channels=coeff_num, padding=2, dilation=4, kernel_size=5,
                             stride=13))
 
-        #self.final_linear = torch.nn.Linear(in_features=coeff_num, out_features=coeff_num)
+        # self.final_linear = torch.nn.Linear(in_features=coeff_num, out_features=coeff_num)
         # self.final_linear_imag = torch.nn.Linear(in_features=input_size, out_features=coeff_num)
 
     def forward(
@@ -64,14 +64,16 @@ class ModulationProjector(AbsProjector):
         # input = input.unsqueeze(1)
         # input=torch.transpose(input,input.shape[-1],input.shape[1]) # batch x 256
 
-        #input = self.convert_to_modulation_dimension(input)  # Convert from input dimension to coeff_num
+        # input = self.convert_to_modulation_dimension(input)  # Convert from input dimension to coeff_num
         input = torch.transpose(input, 2, 1)  # batch x input_size(channels) x time
-        #print(input.shape)
-        #print(self.conv[0][0].device)
-        #print(self.final_linear.device)
-        conv_outputs = []
-        for i in range(self.n_filters):
-            conv_outputs.append((self.conv2(input)).unsqueeze(-1))  # batch x coeff_num(channels) x time (downsampled)
+        # print(input.shape)
+        # print(self.conv[0][0].device)
+        # print(self.final_linear.device)
+        # conv_outputs = []
+        # for i in range(self.n_filters):
+        conv_outputs = self.conv2(input).unsqueeze(-1)  # batch x coeff_num(channels) x time (downsampled)
+        conv_outputs = [conv_outputs for i in range(self.n_filters)]
+
         input = torch.cat(conv_outputs, dim=-1)  # batch x coeff_num(channels) x time (downsampled) x n_filters
         input = torch.transpose(input, 1, 2)  # batch x time (downsampled) x coeff_num(channels) x n_filters
         input = torch.transpose(input, 2, 3)  # batch x time (downsampled) x n_filters x coeff_num(channels)
