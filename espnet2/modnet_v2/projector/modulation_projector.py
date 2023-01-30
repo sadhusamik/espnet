@@ -29,11 +29,11 @@ class ModulationProjector(AbsProjector):
         self.coeff_num = coeff_num
         self.n_filters = n_filters
 
-        # self.convert_to_modulation_dimension = torch.nn.Linear(in_features=input_size, out_features=coeff_num)
+        self.convert_to_modulation_dimension = torch.nn.Linear(in_features=input_size, out_features=coeff_num)
 
         # This will be assuming we need 39 factor down-sampling
         self.conv = [torch.nn.Sequential(
-            torch.nn.Conv1d(in_channels=input_size, out_channels=coeff_num, padding=2, dilation=4, kernel_size=5,
+            torch.nn.Conv1d(in_channels=coeff_num, out_channels=coeff_num, padding=2, dilation=4, kernel_size=5,
                             stride=13),
             torch.nn.Tanh(),
             torch.nn.Conv1d(in_channels=coeff_num, out_channels=coeff_num, padding=2, dilation=4, kernel_size=5,
