@@ -10,7 +10,7 @@ from typing import Tuple
 
 import torch
 import os
-os.environ['CUDA_LAUNCH_BLOCKING'] = 1
+os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
 
 class ModulationProjector(AbsProjector):
     """Projecting from high dimension features to modulation domain."""
