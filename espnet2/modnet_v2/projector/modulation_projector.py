@@ -44,7 +44,7 @@ class ModulationProjector(AbsProjector):
         #                    stride=13)
         # ) for i in range(n_filters)]
         self.conv2 = torch.nn.Sequential(
-            torch.nn.Conv1d(in_channels=input_size, out_channels=coeff_num, padding=2, dilation=1, kernel_size=5,
+            torch.nn.Conv1d(in_channels=input_size, out_channels=coeff_num, padding=1, dilation=1, kernel_size=5,
                             stride=3),
             torch.nn.Tanh(),
             torch.nn.Conv1d(in_channels=coeff_num, out_channels=coeff_num, padding=2, dilation=4, kernel_size=5,
