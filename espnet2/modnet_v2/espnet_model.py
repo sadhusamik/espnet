@@ -116,6 +116,8 @@ class ModNet_v2(AbsESPnetModel):
         loss = torch.Tensor([0])
         loss = loss.to(encoder_out.device)
         count = 0
+        print(encoder_out.shape)
+        print(feats_original.shape)
         for p, q in zip(batch_idx, random_frame_idx):
             #for freq_band in range(feats_original.shape[2]):
             count += 1
