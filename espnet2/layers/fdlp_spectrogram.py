@@ -751,7 +751,10 @@ class fdlp_spectrogram(torch.nn.Module):
 
         if self.feature_batch is not None:
             modspec = torch.reshape(modspec, (-1, self.n_filters))
+            print(modspec.shape)
             frame_num_original = int(np.ceil(tsamples_original * self.frate / self.srate))
+            print(frame_num_original)
+            print(num_batch)
             modspec = modspec[0:frame_num_original * num_batch, :]
             modspec = torch.reshape(modspec, (num_batch, frame_num_original, self.n_filters))
 
