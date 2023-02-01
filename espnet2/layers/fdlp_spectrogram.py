@@ -376,7 +376,7 @@ class fdlp_spectrogram(torch.nn.Module):
                 #    signal = signal[:-div_reminder]
                 # else:
                 signal = torch.cat(
-                    [signal, torch.zeros(div_req - div_reminder, device=signal.device)])  # append extra zeros
+                    [signal, torch.zeros(div_req - div_reminder+div_req, device=signal.device)])  # append extra zeros
             signal = torch.reshape(signal, (self.feature_batch, -1))
 
         tsamples = signal.shape[1]
