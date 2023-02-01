@@ -362,6 +362,8 @@ class fdlp_spectrogram(torch.nn.Module):
             sp_f = int((flength_samples - 1) / 2)
             extend = int((flength_samples - 1) / 2)
 
+        tsamples_original = signal.shape[1]
+
         if self.feature_batch is not None:
             # Reshape to have longer utterances, helps in feature extraction
             # Might not be equally divisible, deal with that
@@ -370,10 +372,11 @@ class fdlp_spectrogram(torch.nn.Module):
             div_reminder = sig_size % div_req
             signal = signal.flatten()
             if div_reminder != 0:
-                if div_reminder < int(div_req / 2):
-                    signal = signal[:-div_reminder]
-                else:
-                    signal = torch.cat([signal, torch.zeros(div_req - div_reminder, device=signal.device)])
+                # if div_reminder < int(div_req / 2):
+                #    signal = signal[:-div_reminder]
+                # else:
+                signal = torch.cat(
+                    [signal, torch.zeros(div_req - div_reminder, device=signal.device)])  # append extra zeros
             signal = torch.reshape(signal, (self.feature_batch, -1))
 
         tsamples = signal.shape[1]
@@ -392,7 +395,7 @@ class fdlp_spectrogram(torch.nn.Module):
             idx += frate_samples
 
         frames = torch.cat(frames, dim=1)
-        return tsamples, frames
+        return tsamples_original, tsamples, frames
 
     def get_normalizing_vector_old(self, signal, fduration, overlap_fraction, append_len=500000, discont=np.pi,
                                    no_window=True, phase_max_cap=200):
@@ -647,7 +650,7 @@ class fdlp_spectrogram(torch.nn.Module):
         if self.spectral_substraction_vector is not None and self.dereverb_whole_sentence:
             input = self.dereverb_whole(input, self.spectral_substraction_vector)
 
-        t_samples, frames = self.get_frames(input)
+        tsamples_original, t_samples, frames = self.get_frames(input)
         num_frames = frames.shape[1]
 
         if self.spectral_substraction_vector is not None and not self.dereverb_whole_sentence:
@@ -747,18 +750,24 @@ class fdlp_spectrogram(torch.nn.Module):
         modspec = self.OLA(modspec=modspec, t_samples=t_samples, dtype=input.dtype, device=input.device)
 
         if self.feature_batch is not None:
-            # Might not be equally divisible, deal with that
-            modspec_size = modspec.shape[0] * modspec.shape[1] * modspec.shape[2]
-            div_req = num_batch * self.n_filters
-            div_reminder = modspec_size % div_req
-            if div_reminder != 0:
-                modspec = modspec.flatten()
-                if div_reminder < int(div_req / 2):
-                    modspec = modspec[:-div_reminder]
-                else:
-                    modspec = torch.cat([modspec, torch.zeros(div_req - div_reminder, device=input.device)])
 
-            modspec = torch.reshape(modspec, (num_batch, -1, self.n_filters))
+            modspec = torch.reshape(modspec, (-1, self.n_filters))
+            frame_num_original = int(np.ceil(tsamples_original * self.frate / self.srate))
+            modspec = modspec[0:frame_num_original * num_batch, :]
+            modspec = torch.reshape(modspec, (num_batch, frame_num_original, self.n_filters))
+
+            # Might not be equally divisible, deal with that
+            #modspec_size = modspec.shape[0] * modspec.shape[1] * modspec.shape[2]
+            #div_req = num_batch * self.n_filters
+            #div_reminder = modspec_size % div_req
+            #if div_reminder != 0:
+            #    modspec = modspec.flatten()
+            #    if div_reminder < int(div_req / 2):
+            #        modspec = modspec[:-div_reminder]
+            #    else:
+            #        modspec = torch.cat([modspec, torch.zeros(div_req - div_reminder, device=input.device)])
+
+            #modspec = torch.reshape(modspec, (num_batch, -1, self.n_filters))
 
         if ilens is not None:
             olens = torch.floor(ilens * self.frate / self.srate)
@@ -1917,16 +1926,16 @@ class fdlp_spectrogram_modnet(fdlp_spectrogram):
         else:
             modspec_ori = torch.fft.fft(modspec_ori, 2 * int(
                 self.fduration * self.frate))  # (batch x num_frames x n_filters x int(self.fduration * self.frate))
-        #modspec_ori = torch.abs(torch.exp(modspec_ori))
-        modspec_ori = modspec_ori[:, :, :, 0:self.cut] #* han_weight / ham_weight
-        #modspec_ori = torch.transpose(modspec_ori, 2,
+        # modspec_ori = torch.abs(torch.exp(modspec_ori))
+        modspec_ori = modspec_ori[:, :, :, 0:self.cut]  # * han_weight / ham_weight
+        # modspec_ori = torch.transpose(modspec_ori, 2,
         #                              3)  # (batch x num_frames x int(self.fduration * self.frate) x n_filters)
 
         if self.training or self.dropout_while_eval:
             # Do masking only during training
             lifter_mask = self._generate_fixed_dropout_lifter(num_batch,
-                                                             dpfn,
-                                                             device=input.device)  # (batch x num_frames_reduced x n_filters x num_modspec)
+                                                              dpfn,
+                                                              device=input.device)  # (batch x num_frames_reduced x n_filters x num_modspec)
             # Masked modulation spectrum
             for p, q in zip(batch_idx, random_frame_idx):
                 modspec[p, q, :, :] = modspec[p, q, :, :] * lifter_mask[p, :, :, :]
