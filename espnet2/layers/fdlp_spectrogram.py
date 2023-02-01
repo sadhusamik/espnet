@@ -623,7 +623,7 @@ class fdlp_spectrogram(torch.nn.Module):
                 ptr = int(ptr + self.cut_overlap - self.cut_half)
             else:
                 # ptr = int(ptr + self.cut_overlap + randrange(2))
-                ptr = int(ptr + self.cut_overlap + 1)
+                ptr = int(ptr + self.cut_overlap + 0)
 
         feats = torch.log(torch.clip(feats, max=None, min=0.0000001))
         feats = torch.nan_to_num(feats, nan=0.0000001, posinf=0.0000001, neginf=0.0000001)  # Probably not the best idea
@@ -754,10 +754,10 @@ class fdlp_spectrogram(torch.nn.Module):
 
         if self.feature_batch is not None:
             modspec = torch.reshape(modspec, (-1, self.n_filters))
-            print(modspec.shape)
+            #print(modspec.shape)
             frame_num_original = int(np.ceil(tsamples_original * self.frate / self.srate))
-            print(frame_num_original)
-            print(num_batch)
+            #print(frame_num_original)
+            #print(num_batch)
             modspec = modspec[0:frame_num_original * num_batch, :]
             modspec = torch.reshape(modspec, (num_batch, frame_num_original, self.n_filters))
 
