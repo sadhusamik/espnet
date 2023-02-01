@@ -376,7 +376,7 @@ class fdlp_spectrogram(torch.nn.Module):
                 #    signal = signal[:-div_reminder]
                 # else:
                 signal = torch.cat(
-                    [signal, torch.zeros(div_req - div_reminder+div_req, device=signal.device)])  # append extra zeros
+                    [signal, torch.zeros(div_req - div_reminder + 50, device=signal.device)])  # append extra zeros
             signal = torch.reshape(signal, (self.feature_batch, -1))
 
         tsamples = signal.shape[1]
@@ -750,24 +750,23 @@ class fdlp_spectrogram(torch.nn.Module):
         modspec = self.OLA(modspec=modspec, t_samples=t_samples, dtype=input.dtype, device=input.device)
 
         if self.feature_batch is not None:
-
             modspec = torch.reshape(modspec, (-1, self.n_filters))
             frame_num_original = int(np.ceil(tsamples_original * self.frate / self.srate))
             modspec = modspec[0:frame_num_original * num_batch, :]
             modspec = torch.reshape(modspec, (num_batch, frame_num_original, self.n_filters))
 
             # Might not be equally divisible, deal with that
-            #modspec_size = modspec.shape[0] * modspec.shape[1] * modspec.shape[2]
-            #div_req = num_batch * self.n_filters
-            #div_reminder = modspec_size % div_req
-            #if div_reminder != 0:
+            # modspec_size = modspec.shape[0] * modspec.shape[1] * modspec.shape[2]
+            # div_req = num_batch * self.n_filters
+            # div_reminder = modspec_size % div_req
+            # if div_reminder != 0:
             #    modspec = modspec.flatten()
             #    if div_reminder < int(div_req / 2):
             #        modspec = modspec[:-div_reminder]
             #    else:
             #        modspec = torch.cat([modspec, torch.zeros(div_req - div_reminder, device=input.device)])
 
-            #modspec = torch.reshape(modspec, (num_batch, -1, self.n_filters))
+            # modspec = torch.reshape(modspec, (num_batch, -1, self.n_filters))
 
         if ilens is not None:
             olens = torch.floor(ilens * self.frate / self.srate)
