@@ -641,7 +641,9 @@ class fdlp_spectrogram(torch.nn.Module):
             output: (Batch, Frames, Freq) or (Batch, Frames, Freq)
 
         """
-
+        if input.shape[1] <= self.srate * self.fduration / 2-1:
+            # Appped zeros to make it 1 second long signal
+            input = torch.cat(input, torch.zeros(input.shape[0], int(self.srate) ), axis=1)
         if self.online_normalize:
             _, _, _, self.spectral_substraction_vector = self.get_normalizing_vector(input, fduration=25,
                                                                                      overlap_fraction=0.98,
@@ -754,10 +756,10 @@ class fdlp_spectrogram(torch.nn.Module):
 
         if self.feature_batch is not None:
             modspec = torch.reshape(modspec, (-1, self.n_filters))
-            #print(modspec.shape)
+            # print(modspec.shape)
             frame_num_original = int(np.ceil(tsamples_original * self.frate / self.srate))
-            #print(frame_num_original)
-            #print(num_batch)
+            # print(frame_num_original)
+            # print(num_batch)
             modspec = modspec[0:frame_num_original * num_batch, :]
             modspec = torch.reshape(modspec, (num_batch, frame_num_original, self.n_filters))
 
