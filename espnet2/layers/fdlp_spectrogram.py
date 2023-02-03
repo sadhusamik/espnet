@@ -643,7 +643,7 @@ class fdlp_spectrogram(torch.nn.Module):
         """
         if input.shape[1] <= self.srate * self.fduration / 2-1:
             # Appped zeros to make it 1 second long signal
-            input = torch.cat(input, torch.zeros(input.shape[0], int(self.srate) ), axis=1)
+            input = torch.cat([input, torch.zeros(input.shape[0], int(self.srate) )], axis=1)
         if self.online_normalize:
             _, _, _, self.spectral_substraction_vector = self.get_normalizing_vector(input, fduration=25,
                                                                                      overlap_fraction=0.98,
