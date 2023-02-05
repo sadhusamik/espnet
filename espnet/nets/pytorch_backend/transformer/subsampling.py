@@ -67,6 +67,7 @@ class Conv2dMultichannel(torch.nn.Module):
         )
 
     def forward(self, x, x_mask):
+        print(x.shape)
         """Subsample x.
 
         Args:
