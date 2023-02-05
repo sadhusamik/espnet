@@ -1038,6 +1038,8 @@ class fdlp_spectrogram_multiorder(fdlp_spectrogram):
             olens = None
 
         modspec = torch.reshape(modspec, (modspec.shape[0], modspec.shape[1], len(self.order_list), self.n_filters))
+        modspec = torch.transpose(modspec, 2, 3)
+
         return modspec, olens
 
 
