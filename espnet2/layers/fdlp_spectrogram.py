@@ -1001,7 +1001,7 @@ class fdlp_spectrogram_multiorder(fdlp_spectrogram):
         for O in self.order_list:
             XX, gain = self.compute_lpc(frames, O)  # batch x num_frames x n_filters x lpc_coeff
             XX = self.compute_modspec_from_lpc(gain, XX,
-                                                   self.coeff_num)  # batch x num_frames x n_filters x num_modspec
+                                               self.coeff_num)  # batch x num_frames x n_filters x num_modspec
             XX = XX * self.mask
 
             modspec.append(XX)
@@ -1024,7 +1024,7 @@ class fdlp_spectrogram_multiorder(fdlp_spectrogram):
         modspec = self.OLA(modspec=modspec, t_samples=t_samples, dtype=input.dtype, device=input.device)
 
         if self.feature_batch is not None:
-            modspec = torch.reshape(modspec, (-1, self.n_filters * len(self.order_list) ))
+            modspec = torch.reshape(modspec, (-1, self.n_filters * len(self.order_list)))
             frame_num_original = int(np.ceil(tsamples_original * self.frate / self.srate))
             modspec = modspec[0:frame_num_original * num_batch, :]
             modspec = torch.reshape(modspec, (num_batch, frame_num_original, self.n_filters * len(self.order_list)))
@@ -1037,6 +1037,7 @@ class fdlp_spectrogram_multiorder(fdlp_spectrogram):
         else:
             olens = None
 
+        modspec = torch.reshape(modspec, (modspec.shape[0], modspec.shape[1], len(self.order_list), self.n_filters))
         return modspec, olens
 
 
