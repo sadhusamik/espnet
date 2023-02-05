@@ -936,7 +936,8 @@ class fdlp_spectrogram_multiorder(fdlp_spectrogram):
                 ptr = int(ptr + self.cut_overlap - self.cut_half)
             else:
                 # ptr = int(ptr + self.cut_overlap + randrange(2))
-                ptr = int(ptr + self.cut_overlap + 1)
+                #ptr = int(ptr + self.cut_overlap + 1)
+                ptr = int(ptr + self.cut_overlap + 0)
 
         feats = torch.log(torch.clip(feats, max=None, min=0.0000001))
         feats = torch.nan_to_num(feats, nan=0.0000001, posinf=0.0000001, neginf=0.0000001)  # Probably not the best idea
@@ -956,7 +957,7 @@ class fdlp_spectrogram_multiorder(fdlp_spectrogram):
         """
         if input.shape[1] <= self.srate * self.fduration / 2 - 1:
             # Appped zeros to make it 1 second long signal
-            input = torch.cat([input, torch.zeros(input.shape[0], int(self.srate),device=input.device)], axis=1)
+            input = torch.cat([input, torch.zeros(input.shape[0], int(self.srate), device=input.device)], axis=1)
         if self.online_normalize:
             _, _, _, self.spectral_substraction_vector = self.get_normalizing_vector(input, fduration=25,
                                                                                      overlap_fraction=0.98,
@@ -1039,7 +1040,6 @@ class fdlp_spectrogram_multiorder(fdlp_spectrogram):
 
         modspec = torch.reshape(modspec, (modspec.shape[0], modspec.shape[1], len(self.order_list), self.n_filters))
         modspec = torch.transpose(modspec, 2, 3)
-        print(modspec.shape)
 
         return modspec, olens
 
