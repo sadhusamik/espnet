@@ -641,9 +641,9 @@ class fdlp_spectrogram(torch.nn.Module):
             output: (Batch, Frames, Freq) or (Batch, Frames, Freq)
 
         """
-        if input.shape[1] <= self.srate * self.fduration / 2-1:
+        if input.shape[1] <= self.srate * self.fduration / 2 - 1:
             # Appped zeros to make it 1 second long signal
-            input = torch.cat([input, torch.zeros(input.shape[0], int(self.srate) )], axis=1)
+            input = torch.cat([input, torch.zeros(input.shape[0], int(self.srate))], axis=1)
         if self.online_normalize:
             _, _, _, self.spectral_substraction_vector = self.get_normalizing_vector(input, fduration=25,
                                                                                      overlap_fraction=0.98,
@@ -895,6 +895,149 @@ class fdlp_spectrogram(torch.nn.Module):
             )
 
         return output, olens
+
+
+class fdlp_spectrogram_multiorder(fdlp_spectrogram):
+    def __init__(self,
+                 order_list: str = '40,60,80,100',
+                 **kwargs
+                 ):
+        assert check_argument_types()
+        super().__init__(**kwargs)
+
+        self.order_list = [int(x) for x in order_list.split(',')]
+
+    def OLA(self, modspec, t_samples, dtype, device):
+
+        num_batch = modspec.shape[0]
+        num_frames = modspec.shape[1]
+        feats = torch.zeros(
+            (num_batch, int(np.ceil(t_samples * self.frate / self.srate)), self.n_filters * len(self.order_list)),
+            dtype=dtype,
+            device=device)
+        ptr = int(0)
+        ### Overlap and Add stage
+        for j in range(0, num_frames):
+            if j == 0:
+                if feats.shape[1] < self.cut_half:
+                    feats += modspec[:, j, :self.cut_half:self.cut_half + feats.shape[1], :]
+                else:
+                    feats[:, ptr:ptr + self.cut_half, :] += modspec[:, j, self.cut_half:, :]
+
+            elif j == num_frames - 1 or j == num_frames - 2:
+                if modspec.shape[2] >= feats.shape[1] - ptr:
+                    feats[:, ptr:, :] += modspec[:, j, :feats.shape[1] - ptr, :]
+                else:
+                    feats[:, ptr:ptr + self.cut, :] += modspec[:, j, :, :]
+            else:
+                feats[:, ptr:ptr + self.cut, :] += modspec[:, j, :, :]
+
+            if j == 0:
+                ptr = int(ptr + self.cut_overlap - self.cut_half)
+            else:
+                # ptr = int(ptr + self.cut_overlap + randrange(2))
+                ptr = int(ptr + self.cut_overlap + 1)
+
+        feats = torch.log(torch.clip(feats, max=None, min=0.0000001))
+        feats = torch.nan_to_num(feats, nan=0.0000001, posinf=0.0000001, neginf=0.0000001)  # Probably not the best idea
+
+        return feats
+
+    def compute_spectrogram(self, input: torch.Tensor, ilens: torch.Tensor = None) -> Tuple[
+        torch.Tensor, Optional[torch.Tensor]]:
+        """Compute FDLP-Spectrogram With Matrices.
+
+        Args:
+            input: (Batch, Nsamples) or (Batch, Nsample)
+            ilens: (Batch)
+        Returns:
+            output: (Batch, Frames, Freq) or (Batch, Frames, Freq)
+
+        """
+        if input.shape[1] <= self.srate * self.fduration / 2 - 1:
+            # Appped zeros to make it 1 second long signal
+            input = torch.cat([input, torch.zeros(input.shape[0], int(self.srate))], axis=1)
+        if self.online_normalize:
+            _, _, _, self.spectral_substraction_vector = self.get_normalizing_vector(input, fduration=25,
+                                                                                     overlap_fraction=0.98,
+                                                                                     append_len=500000,
+                                                                                     discont=np.pi)
+
+        num_batch = input.shape[0]
+        # First divide the signal into frames
+
+        if self.spectral_substraction_vector is not None and self.dereverb_whole_sentence:
+            input = self.dereverb_whole(input, self.spectral_substraction_vector)
+
+        tsamples_original, t_samples, frames = self.get_frames(input)
+        num_frames = frames.shape[1]
+
+        if self.spectral_substraction_vector is not None and not self.dereverb_whole_sentence:
+            self.spectral_substraction_vector = self.spectral_substraction_vector.to(input.device)
+            # logging.info('Substracting spectral vector')
+            frames = self.spectral_substraction_preprocessing(frames)
+
+        # Compute DCT (olens remains the same)
+        if self.complex_modulation:
+            frames = torch.fft.ifft(frames) * int(self.srate * self.fduration)
+        else:
+            frames = self.dct_type2(frames) / np.sqrt(2 * int(self.srate * self.fduration))
+
+        # Put fbank, mask and lifter into proper device if they are already not there
+        if self.fbank.device.type != input.device.type:
+            print('Transferring fbank, mask and lifter to {:s}'.format(input.device.type))
+            self.fbank = self.fbank.to(input.device)
+            self.lifter = self.lifter.to(input.device)
+            self.mask = self.mask.to(input.device)
+
+        # Divide into sub-bands
+        frames = frames.unsqueeze(2).repeat(1, 1, self.n_filters, 1)
+        frames = frames * self.fbank[:, 0:-1]  # batch x num_frames x n_filters x frame_dim of 1.5 secs
+
+        han_weight = torch.hann_window(self.cut, dtype=input.dtype, device=input.device)
+        ham_weight = torch.hamming_window(self.cut, dtype=input.dtype, device=input.device)
+
+        modspec = []
+        for O in self.order_list:
+            frames, gain = self.compute_lpc(frames, O)  # batch x num_frames x n_filters x lpc_coeff
+            frames = self.compute_modspec_from_lpc(gain, frames,
+                                                   self.coeff_num)  # batch x num_frames x n_filters x num_modspec
+            frames = frames * self.mask
+
+        modspec.append(frames)
+        modspec = torch.cat(modspec, axis=2)  # batch x num_frames x n_filters* order_list x num_modspec
+
+        modspec = modspec * self.boost_lifter_lr * self.lifter  # (batch x num_frames x n_filters x num_modspec)
+        if self.complex_modulation:
+            modspec = torch.fft.fft(modspec, 1 * int(round(
+                self.fduration * self.frate)))  # (batch x num_frames x n_filters x int(self.fduration * self.frate))
+        else:
+            modspec = torch.fft.fft(modspec, 2 * int(round(
+                self.fduration * self.frate)))  # (batch x num_frames x n_filters x int(self.fduration * self.frate))
+        modspec = torch.abs(torch.exp(modspec))
+        modspec = modspec[:, :, :, 0:self.cut] * han_weight / ham_weight
+        modspec = torch.transpose(modspec, 2,
+                                  3)  # (batch x num_frames x int(self.fduration * self.frate) x n_filters)
+
+        # OVERLAP AND ADD
+
+        modspec = self.OLA(modspec=modspec, t_samples=t_samples, dtype=input.dtype, device=input.device)
+
+        if self.feature_batch is not None:
+            modspec = torch.reshape(modspec, (-1, self.n_filters))
+            frame_num_original = int(np.ceil(tsamples_original * self.frate / self.srate))
+            modspec = modspec[0:frame_num_original * num_batch, :]
+            modspec = torch.reshape(modspec, (num_batch, frame_num_original, self.n_filters))
+
+        if ilens is not None:
+            olens = torch.floor(ilens * self.frate / self.srate)
+            olens = olens.to(ilens.dtype)
+            modspec.masked_fill_(make_pad_mask(olens, modspec, 1), 0.0000001)
+            modspec = modspec[:, :torch.max(olens), :]
+        else:
+            olens = None
+
+        return modspec, olens
 
 
 class fdlp_spectrogram_dereverb(fdlp_spectrogram):
