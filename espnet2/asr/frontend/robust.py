@@ -13,7 +13,7 @@ from typeguard import check_argument_types
 from espnet.nets.pytorch_backend.frontends.frontend import Frontend
 from espnet2.asr.frontend.abs_frontend import AbsFrontend
 from espnet2.layers.fdlp_spectrogram import fdlp_spectrogram, fdlp_spectrogram_update, fdlp_spectrogram_dropout, \
-    fdlp_spectrogram_with_mmh, fdlp_spectrogram_modnet, mvector
+    fdlp_spectrogram_with_mmh, fdlp_spectrogram_modnet, mvector, fdlp_spectrogram_multiorder
 from espnet2.utils.get_default_kwargs import get_default_kwargs
 
 
@@ -75,6 +75,8 @@ class RobustFrontend(AbsFrontend):
             log_magnitude_modulation: bool = False,
             full_modulation_spectrum: bool = False,
             return_as_magnitude_phase: bool = False,
+            multiorder: bool = False,
+            order_list: str = '40,60,80,100',
             fs: Union[int, str] = 16000,
             frontend_conf: Optional[dict] = get_default_kwargs(Frontend),
     ):
@@ -93,7 +95,34 @@ class RobustFrontend(AbsFrontend):
         self.coeff_num = coeff_num
         self.complex_modulation = complex_modulation
 
-        if modnet:
+        if multiorder:
+            self.fdlp_spectrogram = fdlp_spectrogram_multiorder(n_filters=n_filters, coeff_num=coeff_num,
+                                                                coeff_range=coeff_range, order=order,
+                                                                fduration=fduration, frate=frate,
+                                                                overlap_fraction=overlap_fraction,
+                                                                srate=srate, update_fbank=update_fbank,
+                                                                use_complex_lifter=use_complex_lifter,
+                                                                update_lifter=update_lifter,
+                                                                update_lifter_multiband=update_lifter_multiband,
+                                                                initialize_lifter=initialize_lifter,
+                                                                complex_modulation=complex_modulation,
+                                                                boost_lifter_lr=boost_lifter_lr,
+                                                                num_chunks=num_chunks,
+                                                                online_normalize=online_normalize,
+                                                                scale_lifter_gradient=scale_lifter_gradient,
+                                                                freeze_lifter_finetune_updates=freeze_lifter_finetune_updates,
+                                                                update_lifter_after_steps=update_lifter_after_steps,
+                                                                lifter_nonlinear_transformation=lifter_nonlinear_transformation,
+                                                                fbank_config=fbank_config,
+                                                                feature_batch=feature_batch,
+                                                                spectral_substraction_vector=spectral_substraction_vector,
+                                                                dereverb_whole_sentence=dereverb_whole_sentence,
+                                                                do_bwe=do_bwe, bwe_factor=bwe_factor,
+                                                                bwe_iter_num=bwe_iter_num,
+                                                                order_list=order_list,
+                                                                precision_lpc=precision_lpc, device=device)
+
+        elif modnet:
             self.fdlp_spectrogram = fdlp_spectrogram_modnet(dropout_frame_num=dropout_frame_num,
                                                             dropout_while_eval=dropout_while_eval,
                                                             pause_dropout_after_steps=pause_dropout_after_steps,
