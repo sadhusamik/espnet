@@ -101,7 +101,7 @@ class TransformerEncoder(AbsEncoder):
             self.embed = Conv2dSubsampling8(input_size, output_size, dropout_rate)
         elif input_layer == "conv2dmultichannel":
             self.embed = Conv2dMultichannel(input_size, output_size, dropout_rate, in_channels=in_channels)
-        elif input_layer == "Conv2dsubsamplingmultichannel":
+        elif input_layer == "conv2dsubsamplingmultichannel":
             self.embed = Conv2dSubsamplingMultichannel(input_size, output_size, dropout_rate, in_channels=in_channels)
         elif input_layer == "conv2dmultichannel2C":
             self.embed = Conv2dMultichannel2Channel(input_size, output_size, dropout_rate, in_channels=in_channels)
