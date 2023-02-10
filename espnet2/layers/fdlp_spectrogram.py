@@ -2174,7 +2174,7 @@ class mvector(fdlp_spectrogram):
                                                                                      append_len=400000, discont=np.pi)
 
         # First divide the signal into frames
-        tsamples, frames = self.get_frames(input)
+        tsamples_original,tsamples, frames = self.get_frames(input)
         num_frames = frames.shape[1]
 
         if self.spectral_substraction_vector is not None:
