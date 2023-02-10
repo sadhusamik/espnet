@@ -199,6 +199,7 @@ class TransformerEncoder(AbsEncoder):
                 or isinstance(self.embed, Conv2dSubsampling6)
                 or isinstance(self.embed, Conv2dSubsampling8)
                 or isinstance(self.embed, Conv2dMultichannel)
+                or isinstance(self.embed, Conv2dSubsamplingMultichannel)
                 or isinstance(self.embed, Conv2dMultichannel2Channel)
                 or isinstance(self.embed, LinearMultichannel2Channel)
         ):
