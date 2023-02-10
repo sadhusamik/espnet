@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>espnet2.tasks package &mdash; ESPnet 202204 documentation</title><link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
@@ -29,14 +29,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> ESPnet
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            ESPnet
           </a>
               <div class="version">
                 202204
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -125,22 +129,22 @@
 <li class="toctree-l1"><a class="reference internal" href="espnet2.fst.html">espnet2.fst package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="espnet2.optimizers.html">espnet2.optimizers package</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">espnet2.tasks package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#espnet2-tasks-hubert">espnet2.tasks.hubert</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#espnet2-tasks-diar">espnet2.tasks.diar</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#espnet2-tasks-asr">espnet2.tasks.asr</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#espnet2-tasks-st">espnet2.tasks.st</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#espnet2-tasks-enh-s2t">espnet2.tasks.enh_s2t</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#espnet2-tasks-modnet">espnet2.tasks.modnet</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#espnet2-tasks-tts">espnet2.tasks.tts</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#espnet2-tasks-gan-tts">espnet2.tasks.gan_tts</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#espnet2-tasks-enh">espnet2.tasks.enh</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#espnet2-tasks-abs-task">espnet2.tasks.abs_task</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#espnet2-tasks-mt">espnet2.tasks.mt</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#espnet2-tasks-modnet-v2">espnet2.tasks.modnet_v2</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#espnet2-tasks-init">espnet2.tasks.__init__</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#espnet2-tasks-asr-frontend">espnet2.tasks.asr_frontend</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#espnet2-tasks-lm">espnet2.tasks.lm</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#espnet2-tasks-cepnet">espnet2.tasks.cepnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#espnet2-tasks-hubert-1">espnet2.tasks.hubert</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#espnet2-tasks-diar-1">espnet2.tasks.diar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#espnet2-tasks-asr-1">espnet2.tasks.asr</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#espnet2-tasks-st-1">espnet2.tasks.st</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#espnet2-tasks-enh-s2t-1">espnet2.tasks.enh_s2t</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#espnet2-tasks-modnet-1">espnet2.tasks.modnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#espnet2-tasks-tts-1">espnet2.tasks.tts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#espnet2-tasks-gan-tts-1">espnet2.tasks.gan_tts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#espnet2-tasks-enh-1">espnet2.tasks.enh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#espnet2-tasks-abs-task-1">espnet2.tasks.abs_task</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#espnet2-tasks-mt-1">espnet2.tasks.mt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#espnet2-tasks-modnet-v2-1">espnet2.tasks.modnet_v2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#espnet2-tasks-init-1">espnet2.tasks.__init__</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#espnet2-tasks-asr-frontend-1">espnet2.tasks.asr_frontend</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#espnet2-tasks-lm-1">espnet2.tasks.lm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#espnet2-tasks-cepnet-1">espnet2.tasks.cepnet</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="espnet2.iterators.html">espnet2.iterators package</a></li>
@@ -177,7 +181,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a></li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">espnet2.tasks package</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/_gen/espnet2.tasks.rst.txt" rel="nofollow"> View page source</a>
@@ -214,8 +218,8 @@
 </style>
 <section id="espnet2-tasks-package">
 <h1>espnet2.tasks package<a class="headerlink" href="#espnet2-tasks-package" title="Permalink to this headline">¶</a></h1>
-<section id="espnet2-tasks-hubert">
-<span id="id1"></span><h2>espnet2.tasks.hubert<a class="headerlink" href="#espnet2-tasks-hubert" title="Permalink to this headline">¶</a></h2>
+<section id="espnet2-tasks-hubert-1">
+<span id="espnet2-tasks-hubert"></span><h2>espnet2.tasks.hubert<a class="headerlink" href="#espnet2-tasks-hubert-1" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.tasks.hubert"></span><dl class="class">
 <dt id="espnet2.tasks.hubert.HubertTask">
 <em class="property">class </em><code class="sig-prename descclassname">espnet2.tasks.hubert.</code><code class="sig-name descname">HubertTask</code><a class="reference internal" href="../_modules/espnet2/tasks/hubert.html#HubertTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.tasks.hubert.HubertTask" title="Permalink to this definition">¶</a></dt>
@@ -301,8 +305,8 @@ If your model is defined as following,</p>
 </dd></dl>
 
 </section>
-<section id="espnet2-tasks-diar">
-<span id="id2"></span><h2>espnet2.tasks.diar<a class="headerlink" href="#espnet2-tasks-diar" title="Permalink to this headline">¶</a></h2>
+<section id="espnet2-tasks-diar-1">
+<span id="espnet2-tasks-diar"></span><h2>espnet2.tasks.diar<a class="headerlink" href="#espnet2-tasks-diar-1" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.tasks.diar"></span><dl class="class">
 <dt id="espnet2.tasks.diar.DiarizationTask">
 <em class="property">class </em><code class="sig-prename descclassname">espnet2.tasks.diar.</code><code class="sig-name descname">DiarizationTask</code><a class="reference internal" href="../_modules/espnet2/tasks/diar.html#DiarizationTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.tasks.diar.DiarizationTask" title="Permalink to this definition">¶</a></dt>
@@ -388,8 +392,8 @@ If your model is defined as following,</p>
 </dd></dl>
 
 </section>
-<section id="espnet2-tasks-asr">
-<span id="id3"></span><h2>espnet2.tasks.asr<a class="headerlink" href="#espnet2-tasks-asr" title="Permalink to this headline">¶</a></h2>
+<section id="espnet2-tasks-asr-1">
+<span id="espnet2-tasks-asr"></span><h2>espnet2.tasks.asr<a class="headerlink" href="#espnet2-tasks-asr-1" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.tasks.asr"></span><dl class="class">
 <dt id="espnet2.tasks.asr.ASRTask">
 <em class="property">class </em><code class="sig-prename descclassname">espnet2.tasks.asr.</code><code class="sig-name descname">ASRTask</code><a class="reference internal" href="../_modules/espnet2/tasks/asr.html#ASRTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.tasks.asr.ASRTask" title="Permalink to this definition">¶</a></dt>
@@ -475,8 +479,8 @@ If your model is defined as following,</p>
 </dd></dl>
 
 </section>
-<section id="espnet2-tasks-st">
-<span id="id4"></span><h2>espnet2.tasks.st<a class="headerlink" href="#espnet2-tasks-st" title="Permalink to this headline">¶</a></h2>
+<section id="espnet2-tasks-st-1">
+<span id="espnet2-tasks-st"></span><h2>espnet2.tasks.st<a class="headerlink" href="#espnet2-tasks-st-1" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.tasks.st"></span><dl class="class">
 <dt id="espnet2.tasks.st.STTask">
 <em class="property">class </em><code class="sig-prename descclassname">espnet2.tasks.st.</code><code class="sig-name descname">STTask</code><a class="reference internal" href="../_modules/espnet2/tasks/st.html#STTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.tasks.st.STTask" title="Permalink to this definition">¶</a></dt>
@@ -562,8 +566,8 @@ If your model is defined as following,</p>
 </dd></dl>
 
 </section>
-<section id="espnet2-tasks-enh-s2t">
-<span id="id5"></span><h2>espnet2.tasks.enh_s2t<a class="headerlink" href="#espnet2-tasks-enh-s2t" title="Permalink to this headline">¶</a></h2>
+<section id="espnet2-tasks-enh-s2t-1">
+<span id="espnet2-tasks-enh-s2t"></span><h2>espnet2.tasks.enh_s2t<a class="headerlink" href="#espnet2-tasks-enh-s2t-1" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.tasks.enh_s2t"></span><dl class="class">
 <dt id="espnet2.tasks.enh_s2t.EnhS2TTask">
 <em class="property">class </em><code class="sig-prename descclassname">espnet2.tasks.enh_s2t.</code><code class="sig-name descname">EnhS2TTask</code><a class="reference internal" href="../_modules/espnet2/tasks/enh_s2t.html#EnhS2TTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.tasks.enh_s2t.EnhS2TTask" title="Permalink to this definition">¶</a></dt>
@@ -649,8 +653,8 @@ If your model is defined as following,</p>
 </dd></dl>
 
 </section>
-<section id="espnet2-tasks-modnet">
-<span id="id6"></span><h2>espnet2.tasks.modnet<a class="headerlink" href="#espnet2-tasks-modnet" title="Permalink to this headline">¶</a></h2>
+<section id="espnet2-tasks-modnet-1">
+<span id="espnet2-tasks-modnet"></span><h2>espnet2.tasks.modnet<a class="headerlink" href="#espnet2-tasks-modnet-1" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.tasks.modnet"></span><dl class="class">
 <dt id="espnet2.tasks.modnet.ModnetTask">
 <em class="property">class </em><code class="sig-prename descclassname">espnet2.tasks.modnet.</code><code class="sig-name descname">ModnetTask</code><a class="reference internal" href="../_modules/espnet2/tasks/modnet.html#ModnetTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.tasks.modnet.ModnetTask" title="Permalink to this definition">¶</a></dt>
@@ -736,8 +740,8 @@ If your model is defined as following,</p>
 </dd></dl>
 
 </section>
-<section id="espnet2-tasks-tts">
-<span id="id7"></span><h2>espnet2.tasks.tts<a class="headerlink" href="#espnet2-tasks-tts" title="Permalink to this headline">¶</a></h2>
+<section id="espnet2-tasks-tts-1">
+<span id="espnet2-tasks-tts"></span><h2>espnet2.tasks.tts<a class="headerlink" href="#espnet2-tasks-tts-1" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.tasks.tts"></span><p>Text-to-speech task.</p>
 <dl class="class">
 <dt id="espnet2.tasks.tts.TTSTask">
@@ -829,8 +833,8 @@ If your model is defined as following,</p>
 </dd></dl>
 
 </section>
-<section id="espnet2-tasks-gan-tts">
-<span id="id8"></span><h2>espnet2.tasks.gan_tts<a class="headerlink" href="#espnet2-tasks-gan-tts" title="Permalink to this headline">¶</a></h2>
+<section id="espnet2-tasks-gan-tts-1">
+<span id="espnet2-tasks-gan-tts"></span><h2>espnet2.tasks.gan_tts<a class="headerlink" href="#espnet2-tasks-gan-tts-1" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.tasks.gan_tts"></span><p>GAN-based text-to-speech task.</p>
 <dl class="class">
 <dt id="espnet2.tasks.gan_tts.GANTTSTask">
@@ -923,8 +927,8 @@ If your model is defined as following,</p>
 </dd></dl>
 
 </section>
-<section id="espnet2-tasks-enh">
-<span id="id9"></span><h2>espnet2.tasks.enh<a class="headerlink" href="#espnet2-tasks-enh" title="Permalink to this headline">¶</a></h2>
+<section id="espnet2-tasks-enh-1">
+<span id="espnet2-tasks-enh"></span><h2>espnet2.tasks.enh<a class="headerlink" href="#espnet2-tasks-enh-1" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.tasks.enh"></span><dl class="class">
 <dt id="espnet2.tasks.enh.EnhancementTask">
 <em class="property">class </em><code class="sig-prename descclassname">espnet2.tasks.enh.</code><code class="sig-name descname">EnhancementTask</code><a class="reference internal" href="../_modules/espnet2/tasks/enh.html#EnhancementTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.tasks.enh.EnhancementTask" title="Permalink to this definition">¶</a></dt>
@@ -1010,8 +1014,8 @@ If your model is defined as following,</p>
 </dd></dl>
 
 </section>
-<section id="espnet2-tasks-abs-task">
-<span id="id10"></span><h2>espnet2.tasks.abs_task<a class="headerlink" href="#espnet2-tasks-abs-task" title="Permalink to this headline">¶</a></h2>
+<section id="espnet2-tasks-abs-task-1">
+<span id="espnet2-tasks-abs-task"></span><h2>espnet2.tasks.abs_task<a class="headerlink" href="#espnet2-tasks-abs-task-1" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.tasks.abs_task"></span><p>Abstract task module.</p>
 <dl class="class">
 <dt id="espnet2.tasks.abs_task.AbsTask">
@@ -1080,7 +1084,7 @@ e.g. If The number of mini-batches equals to 4, the following two are same:</p>
 <dd><p>Build model from the files.</p>
 <p>This method is used for inference or fine-tuning.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>config_file</strong> – The yaml file saved when training.</p></li>
 <li><p><strong>model_file</strong> – The model file saved when training.</p></li>
@@ -1251,8 +1255,8 @@ If your model is defined as following,</p>
 </dd></dl>
 
 </section>
-<section id="espnet2-tasks-mt">
-<span id="id11"></span><h2>espnet2.tasks.mt<a class="headerlink" href="#espnet2-tasks-mt" title="Permalink to this headline">¶</a></h2>
+<section id="espnet2-tasks-mt-1">
+<span id="espnet2-tasks-mt"></span><h2>espnet2.tasks.mt<a class="headerlink" href="#espnet2-tasks-mt-1" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.tasks.mt"></span><dl class="class">
 <dt id="espnet2.tasks.mt.MTTask">
 <em class="property">class </em><code class="sig-prename descclassname">espnet2.tasks.mt.</code><code class="sig-name descname">MTTask</code><a class="reference internal" href="../_modules/espnet2/tasks/mt.html#MTTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.tasks.mt.MTTask" title="Permalink to this definition">¶</a></dt>
@@ -1338,8 +1342,8 @@ If your model is defined as following,</p>
 </dd></dl>
 
 </section>
-<section id="espnet2-tasks-modnet-v2">
-<span id="id12"></span><h2>espnet2.tasks.modnet_v2<a class="headerlink" href="#espnet2-tasks-modnet-v2" title="Permalink to this headline">¶</a></h2>
+<section id="espnet2-tasks-modnet-v2-1">
+<span id="espnet2-tasks-modnet-v2"></span><h2>espnet2.tasks.modnet_v2<a class="headerlink" href="#espnet2-tasks-modnet-v2-1" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.tasks.modnet_v2"></span><dl class="class">
 <dt id="espnet2.tasks.modnet_v2.ModnetTask_v2">
 <em class="property">class </em><code class="sig-prename descclassname">espnet2.tasks.modnet_v2.</code><code class="sig-name descname">ModnetTask_v2</code><a class="reference internal" href="../_modules/espnet2/tasks/modnet_v2.html#ModnetTask_v2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.tasks.modnet_v2.ModnetTask_v2" title="Permalink to this definition">¶</a></dt>
@@ -1425,11 +1429,11 @@ If your model is defined as following,</p>
 </dd></dl>
 
 </section>
-<section id="espnet2-tasks-init">
-<span id="id13"></span><h2>espnet2.tasks.__init__<a class="headerlink" href="#espnet2-tasks-init" title="Permalink to this headline">¶</a></h2>
+<section id="espnet2-tasks-init-1">
+<span id="espnet2-tasks-init"></span><h2>espnet2.tasks.__init__<a class="headerlink" href="#espnet2-tasks-init-1" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.tasks.__init__"></span></section>
-<section id="espnet2-tasks-asr-frontend">
-<span id="id14"></span><h2>espnet2.tasks.asr_frontend<a class="headerlink" href="#espnet2-tasks-asr-frontend" title="Permalink to this headline">¶</a></h2>
+<section id="espnet2-tasks-asr-frontend-1">
+<span id="espnet2-tasks-asr-frontend"></span><h2>espnet2.tasks.asr_frontend<a class="headerlink" href="#espnet2-tasks-asr-frontend-1" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.tasks.asr_frontend"></span><dl class="class">
 <dt id="espnet2.tasks.asr_frontend.ASRTask">
 <em class="property">class </em><code class="sig-prename descclassname">espnet2.tasks.asr_frontend.</code><code class="sig-name descname">ASRTask</code><a class="reference internal" href="../_modules/espnet2/tasks/asr_frontend.html#ASRTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.tasks.asr_frontend.ASRTask" title="Permalink to this definition">¶</a></dt>
@@ -1515,8 +1519,8 @@ If your model is defined as following,</p>
 </dd></dl>
 
 </section>
-<section id="espnet2-tasks-lm">
-<span id="id15"></span><h2>espnet2.tasks.lm<a class="headerlink" href="#espnet2-tasks-lm" title="Permalink to this headline">¶</a></h2>
+<section id="espnet2-tasks-lm-1">
+<span id="espnet2-tasks-lm"></span><h2>espnet2.tasks.lm<a class="headerlink" href="#espnet2-tasks-lm-1" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.tasks.lm"></span><dl class="class">
 <dt id="espnet2.tasks.lm.LMTask">
 <em class="property">class </em><code class="sig-prename descclassname">espnet2.tasks.lm.</code><code class="sig-name descname">LMTask</code><a class="reference internal" href="../_modules/espnet2/tasks/lm.html#LMTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.tasks.lm.LMTask" title="Permalink to this definition">¶</a></dt>
@@ -1602,8 +1606,8 @@ If your model is defined as following,</p>
 </dd></dl>
 
 </section>
-<section id="espnet2-tasks-cepnet">
-<span id="id16"></span><h2>espnet2.tasks.cepnet<a class="headerlink" href="#espnet2-tasks-cepnet" title="Permalink to this headline">¶</a></h2>
+<section id="espnet2-tasks-cepnet-1">
+<span id="espnet2-tasks-cepnet"></span><h2>espnet2.tasks.cepnet<a class="headerlink" href="#espnet2-tasks-cepnet-1" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.tasks.cepnet"></span><dl class="class">
 <dt id="espnet2.tasks.cepnet.CepNetTask">
 <em class="property">class </em><code class="sig-prename descclassname">espnet2.tasks.cepnet.</code><code class="sig-name descname">CepNetTask</code><a class="reference internal" href="../_modules/espnet2/tasks/cepnet.html#CepNetTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.tasks.cepnet.CepNetTask" title="Permalink to this definition">¶</a></dt>

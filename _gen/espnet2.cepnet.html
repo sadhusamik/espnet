@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>espnet2.cepnet package &mdash; ESPnet 202204 documentation</title><link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
@@ -29,14 +29,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> ESPnet
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            ESPnet
           </a>
               <div class="version">
                 202204
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -115,8 +119,8 @@
 <li class="toctree-l1"><a class="reference internal" href="espnet2.torch_utils.html">espnet2.torch_utils package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="espnet2.main_funcs.html">espnet2.main_funcs package</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">espnet2.cepnet package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#espnet2-cepnet-init">espnet2.cepnet.__init__</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#espnet2-cepnet-espnet-model">espnet2.cepnet.espnet_model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#espnet2-cepnet-init-1">espnet2.cepnet.__init__</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#espnet2-cepnet-espnet-model-1">espnet2.cepnet.espnet_model</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="espnet2.diar.html">espnet2.diar package</a></li>
@@ -163,7 +167,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a></li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">espnet2.cepnet package</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/_gen/espnet2.cepnet.rst.txt" rel="nofollow"> View page source</a>
@@ -200,11 +204,11 @@
 </style>
 <section id="espnet2-cepnet-package">
 <h1>espnet2.cepnet package<a class="headerlink" href="#espnet2-cepnet-package" title="Permalink to this headline">¶</a></h1>
-<section id="espnet2-cepnet-init">
-<span id="id1"></span><h2>espnet2.cepnet.__init__<a class="headerlink" href="#espnet2-cepnet-init" title="Permalink to this headline">¶</a></h2>
+<section id="espnet2-cepnet-init-1">
+<span id="espnet2-cepnet-init"></span><h2>espnet2.cepnet.__init__<a class="headerlink" href="#espnet2-cepnet-init-1" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.cepnet.__init__"></span></section>
-<section id="espnet2-cepnet-espnet-model">
-<span id="id2"></span><h2>espnet2.cepnet.espnet_model<a class="headerlink" href="#espnet2-cepnet-espnet-model" title="Permalink to this headline">¶</a></h2>
+<section id="espnet2-cepnet-espnet-model-1">
+<span id="espnet2-cepnet-espnet-model"></span><h2>espnet2.cepnet.espnet_model<a class="headerlink" href="#espnet2-cepnet-espnet-model-1" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.cepnet.espnet_model"></span><dl class="class">
 <dt id="espnet2.cepnet.espnet_model.CepNet">
 <em class="property">class </em><code class="sig-prename descclassname">espnet2.cepnet.espnet_model.</code><code class="sig-name descname">CepNet</code><span class="sig-paren">(</span><em class="sig-param">encoder: espnet2.asr.encoder.abs_encoder.AbsEncoder</em>, <em class="sig-param">projector</em>, <em class="sig-param">extract_feats_in_collect_stats: bool = True</em>, <em class="sig-param">prediction_loss: str = 'MSE'</em>, <em class="sig-param">srate: int = 16000</em>, <em class="sig-param">fduration: float = 3</em>, <em class="sig-param">overlap_fraction: float = 0.75</em>, <em class="sig-param">chunk_num: int = 5</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/cepnet/espnet_model.html#CepNet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.cepnet.espnet_model.CepNet" title="Permalink to this definition">¶</a></dt>
@@ -215,7 +219,7 @@
 <code class="sig-name descname">clean_up</code><span class="sig-paren">(</span><em class="sig-param">speech: torch.Tensor</em>, <em class="sig-param">speech_lengths: torch.Tensor</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/cepnet/espnet_model.html#CepNet.clean_up"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.cepnet.espnet_model.CepNet.clean_up" title="Permalink to this definition">¶</a></dt>
 <dd><p>Frontend + Encoder + Calc loss</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>speech</strong> – (Batch, Length, …)</p></li>
 <li><p><strong>speech_lengths</strong> – (Batch, )</p></li>
@@ -234,7 +238,7 @@
 <code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">speech: torch.Tensor</em>, <em class="sig-param">speech_original: torch.Tensor</em>, <em class="sig-param">speech_lengths: torch.Tensor</em>, <em class="sig-param">speech_original_lengths: torch.Tensor</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, Dict[str, torch.Tensor], torch.Tensor]<a class="reference internal" href="../_modules/espnet2/cepnet/espnet_model.html#CepNet.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.cepnet.espnet_model.CepNet.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Frontend + Encoder + Calc loss</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>speech</strong> – (Batch, Length, …)</p></li>
 <li><p><strong>speech_original</strong> – (Batch, Length, …)</p></li>
@@ -249,7 +253,7 @@
 <code class="sig-name descname">forward_x</code><span class="sig-paren">(</span><em class="sig-param">speech: torch.Tensor</em>, <em class="sig-param">speech_original: torch.Tensor</em>, <em class="sig-param">speech_lengths: torch.Tensor</em>, <em class="sig-param">speech_original_lengths: torch.Tensor</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, Dict[str, torch.Tensor], torch.Tensor]<a class="reference internal" href="../_modules/espnet2/cepnet/espnet_model.html#CepNet.forward_x"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.cepnet.espnet_model.CepNet.forward_x" title="Permalink to this definition">¶</a></dt>
 <dd><p>Frontend + Encoder + Calc loss</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>speech</strong> – (Batch, Length, …)</p></li>
 <li><p><strong>speech_original</strong> – (Batch, Length, …)</p></li>
@@ -264,13 +268,13 @@
 <code class="sig-name descname">get_frames</code><span class="sig-paren">(</span><em class="sig-param">signal: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="../_modules/espnet2/cepnet/espnet_model.html#CepNet.get_frames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.cepnet.espnet_model.CepNet.get_frames" title="Permalink to this definition">¶</a></dt>
 <dd><p>Divide speech signal into frames.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>signal</strong> – (Batch, Nsamples) or (Batch, Nsample)</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>(Batch, Frame num, Frame dimension) or (Batch, Frame num, Frame dimension)</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>output</p>
 </dd>
 </dl>
