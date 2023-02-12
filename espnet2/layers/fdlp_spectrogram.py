@@ -936,7 +936,7 @@ class fdlp_spectrogram_multiorder(fdlp_spectrogram):
                 ptr = int(ptr + self.cut_overlap - self.cut_half)
             else:
                 # ptr = int(ptr + self.cut_overlap + randrange(2))
-                #ptr = int(ptr + self.cut_overlap + 1)
+                # ptr = int(ptr + self.cut_overlap + 1)
                 ptr = int(ptr + self.cut_overlap + 0)
 
         feats = torch.log(torch.clip(feats, max=None, min=0.0000001))
@@ -2174,7 +2174,7 @@ class mvector(fdlp_spectrogram):
                                                                                      append_len=400000, discont=np.pi)
 
         # First divide the signal into frames
-        tsamples_original,tsamples, frames = self.get_frames(input)
+        tsamples_original, tsamples, frames = self.get_frames(input)
         num_frames = frames.shape[1]
 
         if self.spectral_substraction_vector is not None:
@@ -2253,6 +2253,15 @@ class mvector(fdlp_spectrogram):
                         frames = [torch.real(frames), torch.imag(frames)]
                 else:
                     frames = torch.abs(frames)
+
+        if self.feature_batch is not None:
+            frames = torch.reshape(frames, (-1, self.n_filters * self.coeff_num))
+            # print(modspec.shape)
+            frame_num_original = int(np.ceil(tsamples_original * self.lfr / self.srate))
+            # print(frame_num_original)
+            # print(num_batch)
+            frames = frames[0:frame_num_original * num_batch, :]
+            frames = torch.reshape(frames, (num_batch, frame_num_original, self.n_filters * self.coeff_num))
 
         # if self.feature_batch is not None:
         #    # Might not be equally divisible, deal with that
