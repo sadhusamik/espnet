@@ -2295,7 +2295,7 @@ class mvector(fdlp_spectrogram):
                 frames = frames.transpose(1, 2)
 
         if ilens is not None:
-            olens = torch.round(ilens * self.frate / self.srate)
+            olens = torch.ceil(ilens * self.frate / self.srate)
             olens = olens.to(ilens.dtype)
             if self.full_modulation_spectrum and self.complex_modulation:
                 for f_idx in range(2):
