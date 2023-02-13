@@ -2261,7 +2261,7 @@ class mvector(fdlp_spectrogram):
         if self.feature_batch is not None:
             frames = torch.reshape(frames, (-1, self.n_filters * self.coeff_num))
             print(frames.shape)
-            frame_num_original = int(np.ceil(tsamples_original * self.lfr / self.srate))
+            frame_num_original = int(np.round(tsamples_original * self.lfr / self.srate))
             print(frame_num_original)
             print(num_batch)
             frames = frames[0:frame_num_original * num_batch, :]
