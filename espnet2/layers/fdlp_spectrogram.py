@@ -2261,7 +2261,7 @@ class mvector(fdlp_spectrogram):
         if self.feature_batch is not None:
             frames = torch.reshape(frames, (-1, self.n_filters * self.coeff_num))
             print(frames.shape)
-            frame_num_original = int(np.round(tsamples_original * self.lfr / self.srate))
+            frame_num_original = int(np.floor(tsamples_original * self.lfr / self.srate))
             print(frame_num_original)
             print(num_batch)
             frames = frames[0:frame_num_original * num_batch, :]
@@ -2295,7 +2295,7 @@ class mvector(fdlp_spectrogram):
                 frames = frames.transpose(1, 2)
 
         if ilens is not None:
-            olens = torch.ceil(ilens * self.frate / self.srate)
+            olens = torch.floor(ilens * self.frate / self.srate)
             olens = olens.to(ilens.dtype)
             if self.full_modulation_spectrum and self.complex_modulation:
                 for f_idx in range(2):
