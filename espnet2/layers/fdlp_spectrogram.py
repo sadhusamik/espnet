@@ -1689,13 +1689,6 @@ class fdlp_spectrogram_dropout(fdlp_spectrogram):
                 self.fduration * self.frate)))  # (batch x num_frames x n_filters x int(self.fduration * self.frate))
         modspec = torch.abs(torch.exp(modspec))
 
-        print('modspec')
-        print(modspec.shape)
-
-
-        print('han_weight')
-        print(han_weight.shape)
-        sys.stdout.flush()
         modspec = modspec[:, :, :, 0:self.cut] * han_weight / ham_weight
         modspec = torch.transpose(modspec, 2, 3)  # (batch x num_frames x int(self.fduration * self.frate) x n_filters)
 
