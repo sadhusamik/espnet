@@ -1594,6 +1594,9 @@ class fdlp_spectrogram_dropout(fdlp_spectrogram):
             output: (Batch, Frames, Freq) or (Batch, Frames, Freq)
 
         """
+        if input.shape[1] <= self.srate * self.fduration / 2 - 1:
+            # Appped zeros to make it 1 second long signal
+            input = torch.cat([input, torch.zeros(input.shape[0], int(self.srate), device=input.device)], axis=1)
         if self.num_updates:
             self.num_updates += 1
             do_dropout = self.pause_dropout_after_steps >= self.num_updates
