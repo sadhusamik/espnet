@@ -48,6 +48,8 @@ class fdlp_spectrogram(torch.nn.Module):
             complex_modulation: bool = False,
             num_chunks: int = None,
             concat_utts_before_frames: bool = False,
+            randomized_lifter: bool = False,
+            randomized_lifter_range: str = '0.8,1.2',
             feature_batch: int = None,
             fbank_config: str = '1,1,2.5',  # om_w,alpha,beta
             spectral_substraction_vector: str = None,
@@ -1528,7 +1530,10 @@ class fdlp_spectrogram_dropout(fdlp_spectrogram):
         assert check_argument_types()
         super().__init__(**kwargs)
         dropout_range_hz = [float(x) for x in dropout_range_hz.strip().split(',')]
-        t_res = 1 / self.fduration  # resolution of modulation features
+        if self.complex_modulation:
+            t_res = 1 / self.fduration  # resolution of modulation features
+        else:
+            t_res = 1 / (2 * self.fduration)  # resolution of modulation features
         self.dropout_range_low = int(dropout_range_hz[0] / t_res)
         self.dropout_range_high = int(dropout_range_hz[1] / t_res)
 
@@ -1601,7 +1606,7 @@ class fdlp_spectrogram_dropout(fdlp_spectrogram):
         num_batch = input.shape[0]
 
         # First divide the signal into frames
-        t_samples, frames = self.get_frames(input)
+        tsamples_original, t_samples, frames = self.get_frames(input)
         num_frames = frames.shape[1]
 
         # Get ids of frames to mask in each batch
