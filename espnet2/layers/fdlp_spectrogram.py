@@ -957,9 +957,9 @@ class fdlp_spectrogram_multiorder(fdlp_spectrogram):
             output: (Batch, Frames, Freq) or (Batch, Frames, Freq)
 
         """
-        if input.shape[1] <= self.srate * self.fduration / 2 - 1:
+        if input.shape[1] <= self.srate * self.fduration  - 1:
             # Appped zeros to make it 1 second long signal
-            input = torch.cat([input, torch.zeros(input.shape[0], 2*int(self.srate), device=input.device)], axis=1)
+            input = torch.cat([input, torch.zeros(input.shape[0], 1 * int(self.srate), device=input.device)], axis=1)
         if self.online_normalize:
             _, _, _, self.spectral_substraction_vector = self.get_normalizing_vector(input, fduration=25,
                                                                                      overlap_fraction=0.98,
