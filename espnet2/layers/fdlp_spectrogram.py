@@ -1691,7 +1691,16 @@ class fdlp_spectrogram_dropout(fdlp_spectrogram):
 
         if self.return_nondropout_spectrogram:
             feats_original = self.OLA(modspec=modspec_ori, t_samples=t_samples, dtype=input.dtype, device=input.device)
-        feats = self.OLA(modspec=modspec, t_samples=t_samples, dtype=input.dtype, device=input.device)
+        modspec = self.OLA(modspec=modspec, t_samples=t_samples, dtype=input.dtype, device=input.device)
+
+        if self.feature_batch is not None:
+            modspec = torch.reshape(modspec, (-1, self.n_filters))
+            # print(modspec.shape)
+            frame_num_original = int(np.ceil(tsamples_original * self.frate / self.srate))
+            # print(frame_num_original)
+            # print(num_batch)
+            modspec = modspec[0:frame_num_original * num_batch, :]
+            modspec = torch.reshape(modspec, (num_batch, frame_num_original, self.n_filters))
 
         if ilens is not None:
             olens = torch.floor(ilens * self.frate / self.srate)
@@ -1699,23 +1708,23 @@ class fdlp_spectrogram_dropout(fdlp_spectrogram):
             if self.return_nondropout_spectrogram:
                 feats_original.masked_fill_(make_pad_mask(olens, feats_original, 1), 0.0000001)
                 feats_original = feats_original[:, :torch.max(olens), :]
-            feats.masked_fill_(make_pad_mask(olens, feats, 1), 0.0000001)
-            feats = feats[:, :torch.max(olens), :]
+            modspec.masked_fill_(make_pad_mask(olens, modspec, 1), 0.0000001)
+            modspec = modspec[:, :torch.max(olens), :]
         else:
             olens = None
 
         if self.return_dropout_mask and self.return_nondropout_spectrogram:
-            dropout_mask = torch.gt(torch.abs(feats_original - feats), 0)
+            dropout_mask = torch.gt(torch.abs(feats_original - modspec), 0)
         else:
             dropout_mask = None
 
         ## TODO: Fix this to return the same number of stuff
         if self.return_dropout_mask and self.return_nondropout_spectrogram:
-            return feats, feats_original, olens, dropout_mask
+            return modspec, feats_original, olens, dropout_mask
         elif self.return_nondropout_spectrogram:
-            return feats, feats_original, olens
+            return modspec, feats_original, olens
         else:
-            return feats, olens
+            return modspec, olens
 
     def forward(self, input: torch.Tensor, ilens: torch.Tensor = None
                 ) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:

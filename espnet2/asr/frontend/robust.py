@@ -192,6 +192,7 @@ class RobustFrontend(AbsFrontend):
                                                              do_bwe=do_bwe, bwe_factor=bwe_factor,
                                                              bwe_iter_num=bwe_iter_num,
                                                              complex_modulation=complex_modulation,
+                                                             feature_batch=feature_batch,
                                                              precision_lpc=precision_lpc, device=device)
         elif return_mvector:
             self.fdlp_spectrogram = mvector(n_filters=n_filters, coeff_num=coeff_num,
