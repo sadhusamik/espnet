@@ -1669,7 +1669,8 @@ class fdlp_spectrogram_dropout(fdlp_spectrogram):
             modspec_ori = modspec_ori[:, :, :, 0:self.cut] * han_weight / ham_weight
             modspec_ori = torch.transpose(modspec_ori, 2,
                                           3)  # (batch x num_frames x int(self.fduration * self.frate) x n_filters)
-
+        print('modspec_ori')
+        print(modspec_ori.shape)
         if self.training or self.dropout_while_eval:
             # Do masking only during training
             if do_dropout:
@@ -1679,7 +1680,8 @@ class fdlp_spectrogram_dropout(fdlp_spectrogram):
                 # Masked modulation spectrum
                 for p, q in zip(batch_idx, random_frame_idx):
                     modspec[p, q, :, :] = modspec[p, q, :, :] * lifter_mask[p, :, :, :]
-
+        print('modspec')
+        print(modspec.shape)
         if self.complex_modulation:
             modspec = torch.fft.fft(modspec, 1 * int(
                 self.fduration * self.frate))  # (batch x num_frames x n_filters x int(self.fduration * self.frate))
@@ -1687,6 +1689,8 @@ class fdlp_spectrogram_dropout(fdlp_spectrogram):
             modspec = torch.fft.fft(modspec, 2 * int(
                 self.fduration * self.frate))  # (batch x num_frames x n_filters x int(self.fduration * self.frate))
         modspec = torch.abs(torch.exp(modspec))
+        print('han_weight')
+        print(han_weight.shape)
         modspec = modspec[:, :, :, 0:self.cut] * han_weight / ham_weight
         modspec = torch.transpose(modspec, 2, 3)  # (batch x num_frames x int(self.fduration * self.frate) x n_filters)
 
