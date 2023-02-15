@@ -1611,10 +1611,11 @@ class fdlp_spectrogram_dropout(fdlp_spectrogram):
         # First divide the signal into frames
         tsamples_original, t_samples, frames = self.get_frames(input)
         num_frames = frames.shape[1]
+        num_batch_changed = frames.shape[0]
 
         # Get ids of frames to mask in each batch
         random_frame_idx = []
-        batch_idx = np.arange(num_batch)
+        batch_idx = np.arange(num_batch_changed)
         if self.dropout_frame_num > num_frames:
             dpfn = num_frames
         else:
