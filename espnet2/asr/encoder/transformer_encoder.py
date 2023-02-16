@@ -27,7 +27,7 @@ from espnet.nets.pytorch_backend.transformer.subsampling import Conv2dSubsamplin
 from espnet.nets.pytorch_backend.transformer.subsampling import Conv2dSubsampling6
 from espnet.nets.pytorch_backend.transformer.subsampling import Conv2dSubsampling8
 from espnet.nets.pytorch_backend.transformer.subsampling import Conv2dMultichannel, Conv2dMultichannel2Channel, \
-    LinearMultichannel2Channel, Conv2dSubsamplingMultichannel, Conv2dNosubsampling
+    LinearMultichannel2Channel, Conv2dSubsamplingMultichannel, Conv2dNosubsampling, LinearMultichannel
 from espnet.nets.pytorch_backend.transformer.subsampling import TooShortUttError
 from espnet2.asr.ctc import CTC
 from espnet2.asr.encoder.abs_encoder import AbsEncoder
@@ -107,6 +107,8 @@ class TransformerEncoder(AbsEncoder):
             self.embed = Conv2dSubsamplingMultichannel(input_size, output_size, dropout_rate, in_channels=in_channels)
         elif input_layer == "conv2dmultichannel2C":
             self.embed = Conv2dMultichannel2Channel(input_size, output_size, dropout_rate, in_channels=in_channels)
+        elif input_layer == "linearmultichannel":
+            self.embed= LinearMultichannel(input_size, output_size, dropout_rate, in_channels=in_channels)
         elif input_layer == "linearmultichannel2C":
             self.embed = LinearMultichannel2Channel(input_size, output_size, dropout_rate, in_channels=in_channels)
         elif input_layer == "embed":
@@ -205,6 +207,7 @@ class TransformerEncoder(AbsEncoder):
                 or isinstance(self.embed, Conv2dSubsamplingMultichannel)
                 or isinstance(self.embed, Conv2dMultichannel2Channel)
                 or isinstance(self.embed, LinearMultichannel2Channel)
+                or isinstance(self.embed, LinearMultichannel)
         ):
             if isinstance(xs_pad, list):
                 short_status, limit_size = check_short_utt(self.embed, xs_pad[0].size(1))

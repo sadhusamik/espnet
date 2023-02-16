@@ -40,6 +40,7 @@ def check_short_utt(ins, size):
         return True, 15
     return False, -1
 
+
 class Conv2dNosubsampling(torch.nn.Module):
     """Convolutional 2D NO subsampling.
 
@@ -98,6 +99,7 @@ class Conv2dNosubsampling(torch.nn.Module):
             raise NotImplementedError("Support only `-1` (for `reset_parameters`).")
         return self.out[key]
 
+
 class Conv2dMultichannel(torch.nn.Module):
     """Convolutional 2D NO subsampling.
 
@@ -124,7 +126,7 @@ class Conv2dMultichannel(torch.nn.Module):
         )
 
     def forward(self, x, x_mask):
-        #print(x.shape)
+        # print(x.shape)
         """Subsample x.
 
         Args:
@@ -158,6 +160,7 @@ class Conv2dMultichannel(torch.nn.Module):
         if key != -1:
             raise NotImplementedError("Support only `-1` (for `reset_parameters`).")
         return self.out[key]
+
 
 class Conv2dSubsamplingMultichannel(torch.nn.Module):
     """Convolutional 2D subsampling (to 1/4 length) with multiple channels.
@@ -200,7 +203,7 @@ class Conv2dSubsamplingMultichannel(torch.nn.Module):
         """
         x = x.transpose(1, 3)  # batch, num_channels , nfilters, time
         x = x.transpose(2, 3)  # batch, num_channels , time, nfilters
-        #x = x.unsqueeze(1)  # (b, c, t, f)
+        # x = x.unsqueeze(1)  # (b, c, t, f)
         x = self.conv(x)
         b, c, t, f = x.size()
         x = self.out(x.transpose(1, 2).contiguous().view(b, t, c * f))
@@ -218,6 +221,69 @@ class Conv2dSubsamplingMultichannel(torch.nn.Module):
         if key != -1:
             raise NotImplementedError("Support only `-1` (for `reset_parameters`).")
         return self.out[key]
+
+
+class LinearMultichannel(torch.nn.Module):
+    """Multichannel Linear embedding NO subsampling.
+
+    Args:
+        idim (int): Input dimension.
+        odim (int): Output dimension.
+        dropout_rate (float): Dropout rate.
+        pos_enc (torch.nn.Module): Custom position encoding layer.
+
+    """
+
+    def __init__(self, idim, odim, dropout_rate, in_channels, pos_enc=None):
+        """Construct an Conv2dSubsampling object."""
+        super(LinearMultichannel, self).__init__()
+
+        self.lin = torch.nn.Sequential(
+            torch.nn.Linear(idim, odim),
+            torch.nn.LayerNorm(odim),
+            torch.nn.Dropout(dropout_rate),
+            torch.nn.ReLU(),
+        )
+
+        self.out = torch.nn.Sequential(
+            torch.nn.Linear(odim * in_channels, odim),
+            pos_enc if pos_enc is not None else PositionalEncoding(odim, dropout_rate),
+        )
+
+    def forward(self, x, x_mask):
+        """Embed x.
+
+        Args:
+            x (torch.Tensor): Input tensor (#batch, time, nfilters, num_channels).
+            x_mask (torch.Tensor): Input mask (#batch, 1, time).
+
+        Returns:
+            torch.Tensor: Subsampled tensor (#batch, time', odim),
+                where time' = time // 4.
+            torch.Tensor: Subsampled mask (#batch, 1, time'),
+                where time' = time // 4.
+
+        """
+        x = x.transpose(2, 3)  # batch, time, num_channels, nfilters
+        b, t, c, f = x.size()
+        x = x.view(b, t, c * f)
+        x = self.out(x)
+
+        if x_mask is None:
+            return x, None
+        return x, x_mask
+
+    def __getitem__(self, key):
+        """Get item.
+
+        When reset_parameters() is called, if use_scaled_pos_enc is used,
+            return the positioning encoding.
+
+        """
+        if key != -1:
+            raise NotImplementedError("Support only `-1` (for `reset_parameters`).")
+        return self.out[key]
+
 
 class LinearMultichannel2Channel(torch.nn.Module):
     """Convolutional 2D NO subsampling.
@@ -269,9 +335,9 @@ class LinearMultichannel2Channel(torch.nn.Module):
                 where time' = time // 4.
 
         """
-        #x[0] = x[0].transpose(1, 3)  # batch, num_channels , nfilters, time
+        # x[0] = x[0].transpose(1, 3)  # batch, num_channels , nfilters, time
         x[0] = x[0].transpose(2, 3)  # batch, time, num_channels, nfilters
-        #x[1] = x[1].transpose(1, 3)  # batch, num_channels , nfilters, time
+        # x[1] = x[1].transpose(1, 3)  # batch, num_channels , nfilters, time
         x[1] = x[1].transpose(2, 3)  # batch, time, num_channels, nfilters
 
         # x = x.unsqueeze(1)  # (b, c, t, f)
@@ -279,7 +345,7 @@ class LinearMultichannel2Channel(torch.nn.Module):
         x[1] = self.lin2(x[1])
         b, t, c, f = x[0].size()
         x[0] = self.proj1(x[0].view(b, t, c * f))
-        #b, c, t, f = x[1].size()
+        # b, c, t, f = x[1].size()
         x[1] = self.proj2(x[1].view(b, t, c * f))
 
         x = self.out(torch.cat(x, dim=-1))
@@ -298,6 +364,7 @@ class LinearMultichannel2Channel(torch.nn.Module):
         if key != -1:
             raise NotImplementedError("Support only `-1` (for `reset_parameters`).")
         return self.out[key]
+
 
 class Conv2dMultichannel2Channel(torch.nn.Module):
     """Convolutional 2D NO subsampling.
@@ -359,7 +426,7 @@ class Conv2dMultichannel2Channel(torch.nn.Module):
         x[1] = self.conv2(x[1])
         b, c, t, f = x[0].size()
         x[0] = self.proj1(x[0].transpose(1, 2).contiguous().view(b, t, c * f))
-        #b, c, t, f = x[1].size()
+        # b, c, t, f = x[1].size()
         x[1] = self.proj2(x[1].transpose(1, 2).contiguous().view(b, t, c * f))
 
         x = self.out(torch.cat(x, dim=-1))
