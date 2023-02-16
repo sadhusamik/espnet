@@ -85,8 +85,7 @@ class DefaultFrontend(AbsFrontend):
         self, input: torch.Tensor, input_lengths: torch.Tensor
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         # 1. Domain-conversion: e.g. Stft: time -> time-freq
-        if input.shape[1] <= 24000:
-            input = torch.cat([input, torch.zeros(input.shape[0], 16000, device=input.device)], axis=1)
+
         if self.stft is not None:
             input_stft, feats_lens = self._compute_stft(input, input_lengths)
         else:
