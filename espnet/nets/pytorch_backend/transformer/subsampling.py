@@ -265,6 +265,7 @@ class LinearMultichannel(torch.nn.Module):
 
         """
         x = x.transpose(2, 3)  # batch, time, num_channels, nfilters
+        x = self.lin(x)
         b, t, c, f = x.size()
         x = torch.reshape(x, (b, t, c * f))
         # x = x.view(b, t, c * f)
