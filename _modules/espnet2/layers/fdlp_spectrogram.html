@@ -1217,8 +1217,6 @@
         <span class="n">modspec</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">modspec</span><span class="p">,</span> <span class="p">(</span><span class="n">modspec</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">modspec</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">order_list</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_filters</span><span class="p">))</span>
         <span class="n">modspec</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">modspec</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 
-        <span class="nb">print</span><span class="p">(</span><span class="n">modspec</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">modspec</span><span class="p">,</span> <span class="n">olens</span></div></div>
 
 
