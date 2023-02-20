@@ -48,12 +48,12 @@ espnet2.diar.espnet_model
     :show-inheritance:
 
 
-.. _espnet2.diar.attractor.rnn_attractor:
+.. _espnet2.diar.attractor.__init__:
 
-espnet2.diar.attractor.rnn_attractor
-------------------------------------
+espnet2.diar.attractor.__init__
+-------------------------------
 
-.. automodule:: espnet2.diar.attractor.rnn_attractor
+.. automodule:: espnet2.diar.attractor.__init__
     :members:
     :undoc-members:
     :show-inheritance:
@@ -70,23 +70,12 @@ espnet2.diar.attractor.abs_attractor
     :show-inheritance:
 
 
-.. _espnet2.diar.attractor.__init__:
+.. _espnet2.diar.attractor.rnn_attractor:
 
-espnet2.diar.attractor.__init__
--------------------------------
+espnet2.diar.attractor.rnn_attractor
+------------------------------------
 
-.. automodule:: espnet2.diar.attractor.__init__
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
-.. _espnet2.diar.decoder.linear_decoder:
-
-espnet2.diar.decoder.linear_decoder
------------------------------------
-
-.. automodule:: espnet2.diar.decoder.linear_decoder
+.. automodule:: espnet2.diar.attractor.rnn_attractor
     :members:
     :undoc-members:
     :show-inheritance:
@@ -98,6 +87,17 @@ espnet2.diar.decoder.__init__
 -----------------------------
 
 .. automodule:: espnet2.diar.decoder.__init__
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+.. _espnet2.diar.decoder.linear_decoder:
+
+espnet2.diar.decoder.linear_decoder
+-----------------------------------
+
+.. automodule:: espnet2.diar.decoder.linear_decoder
     :members:
     :undoc-members:
     :show-inheritance:
