@@ -275,6 +275,52 @@ class fdlp_spectrogram(torch.nn.Module):
         return torch.cat((torch.ones((num_batch, num_frames, n_filters, 1), dtype=R.dtype, device=R.device),
                           -alphs[:, :, :, :, p - 1]), axis=3), errs[:, :, :, -1]
 
+    def levinson_durbin_multiorder(self, R, p_list):
+        """
+        Levinson Durbin recursion to compute LPC coefficients
+
+        :param R - autocorrelation coefficients: Tensor (batch x num_frames x n_filters x autocorr)
+        :param p - lpc model order: int
+        :return: Tensor (batch x num_frames x n_filters x lpc_coeff), Tensor (batch x num_frames x n_filters)
+
+        """
+        num_batch = R.shape[0]
+        num_frames = R.shape[1]
+        n_filters = R.shape[2]
+        p = p_list[-1]
+        k = torch.zeros((num_batch, num_frames, n_filters, p), dtype=R.dtype, device=R.device)
+        alphs = torch.zeros((num_batch, num_frames, n_filters, p, p), dtype=R.dtype, device=R.device)
+        errs = torch.zeros((num_batch, num_frames, n_filters, p + 1), dtype=R.dtype, device=R.device)
+        errs[:, :, :, 0] = R[:, :, :, 0]
+
+        coeff_list = []
+        gain_list = []
+        for i in range(1, p + 1):
+            if i == 1:
+                k[:, :, :, i - 1] = R[:, :, :, i] / errs[:, :, :, i - 1]
+            else:
+                k[:, :, :, i - 1] = (R[:, :, :, i] - torch.sum(
+                    alphs[:, :, :, 0:i - 1, i - 2] * torch.flip(R[:, :, :, 1:i], [3]), dim=3)) / errs[:, :, :,
+                                                                                                 i - 1]
+            alphs[:, :, :, i - 1, i - 1] = k[:, :, :, i - 1]
+            if i > 1:
+                for j in range(1, i):
+                    alphs[:, :, :, j - 1, i - 1] = alphs[:, :, :, j - 1, i - 2] - k[:, :, :, i - 1] * torch.conj(
+                        alphs[:, :, :,
+                        i - j - 1,
+                        i - 2])
+            errs[:, :, :, i] = (1 - torch.abs(k[:, :, :, i - 1]) ** 2) * errs[:, :, :, i - 1]
+
+            if i in p_list:
+                coeff_list.append(
+                    torch.cat((torch.ones((num_batch, num_frames, n_filters, 1), dtype=R.dtype, device=R.device),
+                               -alphs[:, :, :, 0:i, i - 1]), axis=3))
+                gain_list.append(errs[:, :, :, i])
+
+        return coeff_list, gain_list
+        # return torch.cat((torch.ones((num_batch, num_frames, n_filters, 1), dtype=R.dtype, device=R.device),
+        #                  -alphs[:, :, :, :, p - 1]), axis=3), errs[:, :, :, -1]
+
     def compute_lpc(self, input: torch.Tensor, order: int):
 
         """
@@ -299,6 +345,33 @@ class fdlp_spectrogram(torch.nn.Module):
                 gain = gain.to(dtype=torch.float)
 
         return lpc_coeff, gain
+
+    def compute_lpc_multiorder(self, input: torch.Tensor, orders):
+
+        """
+
+        :param input: Tensor (batch x num_frames x n_filters x frame_dim)
+        :return: Tensor (batch x num_frames x n_filters x lpc_coeff), Tensor (batch x num_frames x n_filters)
+        """
+
+        if self.precision_lpc:
+            if self.complex_modulation:
+                input = input.to(dtype=torch.complex128)
+            else:
+                input = input.to(dtype=torch.double)
+        R = self.compute_autocorr(input)
+        lpc_coeff_list, gain_list = self.levinson_durbin_multiorder(R, p_list=orders)
+        if self.precision_lpc:
+            if self.complex_modulation:
+                for i in range(len(lpc_coeff_list)):
+                    lpc_coeff_list[i] = lpc_coeff_list[i].to(dtype=torch.complex64)
+                    gain_list[i] = gain_list[i].to(dtype=torch.complex64)
+            else:
+                for i in range(len(lpc_coeff_list)):
+                    lpc_coeff_list[i] = lpc_coeff_list[i].to(dtype=torch.float)
+                    gain_list[i] = gain_list[i].to(dtype=torch.float)
+
+        return lpc_coeff_list, gain_list
 
     def bwe_lpc_stabilizer(self, input: torch.Tensor):
         """
@@ -1001,9 +1074,10 @@ class fdlp_spectrogram_multiorder(fdlp_spectrogram):
         ham_weight = torch.hamming_window(self.cut, dtype=input.dtype, device=input.device)
 
         modspec = []
-        for O in self.order_list:
-            XX, gain = self.compute_lpc(frames, O)  # batch x num_frames x n_filters x lpc_coeff
-            XX = self.compute_modspec_from_lpc(gain, XX,
+        all_coeff_list, all_gain_list = self.compute_lpc_multiorder(frames, self.order_list)
+        for idx in range(len(self.order_list)):
+            #XX, gain = self.compute_lpc(frames, O)  # batch x num_frames x n_filters x lpc_coeff
+            XX = self.compute_modspec_from_lpc(all_gain_list[idx], all_coeff_list[idx],
                                                self.coeff_num)  # batch x num_frames x n_filters x num_modspec
             XX = XX * self.mask
 
