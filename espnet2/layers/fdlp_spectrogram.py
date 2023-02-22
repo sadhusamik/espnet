@@ -818,6 +818,22 @@ class fdlp_spectrogram(torch.nn.Module):
             else:
                 modspec = modspec * self.boost_lifter_lr * self.lifter  # (batch x num_frames x n_filters x num_modspec)
 
+
+        if self.complex_modulation:
+            spectrum_feats = torch.fft.fft(modspec, 1 * int(round(
+                self.fduration * self.frate)))  # (batch x num_frames x n_filters x int(self.fduration * self.frate))
+        else:
+            spectrum_feats = torch.fft.fft(modspec, 2 * int(round(
+                self.fduration * self.frate)))  # (batch x num_frames x n_filters x int(self.fduration * self.frate))
+        spectrum_feats = torch.abs(torch.exp(spectrum_feats))
+        spectrum_feats = spectrum_feats[:, :, :, 0:self.cut] * han_weight / ham_weight
+        spectrum_feats = torch.transpose(spectrum_feats, 2,
+                                         3)  # (batch x num_frames x int(self.fduration * self.frate) x n_filters)
+
+        # OVERLAP AND ADD
+
+        spectrum_feats = self.OLA(modspec=spectrum_feats, t_samples=t_samples, dtype=input.dtype, device=input.device)
+
         if self.attach_mvector:
             modspec = modspec.reshape(modspec.size(0), modspec.size(1),
                                       -1)  # batch x num_frames x n_filters * num_modspec
@@ -836,21 +852,6 @@ class fdlp_spectrogram(torch.nn.Module):
 
             modspec = torch.reshape(modspec, (modspec.shape[0], modspec.shape[1], self.n_filters, self.coeff_num))
 
-        if self.complex_modulation:
-            spectrum_feats = torch.fft.fft(modspec, 1 * int(round(
-                self.fduration * self.frate)))  # (batch x num_frames x n_filters x int(self.fduration * self.frate))
-        else:
-            spectrum_feats = torch.fft.fft(modspec, 2 * int(round(
-                self.fduration * self.frate)))  # (batch x num_frames x n_filters x int(self.fduration * self.frate))
-        spectrum_feats = torch.abs(torch.exp(spectrum_feats))
-        spectrum_feats = spectrum_feats[:, :, :, 0:self.cut] * han_weight / ham_weight
-        spectrum_feats = torch.transpose(spectrum_feats, 2,
-                                         3)  # (batch x num_frames x int(self.fduration * self.frate) x n_filters)
-
-        # OVERLAP AND ADD
-
-        spectrum_feats = self.OLA(modspec=spectrum_feats, t_samples=t_samples, dtype=input.dtype, device=input.device)
-
         if self.feature_batch is not None:
             spectrum_feats = torch.reshape(spectrum_feats, (-1, self.n_filters))
             frame_num_original = int(np.ceil(tsamples_original * self.frate / self.srate))
@@ -868,7 +869,7 @@ class fdlp_spectrogram(torch.nn.Module):
         if self.attach_mvector:
             return (modspec, spectrum_feats), olens
         else:
-            return modspec, olens
+            return spectrum_feats, olens
 
     def dereverb_whole(self, signal, rir_mag):
         sig_shape = signal.shape[1]
