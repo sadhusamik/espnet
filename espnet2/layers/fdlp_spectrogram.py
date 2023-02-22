@@ -48,6 +48,7 @@ class fdlp_spectrogram(torch.nn.Module):
             complex_modulation: bool = False,
             num_chunks: int = None,
             concat_utts_before_frames: bool = False,
+            attach_mvector: bool = False,
             randomized_lifter: bool = False,
             randomized_lifter_range: str = '0.8,1.2',
             feature_batch: int = None,
@@ -81,6 +82,7 @@ class fdlp_spectrogram(torch.nn.Module):
         self.overlap_fraction = 1 - overlap_fraction
         self.srate = srate
         self.lfr = 1 / (self.overlap_fraction * self.fduration)
+        self.attach_mvector = attach_mvector
         self.fbank_config = [float(x) for x in fbank_config.split(',')]
         mask = []
         for i in range(coeff_num):
@@ -815,51 +817,58 @@ class fdlp_spectrogram(torch.nn.Module):
                     self.lifter)  # (batch x num_frames x n_filters x num_modspec)
             else:
                 modspec = modspec * self.boost_lifter_lr * self.lifter  # (batch x num_frames x n_filters x num_modspec)
+
+        if self.attach_mvector:
+            modspec = modspec.reshape(modspec.size(0), modspec.size(1),
+                                      -1)  # batch x num_frames x n_filters * num_modspec
+
+            if self.feature_batch is not None:
+                modspec = torch.reshape(modspec, (-1, self.n_filters * self.coeff_num))
+                frame_num_original = int(np.ceil(tsamples_original * self.lfr / self.srate))
+                modspec = modspec[0:frame_num_original * num_batch, :]
+                modspec = torch.reshape(modspec, (num_batch, frame_num_original, self.n_filters * self.coeff_num))
+
+            if self.lfr != self.frate:
+                # We have to bilinear interpolate features to frame rate
+                modspec = modspec.transpose(1, 2)
+                modspec = torch.nn.functional.interpolate(modspec, scale_factor=self.frate / self.lfr, mode='linear')
+                modspec = modspec.transpose(1, 2)
+
+            modspec = torch.reshape(modspec, (modspec.shape[0], modspec.shape[1], self.n_filters, self.coeff_num))
+
         if self.complex_modulation:
-            modspec = torch.fft.fft(modspec, 1 * int(round(
+            spectrum_feats = torch.fft.fft(modspec, 1 * int(round(
                 self.fduration * self.frate)))  # (batch x num_frames x n_filters x int(self.fduration * self.frate))
         else:
-            modspec = torch.fft.fft(modspec, 2 * int(round(
+            spectrum_feats = torch.fft.fft(modspec, 2 * int(round(
                 self.fduration * self.frate)))  # (batch x num_frames x n_filters x int(self.fduration * self.frate))
-        modspec = torch.abs(torch.exp(modspec))
-        modspec = modspec[:, :, :, 0:self.cut] * han_weight / ham_weight
-        modspec = torch.transpose(modspec, 2, 3)  # (batch x num_frames x int(self.fduration * self.frate) x n_filters)
+        spectrum_feats = torch.abs(torch.exp(spectrum_feats))
+        spectrum_feats = spectrum_feats[:, :, :, 0:self.cut] * han_weight / ham_weight
+        spectrum_feats = torch.transpose(spectrum_feats, 2,
+                                         3)  # (batch x num_frames x int(self.fduration * self.frate) x n_filters)
 
         # OVERLAP AND ADD
 
-        modspec = self.OLA(modspec=modspec, t_samples=t_samples, dtype=input.dtype, device=input.device)
+        spectrum_feats = self.OLA(modspec=spectrum_feats, t_samples=t_samples, dtype=input.dtype, device=input.device)
 
         if self.feature_batch is not None:
-            modspec = torch.reshape(modspec, (-1, self.n_filters))
-            # print(modspec.shape)
+            spectrum_feats = torch.reshape(spectrum_feats, (-1, self.n_filters))
             frame_num_original = int(np.ceil(tsamples_original * self.frate / self.srate))
-            # print(frame_num_original)
-            # print(num_batch)
-            modspec = modspec[0:frame_num_original * num_batch, :]
-            modspec = torch.reshape(modspec, (num_batch, frame_num_original, self.n_filters))
-
-            # Might not be equally divisible, deal with that
-            # modspec_size = modspec.shape[0] * modspec.shape[1] * modspec.shape[2]
-            # div_req = num_batch * self.n_filters
-            # div_reminder = modspec_size % div_req
-            # if div_reminder != 0:
-            #    modspec = modspec.flatten()
-            #    if div_reminder < int(div_req / 2):
-            #        modspec = modspec[:-div_reminder]
-            #    else:
-            #        modspec = torch.cat([modspec, torch.zeros(div_req - div_reminder, device=input.device)])
-
-            # modspec = torch.reshape(modspec, (num_batch, -1, self.n_filters))
+            spectrum_feats = spectrum_feats[0:frame_num_original * num_batch, :]
+            spectrum_feats = torch.reshape(spectrum_feats, (num_batch, frame_num_original, self.n_filters))
 
         if ilens is not None:
             olens = torch.floor(ilens * self.frate / self.srate)
             olens = olens.to(ilens.dtype)
-            modspec.masked_fill_(make_pad_mask(olens, modspec, 1), 0.0000001)
-            modspec = modspec[:, :torch.max(olens), :]
+            spectrum_feats.masked_fill_(make_pad_mask(olens, spectrum_feats, 1), 0.0000001)
+            spectrum_feats = spectrum_feats[:, :torch.max(olens), :]
         else:
             olens = None
 
-        return modspec, olens
+        if self.attach_mvector:
+            return (modspec, spectrum_feats), olens
+        else:
+            return modspec, olens
 
     def dereverb_whole(self, signal, rir_mag):
         sig_shape = signal.shape[1]
@@ -1076,7 +1085,7 @@ class fdlp_spectrogram_multiorder(fdlp_spectrogram):
         modspec = []
         all_coeff_list, all_gain_list = self.compute_lpc_multiorder(frames, self.order_list)
         for idx in range(len(self.order_list)):
-            #XX, gain = self.compute_lpc(frames, O)  # batch x num_frames x n_filters x lpc_coeff
+            # XX, gain = self.compute_lpc(frames, O)  # batch x num_frames x n_filters x lpc_coeff
             XX = self.compute_modspec_from_lpc(all_gain_list[idx], all_coeff_list[idx],
                                                self.coeff_num)  # batch x num_frames x n_filters x num_modspec
             XX = XX * self.mask

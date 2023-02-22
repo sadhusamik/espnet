@@ -316,7 +316,7 @@ class LinearMultichannel2Channel(torch.nn.Module):
         )
 
         self.proj1 = torch.nn.Linear(odim * in_channels, odim)
-        self.proj2 = torch.nn.Linear(odim * in_channels, odim)
+        self.proj2 = torch.nn.Linear(odim * 1, odim)
 
         self.out = torch.nn.Sequential(
             torch.nn.Linear(2 * odim, odim),
@@ -340,7 +340,7 @@ class LinearMultichannel2Channel(torch.nn.Module):
         # x[0] = x[0].transpose(1, 3)  # batch, num_channels , nfilters, time
         x[0] = x[0].transpose(2, 3)  # batch, time, num_channels, nfilters
         # x[1] = x[1].transpose(1, 3)  # batch, num_channels , nfilters, time
-        x[1] = x[1].transpose(2, 3)  # batch, time, num_channels, nfilters
+        #x[1] = x[1].transpose(2, 3)  # batch, time, num_channels, nfilters
 
         # x = x.unsqueeze(1)  # (b, c, t, f)
         x[0] = self.lin1(x[0])
@@ -348,7 +348,8 @@ class LinearMultichannel2Channel(torch.nn.Module):
         b, t, c, f = x[0].size()
         x[0] = self.proj1(x[0].view(b, t, c * f))
         # b, c, t, f = x[1].size()
-        x[1] = self.proj2(x[1].view(b, t, c * f))
+        #x[1] = self.proj2(x[1].view(b, t, c * f))
+        x[1] = self.proj2(x[1])
 
         x = self.out(torch.cat(x, dim=-1))
 
