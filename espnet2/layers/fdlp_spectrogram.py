@@ -818,7 +818,6 @@ class fdlp_spectrogram(torch.nn.Module):
             else:
                 modspec = modspec * self.boost_lifter_lr * self.lifter  # (batch x num_frames x n_filters x num_modspec)
 
-
         if self.complex_modulation:
             spectrum_feats = torch.fft.fft(modspec, 1 * int(round(
                 self.fduration * self.frate)))  # (batch x num_frames x n_filters x int(self.fduration * self.frate))
@@ -847,7 +846,8 @@ class fdlp_spectrogram(torch.nn.Module):
             if self.lfr != self.frate:
                 # We have to bilinear interpolate features to frame rate
                 modspec = modspec.transpose(1, 2)
-                modspec = torch.nn.functional.interpolate(modspec, scale_factor=self.frate / self.lfr, mode='linear')
+                scl = int(spectrum_feats.shape[1] / modspec.shape[2])
+                modspec = torch.nn.functional.interpolate(modspec, scale_factor=scl, mode='linear')
                 modspec = modspec.transpose(1, 2)
 
             modspec = torch.reshape(modspec, (modspec.shape[0], modspec.shape[1], self.n_filters, self.coeff_num))
@@ -867,7 +867,7 @@ class fdlp_spectrogram(torch.nn.Module):
             olens = None
 
         if self.attach_mvector:
-            return (modspec, spectrum_feats), olens
+            return [modspec, spectrum_feats], olens
         else:
             return spectrum_feats, olens
 
