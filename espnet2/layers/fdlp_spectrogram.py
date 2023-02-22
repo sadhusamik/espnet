@@ -846,9 +846,11 @@ class fdlp_spectrogram(torch.nn.Module):
             if self.lfr != self.frate:
                 # We have to bilinear interpolate features to frame rate
                 modspec = modspec.transpose(1, 2)
-                scl = (spectrum_feats.shape[1]-1) / modspec.shape[2]
+                scl = (spectrum_feats.shape[1] + 1) / modspec.shape[2]
                 modspec = torch.nn.functional.interpolate(modspec, scale_factor=scl, mode='linear')
                 modspec = modspec.transpose(1, 2)
+                if modspec.shape[1] > spectrum_feats.shape[1]:
+                    modspec = modspec[:, 0:spectrum_feats.shape[1], :]
 
             modspec = torch.reshape(modspec, (modspec.shape[0], modspec.shape[1], self.n_filters, self.coeff_num))
 
@@ -863,6 +865,7 @@ class fdlp_spectrogram(torch.nn.Module):
             olens = olens.to(ilens.dtype)
             spectrum_feats.masked_fill_(make_pad_mask(olens, spectrum_feats, 1), 0.0000001)
             spectrum_feats = spectrum_feats[:, :torch.max(olens), :]
+            modspec = modspec[:, :torch.max(olens), :,:]
         else:
             olens = None
 
