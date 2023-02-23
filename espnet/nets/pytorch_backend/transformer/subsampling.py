@@ -449,6 +449,85 @@ class Conv2dMultichannel2Channel(torch.nn.Module):
             raise NotImplementedError("Support only `-1` (for `reset_parameters`).")
         return self.out[key]
 
+class Conv2dSubsamplingMultichannel2Channel(torch.nn.Module):
+    """Convolutional with 1/4 subsampling.
+
+    Args:
+        idim (int): Input dimension.
+        odim (int): Output dimension.
+        dropout_rate (float): Dropout rate.
+        pos_enc (torch.nn.Module): Custom position encoding layer.
+
+    """
+
+    def __init__(self, idim, odim, dropout_rate, in_channels, pos_enc=None):
+        """Construct an Conv2dSubsampling object."""
+        super(Conv2dSubsamplingMultichannel2Channel, self).__init__()
+
+        self.conv1 = torch.nn.Sequential(
+            torch.nn.Conv2d(in_channels, odim, 3, 2),
+            torch.nn.ReLU(),
+            torch.nn.Conv2d(odim, odim, 3, 2),
+            torch.nn.ReLU(),
+        )
+        self.conv2 = torch.nn.Sequential(
+            torch.nn.Conv2d(1, odim, 3, 2),
+            torch.nn.ReLU(),
+            torch.nn.Conv2d(odim, odim, 3, 2),
+            torch.nn.ReLU(),
+        )
+
+        self.proj1 = torch.nn.Linear(odim * (((idim - 1) // 2 - 1) // 2), odim)
+        self.proj2 = torch.nn.Linear(odim * (((idim - 1) // 2 - 1) // 2), odim)
+
+        self.out = torch.nn.Sequential(
+            torch.nn.Linear(2 * odim, odim),
+            pos_enc if pos_enc is not None else PositionalEncoding(odim, dropout_rate),
+        )
+
+    def forward(self, x, x_mask):
+        """Subsample x.
+
+        Args:
+            x (torch.Tensor): Input tensor (#batch, time, nfilters, num_channels).
+            x_mask (torch.Tensor): Input mask (#batch, 1, time).
+
+        Returns:
+            torch.Tensor: Subsampled tensor (#batch, time', odim),
+                where time' = time // 4.
+            torch.Tensor: Subsampled mask (#batch, 1, time'),
+                where time' = time // 4.
+
+        """
+        x[0] = x[0].transpose(1, 3)  # batch, num_channels , nfilters, time
+        x[0] = x[0].transpose(2, 3)  # batch, num_channels , time, nfilters
+        x[1] = x[1].unsqueeze(1)     # batch, num_channels = 1 , nfilters, time
+
+
+        # x = x.unsqueeze(1)  # (b, c, t, f)
+        x[0] = self.conv1(x[0])
+        x[1] = self.conv2(x[1])
+        b, c, t, f = x[0].size()
+        x[0] = self.proj1(x[0].transpose(1, 2).contiguous().view(b, t, c * f))
+        b, c, t, f = x[1].size()
+        x[1] = self.proj2(x[1].transpose(1, 2).contiguous().view(b, t, c * f))
+
+        x = self.out(torch.cat(x, dim=-1))
+
+        if x_mask is None:
+            return x, None
+        return x, x_mask[:, :, :-2:2][:, :, :-2:2]
+
+    def __getitem__(self, key):
+        """Get item.
+
+        When reset_parameters() is called, if use_scaled_pos_enc is used,
+            return the positioning encoding.
+
+        """
+        if key != -1:
+            raise NotImplementedError("Support only `-1` (for `reset_parameters`).")
+        return self.out[key]
 
 class Conv2dSubsampling(torch.nn.Module):
     """Convolutional 2D subsampling (to 1/4 length).
