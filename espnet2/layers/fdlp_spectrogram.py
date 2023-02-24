@@ -848,6 +848,8 @@ class fdlp_spectrogram(torch.nn.Module):
                     modspec = torch.fft.ifft(modspec) * int(self.srate * self.fduration)
                 else:
                     modspec = self.dct_type2(modspec) / np.sqrt(2 * int(self.srate * self.fduration))
+                modspec = modspec.unsqueeze(2).repeat(1, 1, self.n_filters, 1)
+                modspec = modspec * self.fbank[:, 0:-1]  # batch x num_frames x n_filters x frame_dim of 1.5 secs
                 modspec, gain = self.compute_lpc(modspec, self.order)  # batch x num_frames x n_filters x lpc_coeff
                 modspec = self.compute_modspec_from_lpc(gain, modspec,
                                                         self.coeff_num)  # batch x num_frames x n_filters x num_modspec
