@@ -49,6 +49,7 @@ class fdlp_spectrogram(torch.nn.Module):
             num_chunks: int = None,
             concat_utts_before_frames: bool = False,
             attach_mvector: bool = False,
+            lfr_attached_mvector: float = None,
             randomized_lifter: bool = False,
             randomized_lifter_range: str = '0.8,1.2',
             feature_batch: int = None,
@@ -82,6 +83,7 @@ class fdlp_spectrogram(torch.nn.Module):
         self.overlap_fraction = 1 - overlap_fraction
         self.srate = srate
         self.lfr = 1 / (self.overlap_fraction * self.fduration)
+        self.lfr_attached_mvector = lfr_attached_mvector
         self.attach_mvector = attach_mvector
         self.fbank_config = [float(x) for x in fbank_config.split(',')]
         mask = []
@@ -418,7 +420,7 @@ class fdlp_spectrogram(torch.nn.Module):
             lpc_cep[:, :, :, n] = acc + lpc_coeff[:, :, :, n]
         return lpc_cep
 
-    def get_frames(self, signal: torch.Tensor) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
+    def get_frames(self, signal: torch.Tensor, lfr) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
         """Divide speech signal into frames.
 
                 Args:
@@ -428,7 +430,7 @@ class fdlp_spectrogram(torch.nn.Module):
                 """
 
         flength_samples = int(self.srate * self.fduration)
-        frate_samples = int(self.srate / self.lfr)
+        frate_samples = int(self.srate / lfr)
 
         if flength_samples % 2 == 0:
             sp_b = int(flength_samples / 2) - 1
@@ -721,6 +723,12 @@ class fdlp_spectrogram(torch.nn.Module):
         if input.shape[1] <= self.srate * self.fduration / 2 - 1:
             # Appped zeros to make it 1 second long signal
             input = torch.cat([input, torch.zeros(input.shape[0], int(self.srate), device=input.device)], axis=1)
+
+        if self.lfr_attached_mvector:
+            input_copy = input.clone()
+        else:
+            input_copy = None
+
         if self.online_normalize:
             _, _, _, self.spectral_substraction_vector = self.get_normalizing_vector(input, fduration=25,
                                                                                      overlap_fraction=0.98,
@@ -732,7 +740,7 @@ class fdlp_spectrogram(torch.nn.Module):
         if self.spectral_substraction_vector is not None and self.dereverb_whole_sentence:
             input = self.dereverb_whole(input, self.spectral_substraction_vector)
 
-        tsamples_original, t_samples, frames = self.get_frames(input)
+        tsamples_original, t_samples, frames = self.get_frames(input, self.lfr)
         num_frames = frames.shape[1]
 
         if self.spectral_substraction_vector is not None and not self.dereverb_whole_sentence:
@@ -834,6 +842,16 @@ class fdlp_spectrogram(torch.nn.Module):
         spectrum_feats = self.OLA(modspec=spectrum_feats, t_samples=t_samples, dtype=input.dtype, device=input.device)
 
         if self.attach_mvector:
+            if self.lfr_attached_mvector:
+                tsamples_original, t_samples, modspec = self.get_frames(input_copy, self.lfr_attached_mvector)
+                if self.complex_modulation:
+                    modspec = torch.fft.ifft(modspec) * int(self.srate * self.fduration)
+                else:
+                    modspec = self.dct_type2(modspec) / np.sqrt(2 * int(self.srate * self.fduration))
+                modspec, gain = self.compute_lpc(modspec, self.order)  # batch x num_frames x n_filters x lpc_coeff
+                modspec = self.compute_modspec_from_lpc(gain, modspec,
+                                                        self.coeff_num)  # batch x num_frames x n_filters x num_modspec
+
             modspec = modspec.reshape(modspec.size(0), modspec.size(1),
                                       -1)  # batch x num_frames x n_filters * num_modspec
 
@@ -865,7 +883,7 @@ class fdlp_spectrogram(torch.nn.Module):
             olens = olens.to(ilens.dtype)
             spectrum_feats.masked_fill_(make_pad_mask(olens, spectrum_feats, 1), 0.0000001)
             spectrum_feats = spectrum_feats[:, :torch.max(olens), :]
-            modspec = modspec[:, :torch.max(olens), :,:]
+            modspec = modspec[:, :torch.max(olens), :, :]
         else:
             olens = None
 
