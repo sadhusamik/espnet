@@ -2305,7 +2305,7 @@ class mvector(fdlp_spectrogram):
                                                                                      append_len=400000, discont=np.pi)
 
         # First divide the signal into frames
-        tsamples_original, tsamples, frames = self.get_frames(input)
+        tsamples_original, tsamples, frames = self.get_frames(input, lfr=self.lfr)
         num_frames = frames.shape[1]
 
         if self.spectral_substraction_vector is not None:
@@ -2393,20 +2393,6 @@ class mvector(fdlp_spectrogram):
             print(num_batch)
             frames = frames[0:frame_num_original * num_batch, :]
             frames = torch.reshape(frames, (num_batch, frame_num_original, self.n_filters * self.coeff_num))
-
-        # if self.feature_batch is not None:
-        #    # Might not be equally divisible, deal with that
-        #    modspec_size = modspec.shape[0] * modspec.shape[1] * modspec.shape[2]
-        #    div_req = num_batch * self.n_filters
-        #    div_reminder = modspec_size % div_req
-        #    if div_reminder != 0:
-        #        modspec = modspec.flatten()
-        #        if div_reminder < int(div_req / 2):
-        #            modspec = modspec[:-div_reminder]
-        #        else:
-        #            modspec = torch.cat([modspec, torch.zeros(div_req - div_reminder, device=input.device)])
-
-        #    modspec = torch.reshape(modspec, (num_batch, -1, self.n_filters))
 
         if self.lfr != self.frate:
             # We have to bilinear interpolate features to frame rate
