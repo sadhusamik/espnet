@@ -2479,7 +2479,7 @@
                                                                                      <span class="n">append_len</span><span class="o">=</span><span class="mi">400000</span><span class="p">,</span> <span class="n">discont</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
 
         <span class="c1"># First divide the signal into frames</span>
-        <span class="n">tsamples_original</span><span class="p">,</span> <span class="n">tsamples</span><span class="p">,</span> <span class="n">frames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_frames</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+        <span class="n">tsamples_original</span><span class="p">,</span> <span class="n">tsamples</span><span class="p">,</span> <span class="n">frames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_frames</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">lfr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lfr</span><span class="p">)</span>
         <span class="n">num_frames</span> <span class="o">=</span> <span class="n">frames</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_substraction_vector</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -2567,20 +2567,6 @@
             <span class="nb">print</span><span class="p">(</span><span class="n">num_batch</span><span class="p">)</span>
             <span class="n">frames</span> <span class="o">=</span> <span class="n">frames</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">frame_num_original</span> <span class="o">*</span> <span class="n">num_batch</span><span class="p">,</span> <span class="p">:]</span>
             <span class="n">frames</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="p">(</span><span class="n">num_batch</span><span class="p">,</span> <span class="n">frame_num_original</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_filters</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeff_num</span><span class="p">))</span>
-
-        <span class="c1"># if self.feature_batch is not None:</span>
-        <span class="c1">#    # Might not be equally divisible, deal with that</span>
-        <span class="c1">#    modspec_size = modspec.shape[0] * modspec.shape[1] * modspec.shape[2]</span>
-        <span class="c1">#    div_req = num_batch * self.n_filters</span>
-        <span class="c1">#    div_reminder = modspec_size % div_req</span>
-        <span class="c1">#    if div_reminder != 0:</span>
-        <span class="c1">#        modspec = modspec.flatten()</span>
-        <span class="c1">#        if div_reminder &lt; int(div_req / 2):</span>
-        <span class="c1">#            modspec = modspec[:-div_reminder]</span>
-        <span class="c1">#        else:</span>
-        <span class="c1">#            modspec = torch.cat([modspec, torch.zeros(div_req - div_reminder, device=input.device)])</span>
-
-        <span class="c1">#    modspec = torch.reshape(modspec, (num_batch, -1, self.n_filters))</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lfr</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frate</span><span class="p">:</span>
             <span class="c1"># We have to bilinear interpolate features to frame rate</span>
