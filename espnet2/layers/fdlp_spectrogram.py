@@ -1078,7 +1078,7 @@ class fdlp_spectrogram_multiorder(fdlp_spectrogram):
         if self.spectral_substraction_vector is not None and self.dereverb_whole_sentence:
             input = self.dereverb_whole(input, self.spectral_substraction_vector)
 
-        tsamples_original, t_samples, frames = self.get_frames(input)
+        tsamples_original, t_samples, frames = self.get_frames(input,lfr=self.lfr)
         num_frames = frames.shape[1]
 
         if self.spectral_substraction_vector is not None and not self.dereverb_whole_sentence:
