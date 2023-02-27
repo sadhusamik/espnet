@@ -238,6 +238,12 @@ class CommonPreprocessor(AbsPreprocessor):
 
                         # rir: (Nmic, Time)
                         rir = rir.T
+                        rir = rir[0, :]
+                        rir = rir[None, :]
+
+                        speech = speech[0, :]
+                        speech = speech[None, :]
+                        #rir = rir.T
 
                         # speech: (Nmic, Time)
                         # Note that this operation doesn't change the signal length
