@@ -288,7 +288,8 @@ class CommonPreprocessor(AbsPreprocessor):
                                     raise RuntimeError(f"Something wrong: {noise_path}")
                         # noise: (Nmic, Time)
                         noise = noise.T
-
+                        print(noise.shape)
+                        sys.stdout.flush()
                         noise_power = (noise ** 2).mean()
                         scale = (
                                 10 ** (-noise_db / 20)
