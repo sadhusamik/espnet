@@ -412,6 +412,12 @@
 
                         <span class="c1"># rir: (Nmic, Time)</span>
                         <span class="n">rir</span> <span class="o">=</span> <span class="n">rir</span><span class="o">.</span><span class="n">T</span>
+                        <span class="n">rir</span> <span class="o">=</span> <span class="n">rir</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span>
+                        <span class="n">rir</span> <span class="o">=</span> <span class="n">rir</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+
+                        <span class="n">speech</span> <span class="o">=</span> <span class="n">speech</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span>
+                        <span class="n">speech</span> <span class="o">=</span> <span class="n">speech</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+                        <span class="c1">#rir = rir.T</span>
 
                         <span class="c1"># speech: (Nmic, Time)</span>
                         <span class="c1"># Note that this operation doesn&#39;t change the signal length</span>
@@ -456,7 +462,10 @@
                                     <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Something wrong: </span><span class="si">{</span><span class="n">noise_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                         <span class="c1"># noise: (Nmic, Time)</span>
                         <span class="n">noise</span> <span class="o">=</span> <span class="n">noise</span><span class="o">.</span><span class="n">T</span>
-
+                        <span class="n">noise</span> <span class="o">=</span> <span class="n">noise</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span>
+                        <span class="n">noise</span> <span class="o">=</span> <span class="n">noise</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+                        <span class="c1">#print(noise.shape)</span>
+                        <span class="c1">#sys.stdout.flush()</span>
                         <span class="n">noise_power</span> <span class="o">=</span> <span class="p">(</span><span class="n">noise</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
                         <span class="n">scale</span> <span class="o">=</span> <span class="p">(</span>
                                 <span class="mi">10</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="n">noise_db</span> <span class="o">/</span> <span class="mi">20</span><span class="p">)</span>
