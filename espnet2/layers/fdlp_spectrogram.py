@@ -1015,6 +1015,7 @@ class fdlp_spectrogram_multiorder(fdlp_spectrogram):
         super().__init__(**kwargs)
 
         self.order_list = [int(x) for x in order_list.split(',')]
+        self.dropout_order_num=dropout_order_num
 
     def OLA(self, modspec, t_samples, dtype, device):
 
