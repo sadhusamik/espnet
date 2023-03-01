@@ -1155,7 +1155,7 @@ class fdlp_spectrogram_multiorder(fdlp_spectrogram):
             if self.dropout_order_num is not None:
                 k = np.arange(len(self.order_list))
                 random.shuffle(k)
-                k = k[0:self.dropout_order_num + 1]
+                k = k[0:self.dropout_order_num]
                 for one_idx in k:
                     modspec[:, :, :, one_idx] = 0
 
