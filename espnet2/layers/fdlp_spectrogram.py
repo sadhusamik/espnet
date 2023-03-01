@@ -1151,12 +1151,13 @@ class fdlp_spectrogram_multiorder(fdlp_spectrogram):
         modspec = torch.reshape(modspec, (modspec.shape[0], modspec.shape[1], len(self.order_list), self.n_filters))
         modspec = torch.transpose(modspec, 2, 3)
 
-        if self.dropout_order_num:
-            k = np.arange(len(self.order_list))
-            random.shuffle(k)
-            k = k[0:self.dropout_order_num + 1]
-            for one_idx in k:
-                modspec[:, :, :, one_idx] = 0
+        if self.training:
+            if self.dropout_order_num is not None:
+                k = np.arange(len(self.order_list))
+                random.shuffle(k)
+                k = k[0:self.dropout_order_num + 1]
+                for one_idx in k:
+                    modspec[:, :, :, one_idx] = 0
 
         return modspec, olens
 
