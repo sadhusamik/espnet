@@ -79,6 +79,7 @@ class RobustFrontend(AbsFrontend):
             return_as_magnitude_phase: bool = False,
             multiorder: bool = False,
             order_list: str = '40,60,80,100',
+            dropout_order_num: int = None,
             fs: Union[int, str] = 16000,
             frontend_conf: Optional[dict] = get_default_kwargs(Frontend),
     ):
@@ -122,6 +123,7 @@ class RobustFrontend(AbsFrontend):
                                                                 do_bwe=do_bwe, bwe_factor=bwe_factor,
                                                                 bwe_iter_num=bwe_iter_num,
                                                                 order_list=order_list,
+                                                                dropout_order_num=dropout_order_num,
                                                                 precision_lpc=precision_lpc, device=device)
 
         elif modnet:

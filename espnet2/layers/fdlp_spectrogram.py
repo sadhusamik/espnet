@@ -1008,6 +1008,7 @@ class fdlp_spectrogram(torch.nn.Module):
 class fdlp_spectrogram_multiorder(fdlp_spectrogram):
     def __init__(self,
                  order_list: str = '40,60,80,100',
+                 dropout_order_num: int = None,
                  **kwargs
                  ):
         assert check_argument_types()
@@ -1078,7 +1079,7 @@ class fdlp_spectrogram_multiorder(fdlp_spectrogram):
         if self.spectral_substraction_vector is not None and self.dereverb_whole_sentence:
             input = self.dereverb_whole(input, self.spectral_substraction_vector)
 
-        tsamples_original, t_samples, frames = self.get_frames(input,lfr=self.lfr)
+        tsamples_original, t_samples, frames = self.get_frames(input, lfr=self.lfr)
         num_frames = frames.shape[1]
 
         if self.spectral_substraction_vector is not None and not self.dereverb_whole_sentence:
@@ -1149,6 +1150,13 @@ class fdlp_spectrogram_multiorder(fdlp_spectrogram):
 
         modspec = torch.reshape(modspec, (modspec.shape[0], modspec.shape[1], len(self.order_list), self.n_filters))
         modspec = torch.transpose(modspec, 2, 3)
+
+        if self.dropout_order_num:
+            k = np.arange(len(self.order_list))
+            random.shuffle(k)
+            k = k[0:self.dropout_order_num + 1]
+            for one_idx in k:
+                modspec[:, :, :, one_idx] = 0
 
         return modspec, olens
 
