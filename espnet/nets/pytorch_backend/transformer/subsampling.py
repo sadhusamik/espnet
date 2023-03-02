@@ -506,7 +506,7 @@ class Conv2dSubsamplingMultichannelNChannel(torch.nn.Module):
         # Outs are shaped b x t x odim
         if self.training:
             if self.num_channel_dropout is not None:
-                k = np.arange(len(self.in_channels))
+                k = np.arange(self.in_channels)
                 random.shuffle(k)
                 k = k[0:self.num_channel_dropout]
                 for one_idx in k:
