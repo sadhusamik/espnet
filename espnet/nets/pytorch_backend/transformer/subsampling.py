@@ -510,7 +510,7 @@ class Conv2dSubsamplingMultichannelNChannel(torch.nn.Module):
                 random.shuffle(k)
                 k = k[0:self.num_channel_dropout]
                 for one_idx in k:
-                    outs[one_idx] = torch.zeros(size=outs[one_idx].size(), device=outs[one_idx].device)
+                    outs[one_idx] = outs[one_idx]*0
 
         x = self.out(torch.cat(outs, dim=-1))
 
