@@ -500,7 +500,7 @@ class Conv2dSubsamplingMultichannelNChannel(torch.nn.Module):
         for i in range(self.in_channels):
             out_one = self.convs[i](x[:, :, :, i].unsqueeze(1))
             b, c, t, f = out_one.size()
-            out_one = self.projs(out_one.transpose(1, 2).contiguous().view(b, t, c * f))
+            out_one = self.projs[i](out_one.transpose(1, 2).contiguous().view(b, t, c * f))
             outs.append(out_one)
 
         # Outs are shaped b x t x odim
