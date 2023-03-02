@@ -467,14 +467,15 @@ class Conv2dSubsamplingMultichannelNChannel(torch.nn.Module):
         super(Conv2dSubsamplingMultichannelNChannel, self).__init__()
         self.in_channels = in_channels
         self.num_channel_dropout = num_channel_dropout
-        self.convs = [torch.nn.Sequential(
+        self.convs = torch.nn.ModuleList([torch.nn.Sequential(
             torch.nn.Conv2d(1, odim, 3, 2),
             torch.nn.ReLU(),
             torch.nn.Conv2d(odim, odim, 3, 2),
             torch.nn.ReLU(),
-        ) for i in range(in_channels)]
+        ) for i in range(in_channels)])
 
-        self.projs = [torch.nn.Linear(odim * (((idim - 1) // 2 - 1) // 2), odim) for i in range(in_channels)]
+        self.projs = torch.nn.ModuleList(
+            [torch.nn.Linear(odim * (((idim - 1) // 2 - 1) // 2), odim) for i in range(in_channels)])
 
         self.out = torch.nn.Sequential(
             torch.nn.Linear(in_channels * odim, odim),
