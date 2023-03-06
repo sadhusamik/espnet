@@ -216,6 +216,7 @@ class TransformerEncoder(AbsEncoder):
                 or isinstance(self.embed, LinearMultichannel2Channel)
                 or isinstance(self.embed, Conv2dSubsamplingMultichannel2Channel)
                 or isinstance(self.embed, Conv2dSubsamplingMultichannelNChannel)
+                or isinstance(self.embed, LinearNoSubsamplingMultichannelNChannel)
                 or isinstance(self.embed, LinearMultichannel)
         ):
             if isinstance(xs_pad, list):
