@@ -44,6 +44,7 @@ class fdlp_spectrogram(torch.nn.Module):
             freeze_lifter_finetune_updates: int = None,
             update_lifter_after_steps: int = None,
             initialize_lifter: str = None,
+            random_lifter: bool = False,
             lifter_nonlinear_transformation: str = None,
             complex_modulation: bool = False,
             num_chunks: int = None,
@@ -108,6 +109,7 @@ class fdlp_spectrogram(torch.nn.Module):
         self.scale_lifter_gradient = scale_lifter_gradient
         self.freeze_lifter_finetune_updates = freeze_lifter_finetune_updates
         self.update_lifter_after_steps = update_lifter_after_steps
+        self.random_lifter = random_lifter
 
         # self.register_buffer("num_updates", torch.LongTensor([0]))
         # self.boost_lifter_lr = boost_lifter_lr
@@ -160,16 +162,27 @@ class fdlp_spectrogram(torch.nn.Module):
         else:
             if self.update_lifter_multiband:
                 if self.use_complex_lifter:
-                    lifter = np.ones((self.n_filters, coeff_num, 2))
-                    # lifter[:, :, 1] = 0
+                    if self.random_lifter:
+                        lifter = np.random.rand(self.n_filters, coeff_num, 2) * 2 - 1
+                    else:
+                        lifter = np.ones((self.n_filters, coeff_num, 2))
                 else:
-                    lifter = np.ones((self.n_filters, coeff_num))
+                    if self.random_lifter:
+                        lifter = np.random.rand(self.n_filters, coeff_num) * 2 - 1
+                    else:
+                        lifter = np.ones((self.n_filters, coeff_num))
             else:
                 if self.use_complex_lifter:
-                    lifter = np.ones((coeff_num, 2))
+                    if self.random_lifter:
+                        lifter = np.random.rand(coeff_num, 2) * 2 - 1
+                    else:
+                        lifter = np.ones((coeff_num, 2))
                     # lifter[:, 1] = 0
                 else:
-                    lifter = np.ones(coeff_num)
+                    if self.random_lifter:
+                        lifter = np.random.rand(coeff_num) * 2 - 1
+                    else:
+                        lifter = np.ones(coeff_num)
 
         lifter /= boost_lifter_lr
 
@@ -809,11 +822,18 @@ class fdlp_spectrogram(torch.nn.Module):
             else:
                 if self.use_complex_lifter:
 
-                    modspec = modspec * torch.view_as_complex(self.boost_lifter_lr * self.lifter).unsqueeze(
-                        0).unsqueeze(0).repeat(num_batch,
-                                               num_frames,
-                                               1,
-                                               1)  # (batch x num_frames x n_filters x num_modspec)
+                    # multiply real and imaginary parts separately
+                    modspec = torch.real(modspec) * self.boost_lifter_lr * self.lifter[:, :, 0].unsqueeze(0).unsqueeze(
+                        0).repeat(num_batch, num_frames, 1,
+                                  1) + 1j * torch.imag(modspec) * self.boost_lifter_lr * self.lifter[:, :, 1].unsqueeze(
+                        0).unsqueeze(0).repeat(num_batch, num_frames, 1,
+                                               1)
+
+                    # modspec = modspec * torch.view_as_complex(self.boost_lifter_lr * self.lifter).unsqueeze(
+                    #    0).unsqueeze(0).repeat(num_batch,
+                    #                           num_frames,
+                    #                           1,
+                    #                           1)  # (batch x num_frames x n_filters x num_modspec)
                 else:
                     modspec = modspec * self.boost_lifter_lr * self.lifter.unsqueeze(0).unsqueeze(0).repeat(num_batch,
                                                                                                             num_frames,
@@ -1015,7 +1035,7 @@ class fdlp_spectrogram_multiorder(fdlp_spectrogram):
         super().__init__(**kwargs)
 
         self.order_list = [int(x) for x in order_list.split(',')]
-        self.dropout_order_num=dropout_order_num
+        self.dropout_order_num = dropout_order_num
 
     def OLA(self, modspec, t_samples, dtype, device):
 
