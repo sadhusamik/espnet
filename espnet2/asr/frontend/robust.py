@@ -80,7 +80,7 @@ class RobustFrontend(AbsFrontend):
             multiorder: bool = False,
             order_list: str = '40,60,80,100',
             dropout_order_num: int = None,
-            random_lifter: bool =False,
+            random_lifter: bool = False,
             fs: Union[int, str] = 16000,
             frontend_conf: Optional[dict] = get_default_kwargs(Frontend),
     ):
