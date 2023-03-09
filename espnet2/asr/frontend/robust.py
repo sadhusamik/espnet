@@ -81,6 +81,8 @@ class RobustFrontend(AbsFrontend):
             order_list: str = '40,60,80,100',
             dropout_order_num: int = None,
             random_lifter: bool = False,
+            lifter_scale: float = None,
+            purturb_lifter: float = None,
             fs: Union[int, str] = 16000,
             frontend_conf: Optional[dict] = get_default_kwargs(Frontend),
     ):
@@ -246,6 +248,8 @@ class RobustFrontend(AbsFrontend):
                                                      lifter_nonlinear_transformation=lifter_nonlinear_transformation,
                                                      fbank_config=fbank_config,
                                                      random_lifter=random_lifter,
+                                                     purturb_lifter=purturb_lifter,
+                                                     lifter_scale=lifter_scale,
                                                      feature_batch=feature_batch,
                                                      attach_mvector=attach_mvector,
                                                      spectral_substraction_vector=spectral_substraction_vector,

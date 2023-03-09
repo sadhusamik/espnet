@@ -45,6 +45,8 @@ class fdlp_spectrogram(torch.nn.Module):
             update_lifter_after_steps: int = None,
             initialize_lifter: str = None,
             random_lifter: bool = False,
+            lifter_scale: float = None,
+            purturb_lifter: float = None,
             lifter_nonlinear_transformation: str = None,
             complex_modulation: bool = False,
             num_chunks: int = None,
@@ -110,7 +112,8 @@ class fdlp_spectrogram(torch.nn.Module):
         self.freeze_lifter_finetune_updates = freeze_lifter_finetune_updates
         self.update_lifter_after_steps = update_lifter_after_steps
         self.random_lifter = random_lifter
-
+        self.lifter_scale = lifter_scale
+        self.purturb_lifter = purturb_lifter
         # self.register_buffer("num_updates", torch.LongTensor([0]))
         # self.boost_lifter_lr = boost_lifter_lr
         self.register_buffer("boost_lifter_lr", torch.Tensor([boost_lifter_lr]))
@@ -165,24 +168,36 @@ class fdlp_spectrogram(torch.nn.Module):
                     if self.random_lifter:
                         lifter = np.random.rand(self.n_filters, coeff_num, 2) * 2 - 1
                     else:
-                        lifter = np.ones((self.n_filters, coeff_num, 2))
+                        if self.lifter_scale is not None:
+                            lifter = self.lifter_scale * np.ones((self.n_filters, coeff_num, 2))
+                        else:
+                            lifter = np.ones((self.n_filters, coeff_num, 2))
                 else:
                     if self.random_lifter:
                         lifter = np.random.rand(self.n_filters, coeff_num) * 2 - 1
                     else:
-                        lifter = np.ones((self.n_filters, coeff_num))
+                        if self.lifter_scale is not None:
+                            lifter = self.lifter_scale * np.ones((self.n_filters, coeff_num))
+                        else:
+                            lifter = np.ones((self.n_filters, coeff_num))
             else:
                 if self.use_complex_lifter:
                     if self.random_lifter:
                         lifter = np.random.rand(coeff_num, 2) * 2 - 1
                     else:
-                        lifter = np.ones((coeff_num, 2))
+                        if self.lifter_scale is not None:
+                            lifter = self.lifter_scale * np.ones((coeff_num, 2))
+                        else:
+                            lifter = np.ones((coeff_num, 2))
                     # lifter[:, 1] = 0
                 else:
                     if self.random_lifter:
                         lifter = np.random.rand(coeff_num) * 2 - 1
                     else:
-                        lifter = np.ones(coeff_num)
+                        if self.lifter_scale is not None:
+                            lifter = self.lifter_scale * np.ones(coeff_num)
+                        else:
+                            lifter = np.ones(coeff_num)
 
         lifter /= boost_lifter_lr
 
@@ -814,11 +829,19 @@ class fdlp_spectrogram(torch.nn.Module):
         # logging.info('Boost rate {}'.format(self.boost_lifter_lr.data))
         # logging.info('lifter mean'.format(torch.mean(self.lifter).data))
         sys.stdout.flush()
+
+        if self.purturb_lifter is not None and self.training:
+            add_purturb = 2 * torch.rand(self.lifter.shape,
+                                         dtype=self.lifter.dtype) * self.purturb_lifter - self.purturb_lifter
+        else:
+            add_purturb = 0
+
         if self.update_lifter_multiband:
             if self.lnlt:
                 modspec = modspec * self.lnlt(
-                    self.boost_lifter_lr * self.lifter.unsqueeze(0).unsqueeze(0).repeat(num_batch, num_frames, 1,
-                                                                                        1))  # (batch x num_frames x n_filters x num_modspec)
+                    self.boost_lifter_lr * (self.lifter + add_purturb).unsqueeze(0).unsqueeze(0).repeat(num_batch,
+                                                                                                        num_frames, 1,
+                                                                                                        1))  # (batch x num_frames x n_filters x num_modspec)
             else:
                 if self.use_complex_lifter:
 
@@ -835,16 +858,18 @@ class fdlp_spectrogram(torch.nn.Module):
                     #                           1,
                     #                           1)  # (batch x num_frames x n_filters x num_modspec)
                 else:
-                    modspec = modspec * self.boost_lifter_lr * self.lifter.unsqueeze(0).unsqueeze(0).repeat(num_batch,
-                                                                                                            num_frames,
-                                                                                                            1,
-                                                                                                            1)  # (batch x num_frames x n_filters x num_modspec)
+                    modspec = modspec * self.boost_lifter_lr * (self.lifter + add_purturb).unsqueeze(0).unsqueeze(
+                        0).repeat(num_batch,
+                                  num_frames,
+                                  1,
+                                  1)  # (batch x num_frames x n_filters x num_modspec)
         else:
             if self.lnlt:
                 modspec = modspec * self.boost_lifter_lr * self.lnlt(
-                    self.lifter)  # (batch x num_frames x n_filters x num_modspec)
+                    (self.lifter + add_purturb))  # (batch x num_frames x n_filters x num_modspec)
             else:
-                modspec = modspec * self.boost_lifter_lr * self.lifter  # (batch x num_frames x n_filters x num_modspec)
+                modspec = modspec * self.boost_lifter_lr * (
+                        self.lifter + add_purturb)  # (batch x num_frames x n_filters x num_modspec)
 
         if self.complex_modulation:
             spectrum_feats = torch.fft.fft(modspec, 1 * int(round(
