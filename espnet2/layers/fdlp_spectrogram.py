@@ -832,7 +832,8 @@ class fdlp_spectrogram(torch.nn.Module):
 
         if self.purturb_lifter is not None and self.training:
             add_purturb = 2 * torch.rand(self.lifter.shape,
-                                         dtype=self.lifter.dtype) * self.purturb_lifter - self.purturb_lifter
+                                         dtype=self.lifter.dtype,
+                                         device=self.lifter.device) * self.purturb_lifter - self.purturb_lifter
         else:
             add_purturb = 0
 
