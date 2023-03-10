@@ -47,6 +47,7 @@ class fdlp_spectrogram(torch.nn.Module):
             random_lifter: bool = False,
             lifter_scale: float = None,
             purturb_lifter: float = None,
+            lifter_purturb_prob: float = 0.8,
             lifter_nonlinear_transformation: str = None,
             complex_modulation: bool = False,
             num_chunks: int = None,
@@ -114,6 +115,7 @@ class fdlp_spectrogram(torch.nn.Module):
         self.random_lifter = random_lifter
         self.lifter_scale = lifter_scale
         self.purturb_lifter = purturb_lifter
+        self.lifter_purturb_prob = lifter_purturb_prob
         # self.register_buffer("num_updates", torch.LongTensor([0]))
         # self.boost_lifter_lr = boost_lifter_lr
         self.register_buffer("boost_lifter_lr", torch.Tensor([boost_lifter_lr]))
@@ -830,7 +832,7 @@ class fdlp_spectrogram(torch.nn.Module):
         # logging.info('lifter mean'.format(torch.mean(self.lifter).data))
         sys.stdout.flush()
 
-        if self.purturb_lifter is not None and self.training:
+        if self.purturb_lifter is not None and self.training and self.lifter_purturb_prob >= np.random.random():
             add_purturb = 2 * torch.rand(self.lifter.shape,
                                          dtype=self.lifter.dtype,
                                          device=self.lifter.device) * self.purturb_lifter - self.purturb_lifter

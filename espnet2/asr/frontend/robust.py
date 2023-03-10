@@ -83,6 +83,7 @@ class RobustFrontend(AbsFrontend):
             random_lifter: bool = False,
             lifter_scale: float = None,
             purturb_lifter: float = None,
+            lifter_purturb_prob: float = 0.8,
             fs: Union[int, str] = 16000,
             frontend_conf: Optional[dict] = get_default_kwargs(Frontend),
     ):
@@ -249,6 +250,7 @@ class RobustFrontend(AbsFrontend):
                                                      fbank_config=fbank_config,
                                                      random_lifter=random_lifter,
                                                      purturb_lifter=purturb_lifter,
+                                                     lifter_purturb_prob=lifter_purturb_prob,
                                                      lifter_scale=lifter_scale,
                                                      feature_batch=feature_batch,
                                                      attach_mvector=attach_mvector,
