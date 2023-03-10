@@ -10,6 +10,7 @@ import torch
 import numpy as np
 import random
 from espnet.nets.pytorch_backend.transformer.embedding import PositionalEncoding
+from espnet.nets.pytorch_backend.rnn.encoders import RNN
 
 
 class TooShortUttError(Exception):
@@ -450,6 +451,80 @@ class Conv2dMultichannel2Channel(torch.nn.Module):
             raise NotImplementedError("Support only `-1` (for `reset_parameters`).")
         return self.out[key]
 
+
+class RNNNoSubsamplingMultichannelNChannel(torch.nn.Module):
+    """RNN with NO subsampling with N channels
+
+    Args:
+        idim (int): Input dimension.
+        odim (int): Output dimension.
+        dropout_rate (float): Dropout rate.
+        pos_enc (torch.nn.Module): Custom position encoding layer.
+
+    """
+
+    def __init__(self, idim, odim, dropout_rate, in_channels, num_layers=2, hidden_size=128, pos_enc=None,
+                 num_channel_dropout=None):
+        """Construct an Conv2dSubsampling object."""
+        super(RNNNoSubsamplingMultichannelNChannel, self).__init__()
+        self.in_channels = in_channels
+        self.num_channel_dropout = num_channel_dropout
+
+        self.rnns = torch.nn.ModuleList([torch.nn.Sequential(
+            RNN(idim, num_layers, hidden_size, odim, dropout_rate, typ='blstm'),
+        ) for i in range(in_channels)])
+
+        self.out = torch.nn.Sequential(
+            torch.nn.Linear(in_channels * odim, odim),
+            pos_enc if pos_enc is not None else PositionalEncoding(odim, dropout_rate),
+        )
+
+    def forward(self, x, x_mask):
+        """Subsample x.
+
+        Args:
+            x (torch.Tensor): Input tensor (#batch, time, nfilters, num_channels).
+            x_mask (torch.Tensor): Input mask (#batch, 1, time).
+
+        Returns:
+            torch.Tensor: Subsampled tensor (#batch, time', odim),
+                where time' = time // 4.
+            torch.Tensor: Subsampled mask (#batch, 1, time'),
+                where time' = time // 4.
+
+        """
+        outs = []
+        for i in range(self.in_channels):
+            out_one = self.rnns[i](x[:, :, :, i])
+            outs.append(out_one)
+
+        # Outs are shaped b x t x odim
+        if self.training:
+            if self.num_channel_dropout is not None:
+                k = np.arange(self.in_channels)
+                random.shuffle(k)
+                k = k[0:self.num_channel_dropout]
+                for one_idx in k:
+                    outs[one_idx] = outs[one_idx] * 0
+
+        x = self.out(torch.cat(outs, dim=-1))
+
+        if x_mask is None:
+            return x, None
+        return x, x_mask
+
+    def __getitem__(self, key):
+        """Get item.
+
+        When reset_parameters() is called, if use_scaled_pos_enc is used,
+            return the positioning encoding.
+
+        """
+        if key != -1:
+            raise NotImplementedError("Support only `-1` (for `reset_parameters`).")
+        return self.out[key]
+
+
 class LinearNoSubsampling4layersMultichannelNChannel(torch.nn.Module):
     """Linear with NO subsampling with N channels
 
@@ -467,7 +542,7 @@ class LinearNoSubsampling4layersMultichannelNChannel(torch.nn.Module):
         self.in_channels = in_channels
         self.num_channel_dropout = num_channel_dropout
 
-        self.lins = torch.nn.ModuleList([ torch.nn.Sequential(
+        self.lins = torch.nn.ModuleList([torch.nn.Sequential(
             torch.nn.Linear(idim, odim),
             torch.nn.LayerNorm(odim),
             torch.nn.Dropout(dropout_rate),
@@ -517,7 +592,7 @@ class LinearNoSubsampling4layersMultichannelNChannel(torch.nn.Module):
                 random.shuffle(k)
                 k = k[0:self.num_channel_dropout]
                 for one_idx in k:
-                    outs[one_idx] = outs[one_idx]*0
+                    outs[one_idx] = outs[one_idx] * 0
 
         x = self.out(torch.cat(outs, dim=-1))
 
@@ -535,6 +610,7 @@ class LinearNoSubsampling4layersMultichannelNChannel(torch.nn.Module):
         if key != -1:
             raise NotImplementedError("Support only `-1` (for `reset_parameters`).")
         return self.out[key]
+
 
 class LinearNoSubsamplingMultichannelNChannel(torch.nn.Module):
     """Linear with NO subsampling with N channels
@@ -553,7 +629,7 @@ class LinearNoSubsamplingMultichannelNChannel(torch.nn.Module):
         self.in_channels = in_channels
         self.num_channel_dropout = num_channel_dropout
 
-        self.lins = torch.nn.ModuleList([ torch.nn.Sequential(
+        self.lins = torch.nn.ModuleList([torch.nn.Sequential(
             torch.nn.Linear(idim, odim),
             torch.nn.LayerNorm(odim),
             torch.nn.Dropout(dropout_rate),
@@ -595,7 +671,7 @@ class LinearNoSubsamplingMultichannelNChannel(torch.nn.Module):
                 random.shuffle(k)
                 k = k[0:self.num_channel_dropout]
                 for one_idx in k:
-                    outs[one_idx] = outs[one_idx]*0
+                    outs[one_idx] = outs[one_idx] * 0
 
         x = self.out(torch.cat(outs, dim=-1))
 
@@ -613,6 +689,7 @@ class LinearNoSubsamplingMultichannelNChannel(torch.nn.Module):
         if key != -1:
             raise NotImplementedError("Support only `-1` (for `reset_parameters`).")
         return self.out[key]
+
 
 class Conv2dSubsamplingMultichannelNChannel(torch.nn.Module):
     """Convolutional with 1/4 subsampling with N channels
@@ -673,7 +750,7 @@ class Conv2dSubsamplingMultichannelNChannel(torch.nn.Module):
                 random.shuffle(k)
                 k = k[0:self.num_channel_dropout]
                 for one_idx in k:
-                    outs[one_idx] = outs[one_idx]*0
+                    outs[one_idx] = outs[one_idx] * 0
 
         x = self.out(torch.cat(outs, dim=-1))
 
