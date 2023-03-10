@@ -123,8 +123,8 @@ class TransformerEncoder(AbsEncoder):
                                                                  num_channel_dropout=num_channel_dropout)
         elif input_layer == "linearnosubsampling4layersmultichannelnchannel":
             self.embed = LinearNoSubsampling4layersMultichannelNChannel(input_size, output_size, dropout_rate,
-                                                                 in_channels=in_channels,
-                                                                 num_channel_dropout=num_channel_dropout)
+                                                                        in_channels=in_channels,
+                                                                        num_channel_dropout=num_channel_dropout)
         elif input_layer == "linearmultichannel":
             self.embed = LinearMultichannel(input_size, output_size, dropout_rate, in_channels=in_channels)
         elif input_layer == "linearmultichannel2C":
