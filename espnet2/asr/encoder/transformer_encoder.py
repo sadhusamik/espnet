@@ -27,7 +27,9 @@ from espnet.nets.pytorch_backend.transformer.subsampling import Conv2dSubsamplin
 from espnet.nets.pytorch_backend.transformer.subsampling import Conv2dSubsampling6
 from espnet.nets.pytorch_backend.transformer.subsampling import Conv2dSubsampling8
 from espnet.nets.pytorch_backend.transformer.subsampling import Conv2dMultichannel, Conv2dMultichannel2Channel, \
-    LinearMultichannel2Channel, Conv2dSubsamplingMultichannel, Conv2dNosubsampling, LinearMultichannel, Conv2dSubsamplingMultichannel2Channel, Conv2dSubsamplingMultichannelNChannel, LinearNoSubsamplingMultichannelNChannel
+    LinearMultichannel2Channel, Conv2dSubsamplingMultichannel, Conv2dNosubsampling, LinearMultichannel, \
+    Conv2dSubsamplingMultichannel2Channel, Conv2dSubsamplingMultichannelNChannel, \
+    LinearNoSubsamplingMultichannelNChannel, LinearNoSubsampling4layersMultichannelNChannel
 from espnet.nets.pytorch_backend.transformer.subsampling import TooShortUttError
 from espnet2.asr.ctc import CTC
 from espnet2.asr.encoder.abs_encoder import AbsEncoder
@@ -109,11 +111,20 @@ class TransformerEncoder(AbsEncoder):
         elif input_layer == "conv2dmultichannel2C":
             self.embed = Conv2dMultichannel2Channel(input_size, output_size, dropout_rate, in_channels=in_channels)
         elif input_layer == "conv2dsubsamplingmultichannel2C":
-            self.embed = Conv2dSubsamplingMultichannel2Channel(input_size, output_size, dropout_rate, in_channels=in_channels)
+            self.embed = Conv2dSubsamplingMultichannel2Channel(input_size, output_size, dropout_rate,
+                                                               in_channels=in_channels)
         elif input_layer == "conv2dsubsamplingmultichannelnchannel":
-            self.embed = Conv2dSubsamplingMultichannelNChannel(input_size, output_size, dropout_rate, in_channels=in_channels,num_channel_dropout=num_channel_dropout)
+            self.embed = Conv2dSubsamplingMultichannelNChannel(input_size, output_size, dropout_rate,
+                                                               in_channels=in_channels,
+                                                               num_channel_dropout=num_channel_dropout)
         elif input_layer == "linearnosubsamplingmultichannelnchannel":
-            self.embed = LinearNoSubsamplingMultichannelNChannel(input_size, output_size, dropout_rate, in_channels=in_channels,num_channel_dropout=num_channel_dropout)
+            self.embed = LinearNoSubsamplingMultichannelNChannel(input_size, output_size, dropout_rate,
+                                                                 in_channels=in_channels,
+                                                                 num_channel_dropout=num_channel_dropout)
+        elif input_layer == "linearnosubsampling4layersmultichannelnchannel":
+            self.embed = LinearNoSubsampling4layersMultichannelNChannel(input_size, output_size, dropout_rate,
+                                                                 in_channels=in_channels,
+                                                                 num_channel_dropout=num_channel_dropout)
         elif input_layer == "linearmultichannel":
             self.embed = LinearMultichannel(input_size, output_size, dropout_rate, in_channels=in_channels)
         elif input_layer == "linearmultichannel2C":
@@ -217,6 +228,7 @@ class TransformerEncoder(AbsEncoder):
                 or isinstance(self.embed, Conv2dSubsamplingMultichannel2Channel)
                 or isinstance(self.embed, Conv2dSubsamplingMultichannelNChannel)
                 or isinstance(self.embed, LinearNoSubsamplingMultichannelNChannel)
+                or isinstance(self.embed, LinearNoSubsampling4layersMultichannelNChannel)
                 or isinstance(self.embed, LinearMultichannel)
         ):
             if isinstance(xs_pad, list):
