@@ -2484,6 +2484,8 @@ class mvector(fdlp_spectrogram):
                     frames[f_idx].shape[0], frames[f_idx].shape[1], self.n_filters, self.coeff_num))
         else:
             frames = torch.reshape(frames, (frames.shape[0], frames.shape[1], self.n_filters, self.coeff_num))
+            frames = frames.transpose(2, 3)
+            # frames = torch.reshape(frames, (frames.shape[0], frames.shape[1], self.n_filters, self.coeff_num))
 
         return frames, olens
 
