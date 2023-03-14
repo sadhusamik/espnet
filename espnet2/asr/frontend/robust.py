@@ -268,7 +268,7 @@ class RobustFrontend(AbsFrontend):
 
     def output_size(self) -> int:
         if self.return_mvector:
-            return self.n_filters
+            return self.coeff_num
         elif self.num_modulation_head:
             return self.n_filters * self.num_modulation_head
         else:
