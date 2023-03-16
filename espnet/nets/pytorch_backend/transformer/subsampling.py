@@ -479,7 +479,7 @@ class RNNNoSubsamplingMultichannelNChannel(torch.nn.Module):
             pos_enc if pos_enc is not None else PositionalEncoding(odim, dropout_rate),
         )
 
-    def forward(self, x, x_mask):
+    def forward(self, x, ilens):
         """Subsample x.
 
         Args:
@@ -495,7 +495,7 @@ class RNNNoSubsamplingMultichannelNChannel(torch.nn.Module):
         """
         outs = []
         for i in range(self.in_channels):
-            out_one = self.rnns[i](x[:, :, :, i])
+            out_one = self.rnns[i](x[:, :, :, i],ilens)
             outs.append(out_one)
 
         # Outs are shaped b x t x odim

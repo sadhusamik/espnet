@@ -257,6 +257,8 @@ class TransformerEncoder(AbsEncoder):
                         limit_size,
                     )
             xs_pad, masks = self.embed(xs_pad, masks)
+        elif isinstance(self.embed, RNNNoSubsamplingMultichannelNChannel) :
+            xs_pad, _ = self.embed(xs_pad, ilens)
         else:
             xs_pad = self.embed(xs_pad)
 
