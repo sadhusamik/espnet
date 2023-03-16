@@ -213,6 +213,7 @@ class TransformerEncoder(AbsEncoder):
         Returns:
             position embedded tensor and mask
         """
+
         if isinstance(xs_pad, list):
             masks = (~make_pad_mask(ilens)[:, None, :]).to(xs_pad[0].device)
         else:
