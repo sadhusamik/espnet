@@ -58,6 +58,7 @@ from espnet2.asr.postencoder.hugging_face_transformers_postencoder import (
 )
 from espnet2.asr.preencoder.abs_preencoder import AbsPreEncoder
 from espnet2.asr.preencoder.linear import LinearProjection
+from espnet2.asr.preencoder.linear_multistream import LinearMultistreamProjection
 from espnet2.asr.preencoder.sinc import LightweightSincConvs
 from espnet2.asr.specaug.abs_specaug import AbsSpecAug
 from espnet2.asr.specaug.specaug import SpecAug
@@ -128,6 +129,7 @@ preencoder_choices = ClassChoices(
     classes=dict(
         sinc=LightweightSincConvs,
         linear=LinearProjection,
+        linear_multistream=LinearMultistreamProjection,
     ),
     type_check=AbsPreEncoder,
     default=None,
