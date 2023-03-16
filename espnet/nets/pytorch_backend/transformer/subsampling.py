@@ -498,7 +498,7 @@ class RNNNoSubsamplingMultichannelNChannel(torch.nn.Module):
         print(ilens.shape)
         for i in range(self.in_channels):
             #out_one, _, _ = self.rnns[i](x[:, :, :, i], ilens)
-            out_one, _, _ = self.rnns[i](x[:, :, :, i], ilens)
+            out_one, _, _ = self.rnns[i](x[:, :, :, i])
             outs.append(out_one)
 
         # Outs are shaped b x t x odim
