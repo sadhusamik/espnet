@@ -444,6 +444,17 @@ espnet2.asr.preencoder.sinc
     :show-inheritance:
 
 
+.. _espnet2.asr.preencoder.linear_multistream:
+
+espnet2.asr.preencoder.linear_multistream
+-----------------------------------------
+
+.. automodule:: espnet2.asr.preencoder.linear_multistream
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
 .. _espnet2.asr.preencoder.linear:
 
 espnet2.asr.preencoder.linear
