@@ -181,31 +181,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  
-<style>
-/* CSS overrides for sphinx_rtd_theme */
-
-/* 24px margin */
-.nbinput.nblast.container,
-.nboutput.nblast.container {
-    margin-bottom: 19px;  /* padding has already 5px */
-}
-
-/* ... except between code cells! */
-.nblast.container + .nbinput.container {
-    margin-top: -19px;
-}
-
-.admonition > p:before {
-    margin-right: 4px;  /* make room for the exclamation icon */
-}
-
-/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
-.math {
-    text-align: unset;
-}
-</style>
-<section id="espnet2-main-funcs-package">
+  <section id="espnet2-main-funcs-package">
 <h1>espnet2.main_funcs package<a class="headerlink" href="#espnet2-main-funcs-package" title="Permalink to this headline">¶</a></h1>
 <section id="espnet2-main-funcs-calculate-all-attentions-1">
 <span id="espnet2-main-funcs-calculate-all-attentions"></span><h2>espnet2.main_funcs.calculate_all_attentions<a class="headerlink" href="#espnet2-main-funcs-calculate-all-attentions-1" title="Permalink to this headline">¶</a></h2>
@@ -236,36 +212,9 @@ key_names x batch x (D1, D2, …)</p>
 <span class="target" id="module-espnet2.main_funcs.__init__"></span></section>
 <section id="espnet2-main-funcs-collect-stats-1">
 <span id="espnet2-main-funcs-collect-stats"></span><h2>espnet2.main_funcs.collect_stats<a class="headerlink" href="#espnet2-main-funcs-collect-stats-1" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-espnet2.main_funcs.collect_stats"></span><dl class="function">
-<dt id="espnet2.main_funcs.collect_stats.collect_stats">
-<code class="sig-prename descclassname">espnet2.main_funcs.collect_stats.</code><code class="sig-name descname">collect_stats</code><span class="sig-paren">(</span><em class="sig-param">model: espnet2.train.abs_espnet_model.AbsESPnetModel, train_iter: Iterable[Tuple[List[str], Dict[str, torch.Tensor]]], valid_iter: Iterable[Tuple[List[str], Dict[str, torch.Tensor]]], output_dir: pathlib.Path, ngpu: Optional[int], log_interval: Optional[int], write_collected_feats: bool</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="../_modules/espnet2/main_funcs/collect_stats.html#collect_stats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.main_funcs.collect_stats.collect_stats" title="Permalink to this definition">¶</a></dt>
-<dd><p>Perform on collect_stats mode.</p>
-<p>Running for deriving the shape information from data
-and gathering statistics.
-This method is used before executing train().</p>
-</dd></dl>
-
 </section>
 <section id="espnet2-main-funcs-average-nbest-models-1">
 <span id="espnet2-main-funcs-average-nbest-models"></span><h2>espnet2.main_funcs.average_nbest_models<a class="headerlink" href="#espnet2-main-funcs-average-nbest-models-1" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-espnet2.main_funcs.average_nbest_models"></span><dl class="function">
-<dt id="espnet2.main_funcs.average_nbest_models.average_nbest_models">
-<code class="sig-prename descclassname">espnet2.main_funcs.average_nbest_models.</code><code class="sig-name descname">average_nbest_models</code><span class="sig-paren">(</span><em class="sig-param">output_dir: pathlib.Path, reporter: espnet2.train.reporter.Reporter, best_model_criterion: Sequence[Sequence[str]], nbest: Union[Collection[int], int], suffix: Optional[str] = None</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="../_modules/espnet2/main_funcs/average_nbest_models.html#average_nbest_models"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.main_funcs.average_nbest_models.average_nbest_models" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate averaged model from n-best models</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>output_dir</strong> – The directory contains the model file for each epoch</p></li>
-<li><p><strong>reporter</strong> – Reporter instance</p></li>
-<li><p><strong>best_model_criterion</strong> – Give criterions to decide the best model.
-e.g. [(“valid”, “loss”, “min”), (“train”, “acc”, “max”)]</p></li>
-<li><p><strong>nbest</strong> – Number of best model files to be averaged</p></li>
-<li><p><strong>suffix</strong> – A suffix added to the averaged model file name</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 </section>
 <section id="espnet2-main-funcs-pack-funcs-1">
 <span id="espnet2-main-funcs-pack-funcs"></span><h2>espnet2.main_funcs.pack_funcs<a class="headerlink" href="#espnet2-main-funcs-pack-funcs-1" title="Permalink to this headline">¶</a></h2>

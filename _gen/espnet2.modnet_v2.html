@@ -181,105 +181,13 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  
-<style>
-/* CSS overrides for sphinx_rtd_theme */
-
-/* 24px margin */
-.nbinput.nblast.container,
-.nboutput.nblast.container {
-    margin-bottom: 19px;  /* padding has already 5px */
-}
-
-/* ... except between code cells! */
-.nblast.container + .nbinput.container {
-    margin-top: -19px;
-}
-
-.admonition > p:before {
-    margin-right: 4px;  /* make room for the exclamation icon */
-}
-
-/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
-.math {
-    text-align: unset;
-}
-</style>
-<section id="espnet2-modnet-v2-package">
+  <section id="espnet2-modnet-v2-package">
 <h1>espnet2.modnet_v2 package<a class="headerlink" href="#espnet2-modnet-v2-package" title="Permalink to this headline">¶</a></h1>
 <section id="espnet2-modnet-v2-init-1">
 <span id="espnet2-modnet-v2-init"></span><h2>espnet2.modnet_v2.__init__<a class="headerlink" href="#espnet2-modnet-v2-init-1" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.modnet_v2.__init__"></span></section>
 <section id="espnet2-modnet-v2-espnet-model-1">
 <span id="espnet2-modnet-v2-espnet-model"></span><h2>espnet2.modnet_v2.espnet_model<a class="headerlink" href="#espnet2-modnet-v2-espnet-model-1" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-espnet2.modnet_v2.espnet_model"></span><dl class="class">
-<dt id="espnet2.modnet_v2.espnet_model.ModNet_v2">
-<em class="property">class </em><code class="sig-prename descclassname">espnet2.modnet_v2.espnet_model.</code><code class="sig-name descname">ModNet_v2</code><span class="sig-paren">(</span><em class="sig-param">frontend: espnet2.asr.frontend.abs_frontend.AbsFrontend</em>, <em class="sig-param">encoder: espnet2.asr.encoder.abs_encoder.AbsEncoder</em>, <em class="sig-param">projector: espnet2.modnet_v2.projector.abs_projector.AbsProjector</em>, <em class="sig-param">extract_feats_in_collect_stats: bool = True</em>, <em class="sig-param">prediction_loss: str = 'MSE'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/modnet_v2/espnet_model.html#ModNet_v2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.modnet_v2.espnet_model.ModNet_v2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="espnet2.train.html#espnet2.train.abs_espnet_model.AbsESPnetModel" title="espnet2.train.abs_espnet_model.AbsESPnetModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">espnet2.train.abs_espnet_model.AbsESPnetModel</span></code></a></p>
-<p>Self-supervised Modulation Net</p>
-<dl class="method">
-<dt id="espnet2.modnet_v2.espnet_model.ModNet_v2.analyze">
-<code class="sig-name descname">analyze</code><span class="sig-paren">(</span><em class="sig-param">speech: torch.Tensor</em>, <em class="sig-param">speech_lengths: torch.Tensor</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/modnet_v2/espnet_model.html#ModNet_v2.analyze"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.modnet_v2.espnet_model.ModNet_v2.analyze" title="Permalink to this definition">¶</a></dt>
-<dd><p>Frontend + Encoder. Note that this method is used by asr_inference.py</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>speech</strong> – (Batch, Length, …)</p></li>
-<li><p><strong>speech_lengths</strong> – (Batch, )</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="espnet2.modnet_v2.espnet_model.ModNet_v2.asr_feats_encode">
-<code class="sig-name descname">asr_feats_encode</code><span class="sig-paren">(</span><em class="sig-param">speech: torch.Tensor</em>, <em class="sig-param">speech_lengths: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, torch.Tensor]<a class="reference internal" href="../_modules/espnet2/modnet_v2/espnet_model.html#ModNet_v2.asr_feats_encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.modnet_v2.espnet_model.ModNet_v2.asr_feats_encode" title="Permalink to this definition">¶</a></dt>
-<dd><p>Frontend + Encoder. Note that this method is used by asr_inference.py</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>speech</strong> – (Batch, Length, …)</p></li>
-<li><p><strong>speech_lengths</strong> – (Batch, )</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="espnet2.modnet_v2.espnet_model.ModNet_v2.collect_feats">
-<code class="sig-name descname">collect_feats</code><span class="sig-paren">(</span><em class="sig-param">speech: torch.Tensor</em>, <em class="sig-param">speech_original: torch.Tensor</em>, <em class="sig-param">speech_lengths: torch.Tensor</em>, <em class="sig-param">speech_original_lengths: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; Dict[str, torch.Tensor]<a class="reference internal" href="../_modules/espnet2/modnet_v2/espnet_model.html#ModNet_v2.collect_feats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.modnet_v2.espnet_model.ModNet_v2.collect_feats" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="espnet2.modnet_v2.espnet_model.ModNet_v2.encode">
-<code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param">speech: torch.Tensor</em>, <em class="sig-param">speech_original: torch.Tensor</em>, <em class="sig-param">speech_lengths: torch.Tensor</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/modnet_v2/espnet_model.html#ModNet_v2.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.modnet_v2.espnet_model.ModNet_v2.encode" title="Permalink to this definition">¶</a></dt>
-<dd><p>Frontend + Encoder. Note that this method is used by asr_inference.py</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>speech</strong> – (Batch, Length, …)</p></li>
-<li><p><strong>speech_lengths</strong> – (Batch, )</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="espnet2.modnet_v2.espnet_model.ModNet_v2.forward">
-<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">speech: torch.Tensor</em>, <em class="sig-param">speech_original: torch.Tensor</em>, <em class="sig-param">speech_lengths: torch.Tensor</em>, <em class="sig-param">speech_original_lengths: torch.Tensor</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, Dict[str, torch.Tensor], torch.Tensor]<a class="reference internal" href="../_modules/espnet2/modnet_v2/espnet_model.html#ModNet_v2.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.modnet_v2.espnet_model.ModNet_v2.forward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Frontend + Encoder + Calc loss</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>speech</strong> – (Batch, Length, …)</p></li>
-<li><p><strong>speech_lengths</strong> – (Batch, )</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
 </section>
 <section id="espnet2-modnet-v2-projector-init-1">
 <span id="espnet2-modnet-v2-projector-init"></span><h2>espnet2.modnet_v2.projector.__init__<a class="headerlink" href="#espnet2-modnet-v2-projector-init-1" title="Permalink to this headline">¶</a></h2>
@@ -315,27 +223,6 @@ registered hooks while the latter silently ignores them.</p>
 </section>
 <section id="espnet2-modnet-v2-projector-modulation-projector-1">
 <span id="espnet2-modnet-v2-projector-modulation-projector"></span><h2>espnet2.modnet_v2.projector.modulation_projector<a class="headerlink" href="#espnet2-modnet-v2-projector-modulation-projector-1" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-espnet2.modnet_v2.projector.modulation_projector"></span><p>Linear Projection.</p>
-<dl class="class">
-<dt id="espnet2.modnet_v2.projector.modulation_projector.ModulationProjector">
-<em class="property">class </em><code class="sig-prename descclassname">espnet2.modnet_v2.projector.modulation_projector.</code><code class="sig-name descname">ModulationProjector</code><span class="sig-paren">(</span><em class="sig-param">input_size: int</em>, <em class="sig-param">output_size: int</em>, <em class="sig-param">coeff_num: int</em>, <em class="sig-param">n_filters: int</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/modnet_v2/projector/modulation_projector.html#ModulationProjector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.modnet_v2.projector.modulation_projector.ModulationProjector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#espnet2.modnet_v2.projector.abs_projector.AbsProjector" title="espnet2.modnet_v2.projector.abs_projector.AbsProjector"><code class="xref py py-class docutils literal notranslate"><span class="pre">espnet2.modnet_v2.projector.abs_projector.AbsProjector</span></code></a></p>
-<p>Projecting from high dimension features to modulation domain.</p>
-<p>Initialize the module.</p>
-<dl class="method">
-<dt id="espnet2.modnet_v2.projector.modulation_projector.ModulationProjector.forward">
-<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">input: torch.Tensor</em>, <em class="sig-param">input_lengths: torch.Tensor</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/modnet_v2/projector/modulation_projector.html#ModulationProjector.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.modnet_v2.projector.modulation_projector.ModulationProjector.forward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Forward.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="espnet2.modnet_v2.projector.modulation_projector.ModulationProjector.output_size">
-<code class="sig-name descname">output_size</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; int<a class="reference internal" href="../_modules/espnet2/modnet_v2/projector/modulation_projector.html#ModulationProjector.output_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.modnet_v2.projector.modulation_projector.ModulationProjector.output_size" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the output size.</p>
-</dd></dl>
-
-</dd></dl>
-
 </section>
 </section>
 

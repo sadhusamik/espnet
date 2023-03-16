@@ -181,115 +181,10 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  
-<style>
-/* CSS overrides for sphinx_rtd_theme */
-
-/* 24px margin */
-.nbinput.nblast.container,
-.nboutput.nblast.container {
-    margin-bottom: 19px;  /* padding has already 5px */
-}
-
-/* ... except between code cells! */
-.nblast.container + .nbinput.container {
-    margin-top: -19px;
-}
-
-.admonition > p:before {
-    margin-right: 4px;  /* make room for the exclamation icon */
-}
-
-/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
-.math {
-    text-align: unset;
-}
-</style>
-<section id="espnet2-lm-package">
+  <section id="espnet2-lm-package">
 <h1>espnet2.lm package<a class="headerlink" href="#espnet2-lm-package" title="Permalink to this headline">¶</a></h1>
 <section id="espnet2-lm-seq-rnn-lm-1">
 <span id="espnet2-lm-seq-rnn-lm"></span><h2>espnet2.lm.seq_rnn_lm<a class="headerlink" href="#espnet2-lm-seq-rnn-lm-1" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-espnet2.lm.seq_rnn_lm"></span><p>Sequential implementation of Recurrent Neural Network Language Model.</p>
-<dl class="class">
-<dt id="espnet2.lm.seq_rnn_lm.SequentialRNNLM">
-<em class="property">class </em><code class="sig-prename descclassname">espnet2.lm.seq_rnn_lm.</code><code class="sig-name descname">SequentialRNNLM</code><span class="sig-paren">(</span><em class="sig-param">vocab_size: int</em>, <em class="sig-param">unit: int = 650</em>, <em class="sig-param">nhid: int = None</em>, <em class="sig-param">nlayers: int = 2</em>, <em class="sig-param">dropout_rate: float = 0.0</em>, <em class="sig-param">tie_weights: bool = False</em>, <em class="sig-param">rnn_type: str = 'lstm'</em>, <em class="sig-param">ignore_id: int = 0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/lm/seq_rnn_lm.html#SequentialRNNLM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.lm.seq_rnn_lm.SequentialRNNLM" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#espnet2.lm.abs_model.AbsLM" title="espnet2.lm.abs_model.AbsLM"><code class="xref py py-class docutils literal notranslate"><span class="pre">espnet2.lm.abs_model.AbsLM</span></code></a></p>
-<p>Sequential RNNLM.</p>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><a class="reference external" href="https://github.com/pytorch/examples/blob/4581968193699de14b56527296262dd76ab43557/word_language_model/model.py">https://github.com/pytorch/examples/blob/4581968193699de14b56527296262dd76ab43557/word_language_model/model.py</a></p>
-</aside>
-<dl class="method">
-<dt id="espnet2.lm.seq_rnn_lm.SequentialRNNLM.batch_score">
-<code class="sig-name descname">batch_score</code><span class="sig-paren">(</span><em class="sig-param">ys: torch.Tensor</em>, <em class="sig-param">states: torch.Tensor</em>, <em class="sig-param">xs: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, torch.Tensor]<a class="reference internal" href="../_modules/espnet2/lm/seq_rnn_lm.html#SequentialRNNLM.batch_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.lm.seq_rnn_lm.SequentialRNNLM.batch_score" title="Permalink to this definition">¶</a></dt>
-<dd><p>Score new token batch.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ys</strong> (<em>torch.Tensor</em>) – torch.int64 prefix tokens (n_batch, ylen).</p></li>
-<li><p><strong>states</strong> (<em>List</em><em>[</em><em>Any</em><em>]</em>) – Scorer states for prefix tokens.</p></li>
-<li><p><strong>xs</strong> (<em>torch.Tensor</em>) – The encoder feature that generates ys (n_batch, xlen, n_feat).</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><dl class="simple">
-<dt>Tuple of</dt><dd><p>batchfied scores for next token with shape of <cite>(n_batch, n_vocab)</cite>
-and next state list for ys.</p>
-</dd>
-</dl>
-</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>tuple[torch.Tensor, List[Any]]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="espnet2.lm.seq_rnn_lm.SequentialRNNLM.forward">
-<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">input: torch.Tensor</em>, <em class="sig-param">hidden: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, torch.Tensor]<a class="reference internal" href="../_modules/espnet2/lm/seq_rnn_lm.html#SequentialRNNLM.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.lm.seq_rnn_lm.SequentialRNNLM.forward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Defines the computation performed at every call.</p>
-<p>Should be overridden by all subclasses.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Although the recipe for forward pass needs to be defined within
-this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
-instead of this since the former takes care of running the
-registered hooks while the latter silently ignores them.</p>
-</aside>
-</dd></dl>
-
-<dl class="method">
-<dt id="espnet2.lm.seq_rnn_lm.SequentialRNNLM.score">
-<code class="sig-name descname">score</code><span class="sig-paren">(</span><em class="sig-param">y: torch.Tensor, state: Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]], x: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]]<a class="reference internal" href="../_modules/espnet2/lm/seq_rnn_lm.html#SequentialRNNLM.score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.lm.seq_rnn_lm.SequentialRNNLM.score" title="Permalink to this definition">¶</a></dt>
-<dd><p>Score new token.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>y</strong> – 1D torch.int64 prefix tokens.</p></li>
-<li><p><strong>state</strong> – Scorer state for prefix tokens</p></li>
-<li><p><strong>x</strong> – 2D encoder feature that generates ys.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><dl class="simple">
-<dt>Tuple of</dt><dd><p>torch.float32 scores for next token (n_vocab)
-and next state for ys</p>
-</dd>
-</dl>
-</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="espnet2.lm.seq_rnn_lm.SequentialRNNLM.zero_state">
-<code class="sig-name descname">zero_state</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/lm/seq_rnn_lm.html#SequentialRNNLM.zero_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.lm.seq_rnn_lm.SequentialRNNLM.zero_state" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize LM state filled with zero values.</p>
-</dd></dl>
-
-</dd></dl>
-
 </section>
 <section id="espnet2-lm-init-1">
 <span id="espnet2-lm-init"></span><h2>espnet2.lm.__init__<a class="headerlink" href="#espnet2-lm-init-1" title="Permalink to this headline">¶</a></h2>
@@ -330,55 +225,6 @@ registered hooks while the latter silently ignores them.</p>
 </section>
 <section id="espnet2-lm-espnet-model-1">
 <span id="espnet2-lm-espnet-model"></span><h2>espnet2.lm.espnet_model<a class="headerlink" href="#espnet2-lm-espnet-model-1" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-espnet2.lm.espnet_model"></span><dl class="class">
-<dt id="espnet2.lm.espnet_model.ESPnetLanguageModel">
-<em class="property">class </em><code class="sig-prename descclassname">espnet2.lm.espnet_model.</code><code class="sig-name descname">ESPnetLanguageModel</code><span class="sig-paren">(</span><em class="sig-param">lm: espnet2.lm.abs_model.AbsLM</em>, <em class="sig-param">vocab_size: int</em>, <em class="sig-param">ignore_id: int = 0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/lm/espnet_model.html#ESPnetLanguageModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.lm.espnet_model.ESPnetLanguageModel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="espnet2.train.html#espnet2.train.abs_espnet_model.AbsESPnetModel" title="espnet2.train.abs_espnet_model.AbsESPnetModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">espnet2.train.abs_espnet_model.AbsESPnetModel</span></code></a></p>
-<dl class="method">
-<dt id="espnet2.lm.espnet_model.ESPnetLanguageModel.batchify_nll">
-<code class="sig-name descname">batchify_nll</code><span class="sig-paren">(</span><em class="sig-param">text: torch.Tensor</em>, <em class="sig-param">text_lengths: torch.Tensor</em>, <em class="sig-param">batch_size: int = 100</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, torch.Tensor]<a class="reference internal" href="../_modules/espnet2/lm/espnet_model.html#ESPnetLanguageModel.batchify_nll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.lm.espnet_model.ESPnetLanguageModel.batchify_nll" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute negative log likelihood(nll) from transformer language model</p>
-<p>To avoid OOM, this fuction seperate the input into batches.
-Then call nll for each batch and combine and return results.
-:param text: (Batch, Length)
-:param text_lengths: (Batch,)
-:param batch_size: int, samples each batch contain when computing nll,</p>
-<blockquote>
-<div><p>you may change this to avoid OOM or increase</p>
-</div></blockquote>
-</dd></dl>
-
-<dl class="method">
-<dt id="espnet2.lm.espnet_model.ESPnetLanguageModel.collect_feats">
-<code class="sig-name descname">collect_feats</code><span class="sig-paren">(</span><em class="sig-param">text: torch.Tensor</em>, <em class="sig-param">text_lengths: torch.Tensor</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; Dict[str, torch.Tensor]<a class="reference internal" href="../_modules/espnet2/lm/espnet_model.html#ESPnetLanguageModel.collect_feats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.lm.espnet_model.ESPnetLanguageModel.collect_feats" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="espnet2.lm.espnet_model.ESPnetLanguageModel.forward">
-<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">text: torch.Tensor</em>, <em class="sig-param">text_lengths: torch.Tensor</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, Dict[str, torch.Tensor], torch.Tensor]<a class="reference internal" href="../_modules/espnet2/lm/espnet_model.html#ESPnetLanguageModel.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.lm.espnet_model.ESPnetLanguageModel.forward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Defines the computation performed at every call.</p>
-<p>Should be overridden by all subclasses.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Although the recipe for forward pass needs to be defined within
-this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
-instead of this since the former takes care of running the
-registered hooks while the latter silently ignores them.</p>
-</aside>
-</dd></dl>
-
-<dl class="method">
-<dt id="espnet2.lm.espnet_model.ESPnetLanguageModel.nll">
-<code class="sig-name descname">nll</code><span class="sig-paren">(</span><em class="sig-param">text: torch.Tensor</em>, <em class="sig-param">text_lengths: torch.Tensor</em>, <em class="sig-param">max_length: Optional[int] = None</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, torch.Tensor]<a class="reference internal" href="../_modules/espnet2/lm/espnet_model.html#ESPnetLanguageModel.nll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.lm.espnet_model.ESPnetLanguageModel.nll" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute negative log likelihood(nll)</p>
-<p>Normally, this function is called in batchify_nll.
-:param text: (Batch, Length)
-:param text_lengths: (Batch,)
-:param max_lengths: int</p>
-</dd></dl>
-
-</dd></dl>
-
 </section>
 <section id="espnet2-lm-transformer-lm-1">
 <span id="espnet2-lm-transformer-lm"></span><h2>espnet2.lm.transformer_lm<a class="headerlink" href="#espnet2-lm-transformer-lm-1" title="Permalink to this headline">¶</a></h2>

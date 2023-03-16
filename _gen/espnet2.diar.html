@@ -186,62 +186,10 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  
-<style>
-/* CSS overrides for sphinx_rtd_theme */
-
-/* 24px margin */
-.nbinput.nblast.container,
-.nboutput.nblast.container {
-    margin-bottom: 19px;  /* padding has already 5px */
-}
-
-/* ... except between code cells! */
-.nblast.container + .nbinput.container {
-    margin-top: -19px;
-}
-
-.admonition > p:before {
-    margin-right: 4px;  /* make room for the exclamation icon */
-}
-
-/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
-.math {
-    text-align: unset;
-}
-</style>
-<section id="espnet2-diar-package">
+  <section id="espnet2-diar-package">
 <h1>espnet2.diar package<a class="headerlink" href="#espnet2-diar-package" title="Permalink to this headline">¶</a></h1>
 <section id="espnet2-diar-label-processor-1">
 <span id="espnet2-diar-label-processor"></span><h2>espnet2.diar.label_processor<a class="headerlink" href="#espnet2-diar-label-processor-1" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-espnet2.diar.label_processor"></span><dl class="class">
-<dt id="espnet2.diar.label_processor.LabelProcessor">
-<em class="property">class </em><code class="sig-prename descclassname">espnet2.diar.label_processor.</code><code class="sig-name descname">LabelProcessor</code><span class="sig-paren">(</span><em class="sig-param">win_length: int = 512</em>, <em class="sig-param">hop_length: int = 128</em>, <em class="sig-param">center: bool = True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/diar/label_processor.html#LabelProcessor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.diar.label_processor.LabelProcessor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
-<p>Label aggregator for speaker diarization</p>
-<dl class="method">
-<dt id="espnet2.diar.label_processor.LabelProcessor.forward">
-<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">input: torch.Tensor</em>, <em class="sig-param">ilens: torch.Tensor</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/diar/label_processor.html#LabelProcessor.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.diar.label_processor.LabelProcessor.forward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Forward.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>input</strong> – (Batch, Nsamples, Label_dim)</p></li>
-<li><p><strong>ilens</strong> – (Batch)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>(Batch, Frames, Label_dim)
-olens: (Batch)</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>output</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
 </section>
 <section id="espnet2-diar-init-1">
 <span id="espnet2-diar-init"></span><h2>espnet2.diar.__init__<a class="headerlink" href="#espnet2-diar-init-1" title="Permalink to this headline">¶</a></h2>
@@ -277,82 +225,6 @@ registered hooks while the latter silently ignores them.</p>
 </section>
 <section id="espnet2-diar-espnet-model-1">
 <span id="espnet2-diar-espnet-model"></span><h2>espnet2.diar.espnet_model<a class="headerlink" href="#espnet2-diar-espnet-model-1" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-espnet2.diar.espnet_model"></span><dl class="class">
-<dt id="espnet2.diar.espnet_model.ESPnetDiarizationModel">
-<em class="property">class </em><code class="sig-prename descclassname">espnet2.diar.espnet_model.</code><code class="sig-name descname">ESPnetDiarizationModel</code><span class="sig-paren">(</span><em class="sig-param">frontend: Optional[espnet2.asr.frontend.abs_frontend.AbsFrontend], specaug: Optional[espnet2.asr.specaug.abs_specaug.AbsSpecAug], normalize: Optional[espnet2.layers.abs_normalize.AbsNormalize], label_aggregator: torch.nn.modules.module.Module, encoder: espnet2.asr.encoder.abs_encoder.AbsEncoder, decoder: espnet2.diar.decoder.abs_decoder.AbsDecoder, attractor: Optional[espnet2.diar.attractor.abs_attractor.AbsAttractor], attractor_weight: float = 1.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/diar/espnet_model.html#ESPnetDiarizationModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.diar.espnet_model.ESPnetDiarizationModel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="espnet2.train.html#espnet2.train.abs_espnet_model.AbsESPnetModel" title="espnet2.train.abs_espnet_model.AbsESPnetModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">espnet2.train.abs_espnet_model.AbsESPnetModel</span></code></a></p>
-<p>Speaker Diarization model</p>
-<p>If “attractor” is “None”, SA-EEND will be used.
-Else if “attractor” is not “None”, EEND-EDA will be used.
-For the details about SA-EEND and EEND-EDA, refer to the following papers:
-SA-EEND: <a class="reference external" href="https://arxiv.org/pdf/1909.06247.pdf">https://arxiv.org/pdf/1909.06247.pdf</a>
-EEND-EDA: <a class="reference external" href="https://arxiv.org/pdf/2005.09921.pdf">https://arxiv.org/pdf/2005.09921.pdf</a>, <a class="reference external" href="https://arxiv.org/pdf/2106.10654.pdf">https://arxiv.org/pdf/2106.10654.pdf</a></p>
-<dl class="method">
-<dt id="espnet2.diar.espnet_model.ESPnetDiarizationModel.attractor_loss">
-<code class="sig-name descname">attractor_loss</code><span class="sig-paren">(</span><em class="sig-param">att_prob</em>, <em class="sig-param">label</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/diar/espnet_model.html#ESPnetDiarizationModel.attractor_loss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.diar.espnet_model.ESPnetDiarizationModel.attractor_loss" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="espnet2.diar.espnet_model.ESPnetDiarizationModel.calc_diarization_error">
-<em class="property">static </em><code class="sig-name descname">calc_diarization_error</code><span class="sig-paren">(</span><em class="sig-param">pred</em>, <em class="sig-param">label</em>, <em class="sig-param">length</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/diar/espnet_model.html#ESPnetDiarizationModel.calc_diarization_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.diar.espnet_model.ESPnetDiarizationModel.calc_diarization_error" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="espnet2.diar.espnet_model.ESPnetDiarizationModel.collect_feats">
-<code class="sig-name descname">collect_feats</code><span class="sig-paren">(</span><em class="sig-param">speech: torch.Tensor</em>, <em class="sig-param">speech_lengths: torch.Tensor</em>, <em class="sig-param">spk_labels: torch.Tensor = None</em>, <em class="sig-param">spk_labels_lengths: torch.Tensor = None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; Dict[str, torch.Tensor]<a class="reference internal" href="../_modules/espnet2/diar/espnet_model.html#ESPnetDiarizationModel.collect_feats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.diar.espnet_model.ESPnetDiarizationModel.collect_feats" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="espnet2.diar.espnet_model.ESPnetDiarizationModel.create_length_mask">
-<code class="sig-name descname">create_length_mask</code><span class="sig-paren">(</span><em class="sig-param">length</em>, <em class="sig-param">max_len</em>, <em class="sig-param">num_output</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/diar/espnet_model.html#ESPnetDiarizationModel.create_length_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.diar.espnet_model.ESPnetDiarizationModel.create_length_mask" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="espnet2.diar.espnet_model.ESPnetDiarizationModel.encode">
-<code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param">speech: torch.Tensor</em>, <em class="sig-param">speech_lengths: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, torch.Tensor]<a class="reference internal" href="../_modules/espnet2/diar/espnet_model.html#ESPnetDiarizationModel.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.diar.espnet_model.ESPnetDiarizationModel.encode" title="Permalink to this definition">¶</a></dt>
-<dd><p>Frontend + Encoder</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>speech</strong> – (Batch, Length, …)</p></li>
-<li><p><strong>speech_lengths</strong> – (Batch,)</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="espnet2.diar.espnet_model.ESPnetDiarizationModel.forward">
-<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">speech: torch.Tensor</em>, <em class="sig-param">speech_lengths: torch.Tensor = None</em>, <em class="sig-param">spk_labels: torch.Tensor = None</em>, <em class="sig-param">spk_labels_lengths: torch.Tensor = None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, Dict[str, torch.Tensor], torch.Tensor]<a class="reference internal" href="../_modules/espnet2/diar/espnet_model.html#ESPnetDiarizationModel.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.diar.espnet_model.ESPnetDiarizationModel.forward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Frontend + Encoder + Decoder + Calc loss</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>speech</strong> – (Batch, samples)</p></li>
-<li><p><strong>speech_lengths</strong> – (Batch,) default None for chunk interator,
-because the chunk-iterator does not
-have the speech_lengths returned.
-see in
-espnet2/iterators/chunk_iter_factory.py</p></li>
-<li><p><strong>spk_labels</strong> – (Batch, )</p></li>
-<li><p><strong>kwargs</strong> – “utt_id” is among the input.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="espnet2.diar.espnet_model.ESPnetDiarizationModel.pit_loss">
-<code class="sig-name descname">pit_loss</code><span class="sig-paren">(</span><em class="sig-param">pred</em>, <em class="sig-param">label</em>, <em class="sig-param">lengths</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/diar/espnet_model.html#ESPnetDiarizationModel.pit_loss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.diar.espnet_model.ESPnetDiarizationModel.pit_loss" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="espnet2.diar.espnet_model.ESPnetDiarizationModel.pit_loss_single_permute">
-<code class="sig-name descname">pit_loss_single_permute</code><span class="sig-paren">(</span><em class="sig-param">pred</em>, <em class="sig-param">label</em>, <em class="sig-param">length</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/diar/espnet_model.html#ESPnetDiarizationModel.pit_loss_single_permute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.diar.espnet_model.ESPnetDiarizationModel.pit_loss_single_permute" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
 </section>
 <section id="espnet2-diar-attractor-init-1">
 <span id="espnet2-diar-attractor-init"></span><h2>espnet2.diar.attractor.__init__<a class="headerlink" href="#espnet2-diar-attractor-init-1" title="Permalink to this headline">¶</a></h2>

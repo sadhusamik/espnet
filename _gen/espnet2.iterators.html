@@ -181,69 +181,13 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  
-<style>
-/* CSS overrides for sphinx_rtd_theme */
-
-/* 24px margin */
-.nbinput.nblast.container,
-.nboutput.nblast.container {
-    margin-bottom: 19px;  /* padding has already 5px */
-}
-
-/* ... except between code cells! */
-.nblast.container + .nbinput.container {
-    margin-top: -19px;
-}
-
-.admonition > p:before {
-    margin-right: 4px;  /* make room for the exclamation icon */
-}
-
-/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
-.math {
-    text-align: unset;
-}
-</style>
-<section id="espnet2-iterators-package">
+  <section id="espnet2-iterators-package">
 <h1>espnet2.iterators package<a class="headerlink" href="#espnet2-iterators-package" title="Permalink to this headline">¶</a></h1>
 <section id="espnet2-iterators-init-1">
 <span id="espnet2-iterators-init"></span><h2>espnet2.iterators.__init__<a class="headerlink" href="#espnet2-iterators-init-1" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.iterators.__init__"></span></section>
 <section id="espnet2-iterators-sequence-iter-factory-1">
 <span id="espnet2-iterators-sequence-iter-factory"></span><h2>espnet2.iterators.sequence_iter_factory<a class="headerlink" href="#espnet2-iterators-sequence-iter-factory-1" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-espnet2.iterators.sequence_iter_factory"></span><dl class="class">
-<dt id="espnet2.iterators.sequence_iter_factory.RawSampler">
-<em class="property">class </em><code class="sig-prename descclassname">espnet2.iterators.sequence_iter_factory.</code><code class="sig-name descname">RawSampler</code><span class="sig-paren">(</span><em class="sig-param">batches</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/iterators/sequence_iter_factory.html#RawSampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.iterators.sequence_iter_factory.RawSampler" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="espnet2.samplers.html#espnet2.samplers.abs_sampler.AbsSampler" title="espnet2.samplers.abs_sampler.AbsSampler"><code class="xref py py-class docutils literal notranslate"><span class="pre">espnet2.samplers.abs_sampler.AbsSampler</span></code></a></p>
-<dl class="method">
-<dt id="espnet2.iterators.sequence_iter_factory.RawSampler.generate">
-<code class="sig-name descname">generate</code><span class="sig-paren">(</span><em class="sig-param">seed</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/iterators/sequence_iter_factory.html#RawSampler.generate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.iterators.sequence_iter_factory.RawSampler.generate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="espnet2.iterators.sequence_iter_factory.SequenceIterFactory">
-<em class="property">class </em><code class="sig-prename descclassname">espnet2.iterators.sequence_iter_factory.</code><code class="sig-name descname">SequenceIterFactory</code><span class="sig-paren">(</span><em class="sig-param">dataset, batches: Union[espnet2.samplers.abs_sampler.AbsSampler, Sequence[Sequence[Any]]], num_iters_per_epoch: int = None, seed: int = 0, shuffle: bool = False, num_workers: int = 0, collate_fn=None, pin_memory: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/iterators/sequence_iter_factory.html#SequenceIterFactory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.iterators.sequence_iter_factory.SequenceIterFactory" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#espnet2.iterators.abs_iter_factory.AbsIterFactory" title="espnet2.iterators.abs_iter_factory.AbsIterFactory"><code class="xref py py-class docutils literal notranslate"><span class="pre">espnet2.iterators.abs_iter_factory.AbsIterFactory</span></code></a></p>
-<p>Build iterator for each epoch.</p>
-<p>This class simply creates pytorch DataLoader except for the following points:
-- The random seed is decided according to the number of epochs. This feature</p>
-<blockquote>
-<div><p>guarantees reproducibility when resuming from middle of training process.</p>
-</div></blockquote>
-<ul class="simple">
-<li><p>Enable to restrict the number of samples for one epoch. This features
-controls the interval number between training and evaluation.</p></li>
-</ul>
-<dl class="method">
-<dt id="espnet2.iterators.sequence_iter_factory.SequenceIterFactory.build_iter">
-<code class="sig-name descname">build_iter</code><span class="sig-paren">(</span><em class="sig-param">epoch: int</em>, <em class="sig-param">shuffle: bool = None</em><span class="sig-paren">)</span> &#x2192; torch.utils.data.dataloader.DataLoader<a class="reference internal" href="../_modules/espnet2/iterators/sequence_iter_factory.html#SequenceIterFactory.build_iter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.iterators.sequence_iter_factory.SequenceIterFactory.build_iter" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
 </section>
 <section id="espnet2-iterators-abs-iter-factory-1">
 <span id="espnet2-iterators-abs-iter-factory"></span><h2>espnet2.iterators.abs_iter_factory<a class="headerlink" href="#espnet2-iterators-abs-iter-factory-1" title="Permalink to this headline">¶</a></h2>
@@ -261,49 +205,9 @@ controls the interval number between training and evaluation.</p></li>
 </section>
 <section id="espnet2-iterators-chunk-iter-factory-1">
 <span id="espnet2-iterators-chunk-iter-factory"></span><h2>espnet2.iterators.chunk_iter_factory<a class="headerlink" href="#espnet2-iterators-chunk-iter-factory-1" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-espnet2.iterators.chunk_iter_factory"></span><dl class="class">
-<dt id="espnet2.iterators.chunk_iter_factory.ChunkIterFactory">
-<em class="property">class </em><code class="sig-prename descclassname">espnet2.iterators.chunk_iter_factory.</code><code class="sig-name descname">ChunkIterFactory</code><span class="sig-paren">(</span><em class="sig-param">dataset, batch_size: int, batches: Union[espnet2.samplers.abs_sampler.AbsSampler, Sequence[Sequence[Any]]], chunk_length: Union[int, str], chunk_shift_ratio: float = 0.5, num_cache_chunks: int = 1024, num_samples_per_epoch: int = None, seed: int = 0, shuffle: bool = False, num_workers: int = 0, collate_fn=None, pin_memory: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/iterators/chunk_iter_factory.html#ChunkIterFactory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.iterators.chunk_iter_factory.ChunkIterFactory" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#espnet2.iterators.abs_iter_factory.AbsIterFactory" title="espnet2.iterators.abs_iter_factory.AbsIterFactory"><code class="xref py py-class docutils literal notranslate"><span class="pre">espnet2.iterators.abs_iter_factory.AbsIterFactory</span></code></a></p>
-<p>Creates chunks from a sequence</p>
-<p class="rubric">Examples</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">batches</span> <span class="o">=</span> <span class="p">[[</span><span class="s2">&quot;id1&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;id2&quot;</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">batch_size</span> <span class="o">=</span> <span class="mi">128</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">chunk_length</span> <span class="o">=</span> <span class="mi">1000</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">iter_factory</span> <span class="o">=</span> <span class="n">ChunkIterFactory</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">chunk_length</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">it</span> <span class="o">=</span> <span class="n">iter_factory</span><span class="o">.</span><span class="n">build_iter</span><span class="p">(</span><span class="n">epoch</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">ids</span><span class="p">,</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">it</span><span class="p">:</span>
-<span class="gp">... </span>    <span class="o">...</span>
-</pre></div>
-</div>
-<ul class="simple">
-<li><p>The number of mini-batches are varied in each epochs and
-we can’t get the number in advance
-because IterFactory doesn’t be given to the length information.</p></li>
-<li><p>Since the first reason, “num_iters_per_epoch” can’t be implemented
-for this iterator. Instead of it, “num_samples_per_epoch” is implemented.</p></li>
-</ul>
-<dl class="method">
-<dt id="espnet2.iterators.chunk_iter_factory.ChunkIterFactory.build_iter">
-<code class="sig-name descname">build_iter</code><span class="sig-paren">(</span><em class="sig-param">epoch: int</em>, <em class="sig-param">shuffle: bool = None</em><span class="sig-paren">)</span> &#x2192; Iterator[Tuple[List[str], Dict[str, torch.Tensor]]]<a class="reference internal" href="../_modules/espnet2/iterators/chunk_iter_factory.html#ChunkIterFactory.build_iter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.iterators.chunk_iter_factory.ChunkIterFactory.build_iter" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
 </section>
 <section id="espnet2-iterators-multiple-iter-factory-1">
 <span id="espnet2-iterators-multiple-iter-factory"></span><h2>espnet2.iterators.multiple_iter_factory<a class="headerlink" href="#espnet2-iterators-multiple-iter-factory-1" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-espnet2.iterators.multiple_iter_factory"></span><dl class="class">
-<dt id="espnet2.iterators.multiple_iter_factory.MultipleIterFactory">
-<em class="property">class </em><code class="sig-prename descclassname">espnet2.iterators.multiple_iter_factory.</code><code class="sig-name descname">MultipleIterFactory</code><span class="sig-paren">(</span><em class="sig-param">build_funcs: Collection[Callable[[], espnet2.iterators.abs_iter_factory.AbsIterFactory]], seed: int = 0, shuffle: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/iterators/multiple_iter_factory.html#MultipleIterFactory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.iterators.multiple_iter_factory.MultipleIterFactory" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#espnet2.iterators.abs_iter_factory.AbsIterFactory" title="espnet2.iterators.abs_iter_factory.AbsIterFactory"><code class="xref py py-class docutils literal notranslate"><span class="pre">espnet2.iterators.abs_iter_factory.AbsIterFactory</span></code></a></p>
-<dl class="method">
-<dt id="espnet2.iterators.multiple_iter_factory.MultipleIterFactory.build_iter">
-<code class="sig-name descname">build_iter</code><span class="sig-paren">(</span><em class="sig-param">epoch: int</em>, <em class="sig-param">shuffle: bool = None</em><span class="sig-paren">)</span> &#x2192; Iterator<a class="reference internal" href="../_modules/espnet2/iterators/multiple_iter_factory.html#MultipleIterFactory.build_iter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.iterators.multiple_iter_factory.MultipleIterFactory.build_iter" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
 </section>
 </section>
 

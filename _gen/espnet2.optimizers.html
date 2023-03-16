@@ -178,45 +178,10 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  
-<style>
-/* CSS overrides for sphinx_rtd_theme */
-
-/* 24px margin */
-.nbinput.nblast.container,
-.nboutput.nblast.container {
-    margin-bottom: 19px;  /* padding has already 5px */
-}
-
-/* ... except between code cells! */
-.nblast.container + .nbinput.container {
-    margin-top: -19px;
-}
-
-.admonition > p:before {
-    margin-right: 4px;  /* make room for the exclamation icon */
-}
-
-/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
-.math {
-    text-align: unset;
-}
-</style>
-<section id="espnet2-optimizers-package">
+  <section id="espnet2-optimizers-package">
 <h1>espnet2.optimizers package<a class="headerlink" href="#espnet2-optimizers-package" title="Permalink to this headline">¶</a></h1>
 <section id="espnet2-optimizers-sgd-1">
 <span id="espnet2-optimizers-sgd"></span><h2>espnet2.optimizers.sgd<a class="headerlink" href="#espnet2-optimizers-sgd-1" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-espnet2.optimizers.sgd"></span><dl class="class">
-<dt id="espnet2.optimizers.sgd.SGD">
-<em class="property">class </em><code class="sig-prename descclassname">espnet2.optimizers.sgd.</code><code class="sig-name descname">SGD</code><span class="sig-paren">(</span><em class="sig-param">params</em>, <em class="sig-param">lr: float = 0.1</em>, <em class="sig-param">momentum: float = 0.0</em>, <em class="sig-param">dampening: float = 0.0</em>, <em class="sig-param">weight_decay: float = 0.0</em>, <em class="sig-param">nesterov: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/optimizers/sgd.html#SGD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.optimizers.sgd.SGD" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.optim.sgd.SGD</span></code></p>
-<p>Thin inheritance of torch.optim.SGD to bind the required arguments, ‘lr’</p>
-<p>Note that
-the arguments of the optimizer invoked by AbsTask.main()
-must have default value except for ‘param’.</p>
-<p>I can’t understand why only SGD.lr doesn’t have the default value.</p>
-</dd></dl>
-
 </section>
 <section id="espnet2-optimizers-init-1">
 <span id="espnet2-optimizers-init"></span><h2>espnet2.optimizers.__init__<a class="headerlink" href="#espnet2-optimizers-init-1" title="Permalink to this headline">¶</a></h2>

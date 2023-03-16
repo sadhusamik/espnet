@@ -325,31 +325,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  
-<style>
-/* CSS overrides for sphinx_rtd_theme */
-
-/* 24px margin */
-.nbinput.nblast.container,
-.nboutput.nblast.container {
-    margin-bottom: 19px;  /* padding has already 5px */
-}
-
-/* ... except between code cells! */
-.nblast.container + .nbinput.container {
-    margin-top: -19px;
-}
-
-.admonition > p:before {
-    margin-right: 4px;  /* make room for the exclamation icon */
-}
-
-/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
-.math {
-    text-align: unset;
-}
-</style>
-<section id="espnet-nets-package">
+  <section id="espnet-nets-package">
 <h1>espnet.nets package<a class="headerlink" href="#espnet-nets-package" title="Permalink to this headline">¶</a></h1>
 <p>Initialize sub package.</p>
 <section id="espnet-nets-batch-beam-search-1">
@@ -8721,7 +8697,7 @@ List[torch.Tensor]: List of cache tensors of each decoder layer.</p>
 <p>Construct an Conv2dSubsampling object.</p>
 <dl class="method">
 <dt id="espnet.nets.pytorch_backend.transformer.subsampling.RNNNoSubsamplingMultichannelNChannel.forward">
-<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">x_mask</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet/nets/pytorch_backend/transformer/subsampling.html#RNNNoSubsamplingMultichannelNChannel.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet.nets.pytorch_backend.transformer.subsampling.RNNNoSubsamplingMultichannelNChannel.forward" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">ilens</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet/nets/pytorch_backend/transformer/subsampling.html#RNNNoSubsamplingMultichannelNChannel.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet.nets.pytorch_backend.transformer.subsampling.RNNNoSubsamplingMultichannelNChannel.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Subsample x.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

@@ -234,31 +234,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  
-<style>
-/* CSS overrides for sphinx_rtd_theme */
-
-/* 24px margin */
-.nbinput.nblast.container,
-.nboutput.nblast.container {
-    margin-bottom: 19px;  /* padding has already 5px */
-}
-
-/* ... except between code cells! */
-.nblast.container + .nbinput.container {
-    margin-top: -19px;
-}
-
-.admonition > p:before {
-    margin-right: 4px;  /* make room for the exclamation icon */
-}
-
-/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
-.math {
-    text-align: unset;
-}
-</style>
-<section id="espnet2-enh-package">
+  <section id="espnet2-enh-package">
 <h1>espnet2.enh package<a class="headerlink" href="#espnet2-enh-package" title="Permalink to this headline">¶</a></h1>
 <section id="espnet2-enh-abs-enh-1">
 <span id="espnet2-enh-abs-enh"></span><h2>espnet2.enh.abs_enh<a class="headerlink" href="#espnet2-enh-abs-enh-1" title="Permalink to this headline">¶</a></h2>
@@ -291,136 +267,12 @@ registered hooks while the latter silently ignores them.</p>
 </section>
 <section id="espnet2-enh-espnet-enh-s2t-model-1">
 <span id="espnet2-enh-espnet-enh-s2t-model"></span><h2>espnet2.enh.espnet_enh_s2t_model<a class="headerlink" href="#espnet2-enh-espnet-enh-s2t-model-1" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-espnet2.enh.espnet_enh_s2t_model"></span><dl class="class">
-<dt id="espnet2.enh.espnet_enh_s2t_model.ESPnetEnhS2TModel">
-<em class="property">class </em><code class="sig-prename descclassname">espnet2.enh.espnet_enh_s2t_model.</code><code class="sig-name descname">ESPnetEnhS2TModel</code><span class="sig-paren">(</span><em class="sig-param">enh_model: espnet2.enh.espnet_model.ESPnetEnhancementModel, s2t_model: Union[espnet2.asr.espnet_model.ESPnetASRModel, espnet2.st.espnet_model.ESPnetSTModel], calc_enh_loss: bool = True, bypass_enh_prob: float = 0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/enh/espnet_enh_s2t_model.html#ESPnetEnhS2TModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.enh.espnet_enh_s2t_model.ESPnetEnhS2TModel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="espnet2.train.html#espnet2.train.abs_espnet_model.AbsESPnetModel" title="espnet2.train.abs_espnet_model.AbsESPnetModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">espnet2.train.abs_espnet_model.AbsESPnetModel</span></code></a></p>
-<p>Joint model Enhancement and Speech to Text.</p>
-<dl class="method">
-<dt id="espnet2.enh.espnet_enh_s2t_model.ESPnetEnhS2TModel.batchify_nll">
-<code class="sig-name descname">batchify_nll</code><span class="sig-paren">(</span><em class="sig-param">encoder_out: torch.Tensor</em>, <em class="sig-param">encoder_out_lens: torch.Tensor</em>, <em class="sig-param">ys_pad: torch.Tensor</em>, <em class="sig-param">ys_pad_lens: torch.Tensor</em>, <em class="sig-param">batch_size: int = 100</em><span class="sig-paren">)</span><a class="headerlink" href="#espnet2.enh.espnet_enh_s2t_model.ESPnetEnhS2TModel.batchify_nll" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute negative log likelihood(nll) from transformer-decoder</p>
-<p>To avoid OOM, this fuction seperate the input into batches.
-Then call nll for each batch and combine and return results.
-:param encoder_out: (Batch, Length, Dim)
-:param encoder_out_lens: (Batch,)
-:param ys_pad: (Batch, Length)
-:param ys_pad_lens: (Batch,)
-:param batch_size: int, samples each batch contain when computing nll,</p>
-<blockquote>
-<div><p>you may change this to avoid OOM or increase
-GPU memory usage</p>
-</div></blockquote>
-</dd></dl>
-
-<dl class="method">
-<dt id="espnet2.enh.espnet_enh_s2t_model.ESPnetEnhS2TModel.collect_feats">
-<code class="sig-name descname">collect_feats</code><span class="sig-paren">(</span><em class="sig-param">speech: torch.Tensor</em>, <em class="sig-param">speech_lengths: torch.Tensor</em>, <em class="sig-param">text: torch.Tensor</em>, <em class="sig-param">text_lengths: torch.Tensor</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; Dict[str, torch.Tensor]<a class="reference internal" href="../_modules/espnet2/enh/espnet_enh_s2t_model.html#ESPnetEnhS2TModel.collect_feats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.enh.espnet_enh_s2t_model.ESPnetEnhS2TModel.collect_feats" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="espnet2.enh.espnet_enh_s2t_model.ESPnetEnhS2TModel.encode">
-<code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param">speech: torch.Tensor</em>, <em class="sig-param">speech_lengths: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, torch.Tensor]<a class="reference internal" href="../_modules/espnet2/enh/espnet_enh_s2t_model.html#ESPnetEnhS2TModel.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.enh.espnet_enh_s2t_model.ESPnetEnhS2TModel.encode" title="Permalink to this definition">¶</a></dt>
-<dd><p>Frontend + Encoder. Note that this method is used by asr_inference.py</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>speech</strong> – (Batch, Length, …)</p></li>
-<li><p><strong>speech_lengths</strong> – (Batch, )</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="espnet2.enh.espnet_enh_s2t_model.ESPnetEnhS2TModel.forward">
-<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">speech: torch.Tensor</em>, <em class="sig-param">speech_lengths: torch.Tensor</em>, <em class="sig-param">text: torch.Tensor</em>, <em class="sig-param">text_lengths: torch.Tensor</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, Dict[str, torch.Tensor], torch.Tensor]<a class="reference internal" href="../_modules/espnet2/enh/espnet_enh_s2t_model.html#ESPnetEnhS2TModel.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.enh.espnet_enh_s2t_model.ESPnetEnhS2TModel.forward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Frontend + Encoder + Decoder + Calc loss</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>speech</strong> – (Batch, Length, …)</p></li>
-<li><p><strong>speech_lengths</strong> – (Batch, )</p></li>
-<li><p><strong>text</strong> – (Batch, Length)</p></li>
-<li><p><strong>text_lengths</strong> – (Batch,)</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="espnet2.enh.espnet_enh_s2t_model.ESPnetEnhS2TModel.inherite_attributes">
-<code class="sig-name descname">inherite_attributes</code><span class="sig-paren">(</span><em class="sig-param">inherite_enh_attrs: List[str] = []</em>, <em class="sig-param">inherite_s2t_attrs: List[str] = []</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/enh/espnet_enh_s2t_model.html#ESPnetEnhS2TModel.inherite_attributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.enh.espnet_enh_s2t_model.ESPnetEnhS2TModel.inherite_attributes" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="espnet2.enh.espnet_enh_s2t_model.ESPnetEnhS2TModel.nll">
-<code class="sig-name descname">nll</code><span class="sig-paren">(</span><em class="sig-param">encoder_out: torch.Tensor</em>, <em class="sig-param">encoder_out_lens: torch.Tensor</em>, <em class="sig-param">ys_pad: torch.Tensor</em>, <em class="sig-param">ys_pad_lens: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="../_modules/espnet2/enh/espnet_enh_s2t_model.html#ESPnetEnhS2TModel.nll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.enh.espnet_enh_s2t_model.ESPnetEnhS2TModel.nll" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute negative log likelihood(nll) from transformer-decoder</p>
-<p>Normally, this function is called in batchify_nll.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>encoder_out</strong> – (Batch, Length, Dim)</p></li>
-<li><p><strong>encoder_out_lens</strong> – (Batch,)</p></li>
-<li><p><strong>ys_pad</strong> – (Batch, Length)</p></li>
-<li><p><strong>ys_pad_lens</strong> – (Batch,)</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
 </section>
 <section id="espnet2-enh-init-1">
 <span id="espnet2-enh-init"></span><h2>espnet2.enh.__init__<a class="headerlink" href="#espnet2-enh-init-1" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-espnet2.enh.__init__"></span></section>
 <section id="espnet2-enh-espnet-model-1">
 <span id="espnet2-enh-espnet-model"></span><h2>espnet2.enh.espnet_model<a class="headerlink" href="#espnet2-enh-espnet-model-1" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-espnet2.enh.espnet_model"></span><p>Enhancement model module.</p>
-<dl class="class">
-<dt id="espnet2.enh.espnet_model.ESPnetEnhancementModel">
-<em class="property">class </em><code class="sig-prename descclassname">espnet2.enh.espnet_model.</code><code class="sig-name descname">ESPnetEnhancementModel</code><span class="sig-paren">(</span><em class="sig-param">encoder: espnet2.enh.encoder.abs_encoder.AbsEncoder, separator: espnet2.enh.separator.abs_separator.AbsSeparator, decoder: espnet2.enh.decoder.abs_decoder.AbsDecoder, loss_wrappers: List[espnet2.enh.loss.wrappers.abs_wrapper.AbsLossWrapper], stft_consistency: bool = False, loss_type: str = 'mask_mse', mask_type: Optional[str] = None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/enh/espnet_model.html#ESPnetEnhancementModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.enh.espnet_model.ESPnetEnhancementModel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="espnet2.train.html#espnet2.train.abs_espnet_model.AbsESPnetModel" title="espnet2.train.abs_espnet_model.AbsESPnetModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">espnet2.train.abs_espnet_model.AbsESPnetModel</span></code></a></p>
-<p>Speech enhancement or separation Frontend model</p>
-<dl class="method">
-<dt id="espnet2.enh.espnet_model.ESPnetEnhancementModel.collect_feats">
-<code class="sig-name descname">collect_feats</code><span class="sig-paren">(</span><em class="sig-param">speech_mix: torch.Tensor</em>, <em class="sig-param">speech_mix_lengths: torch.Tensor</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; Dict[str, torch.Tensor]<a class="reference internal" href="../_modules/espnet2/enh/espnet_model.html#ESPnetEnhancementModel.collect_feats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.enh.espnet_model.ESPnetEnhancementModel.collect_feats" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="espnet2.enh.espnet_model.ESPnetEnhancementModel.forward">
-<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">speech_mix: torch.Tensor</em>, <em class="sig-param">speech_mix_lengths: torch.Tensor = None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, Dict[str, torch.Tensor], torch.Tensor]<a class="reference internal" href="../_modules/espnet2/enh/espnet_model.html#ESPnetEnhancementModel.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.enh.espnet_model.ESPnetEnhancementModel.forward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Frontend + Encoder + Decoder + Calc loss</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>speech_mix</strong> – (Batch, samples) or (Batch, samples, channels)</p></li>
-<li><p><strong>speech_ref</strong> – (Batch, num_speaker, samples)
-or (Batch, num_speaker, samples, channels)</p></li>
-<li><p><strong>speech_mix_lengths</strong> – (Batch,), default None for chunk interator,
-because the chunk-iterator does not have the
-speech_lengths returned. see in
-espnet2/iterators/chunk_iter_factory.py</p></li>
-<li><p><strong>kwargs</strong> – “utt_id” is among the input.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="espnet2.enh.espnet_model.ESPnetEnhancementModel.forward_enhance">
-<code class="sig-name descname">forward_enhance</code><span class="sig-paren">(</span><em class="sig-param">speech_mix: torch.Tensor</em>, <em class="sig-param">speech_lengths: torch.Tensor</em>, <em class="sig-param">additional: Optional[Dict] = None</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, torch.Tensor, torch.Tensor]<a class="reference internal" href="../_modules/espnet2/enh/espnet_model.html#ESPnetEnhancementModel.forward_enhance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.enh.espnet_model.ESPnetEnhancementModel.forward_enhance" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="espnet2.enh.espnet_model.ESPnetEnhancementModel.forward_loss">
-<code class="sig-name descname">forward_loss</code><span class="sig-paren">(</span><em class="sig-param">speech_pre: torch.Tensor</em>, <em class="sig-param">speech_lengths: torch.Tensor</em>, <em class="sig-param">feature_mix: torch.Tensor</em>, <em class="sig-param">feature_pre: torch.Tensor</em>, <em class="sig-param">others: OrderedDict</em>, <em class="sig-param">speech_ref: torch.Tensor</em>, <em class="sig-param">noise_ref: torch.Tensor = None</em>, <em class="sig-param">dereverb_speech_ref: torch.Tensor = None</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, Dict[str, torch.Tensor], torch.Tensor]<a class="reference internal" href="../_modules/espnet2/enh/espnet_model.html#ESPnetEnhancementModel.forward_loss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.enh.espnet_model.ESPnetEnhancementModel.forward_loss" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
 </section>
 <section id="espnet2-enh-layers-complex-utils-1">
 <span id="espnet2-enh-layers-complex-utils"></span><h2>espnet2.enh.layers.complex_utils<a class="headerlink" href="#espnet2-enh-layers-complex-utils-1" title="Permalink to this headline">¶</a></h2>
@@ -3295,27 +3147,6 @@ ilens (torch.Tensor): input lengths [Batch]</p>
 </section>
 <section id="espnet2-enh-decoder-stft-decoder-1">
 <span id="espnet2-enh-decoder-stft-decoder"></span><h2>espnet2.enh.decoder.stft_decoder<a class="headerlink" href="#espnet2-enh-decoder-stft-decoder-1" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-espnet2.enh.decoder.stft_decoder"></span><dl class="class">
-<dt id="espnet2.enh.decoder.stft_decoder.STFTDecoder">
-<em class="property">class </em><code class="sig-prename descclassname">espnet2.enh.decoder.stft_decoder.</code><code class="sig-name descname">STFTDecoder</code><span class="sig-paren">(</span><em class="sig-param">n_fft: int = 512</em>, <em class="sig-param">win_length: int = None</em>, <em class="sig-param">hop_length: int = 128</em>, <em class="sig-param">window='hann'</em>, <em class="sig-param">center: bool = True</em>, <em class="sig-param">normalized: bool = False</em>, <em class="sig-param">onesided: bool = True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/enh/decoder/stft_decoder.html#STFTDecoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.enh.decoder.stft_decoder.STFTDecoder" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#espnet2.enh.decoder.abs_decoder.AbsDecoder" title="espnet2.enh.decoder.abs_decoder.AbsDecoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">espnet2.enh.decoder.abs_decoder.AbsDecoder</span></code></a></p>
-<p>STFT decoder for speech enhancement and separation</p>
-<dl class="method">
-<dt id="espnet2.enh.decoder.stft_decoder.STFTDecoder.forward">
-<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">input: torch_complex.tensor.ComplexTensor</em>, <em class="sig-param">ilens: torch.Tensor</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/enh/decoder/stft_decoder.html#STFTDecoder.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.enh.decoder.stft_decoder.STFTDecoder.forward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Forward.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>input</strong> (<em>ComplexTensor</em>) – spectrum [Batch, T, F]</p></li>
-<li><p><strong>ilens</strong> (<em>torch.Tensor</em>) – input lengths [Batch]</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
 </section>
 <section id="espnet2-enh-decoder-abs-decoder-1">
 <span id="espnet2-enh-decoder-abs-decoder"></span><h2>espnet2.enh.decoder.abs_decoder<a class="headerlink" href="#espnet2-enh-decoder-abs-decoder-1" title="Permalink to this headline">¶</a></h2>
@@ -3428,32 +3259,6 @@ registered hooks while the latter silently ignores them.</p>
 <span class="target" id="module-espnet2.enh.encoder.__init__"></span></section>
 <section id="espnet2-enh-encoder-stft-encoder-1">
 <span id="espnet2-enh-encoder-stft-encoder"></span><h2>espnet2.enh.encoder.stft_encoder<a class="headerlink" href="#espnet2-enh-encoder-stft-encoder-1" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-espnet2.enh.encoder.stft_encoder"></span><dl class="class">
-<dt id="espnet2.enh.encoder.stft_encoder.STFTEncoder">
-<em class="property">class </em><code class="sig-prename descclassname">espnet2.enh.encoder.stft_encoder.</code><code class="sig-name descname">STFTEncoder</code><span class="sig-paren">(</span><em class="sig-param">n_fft: int = 512</em>, <em class="sig-param">win_length: int = None</em>, <em class="sig-param">hop_length: int = 128</em>, <em class="sig-param">window='hann'</em>, <em class="sig-param">center: bool = True</em>, <em class="sig-param">normalized: bool = False</em>, <em class="sig-param">onesided: bool = True</em>, <em class="sig-param">use_builtin_complex: bool = True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/enh/encoder/stft_encoder.html#STFTEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.enh.encoder.stft_encoder.STFTEncoder" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#espnet2.enh.encoder.abs_encoder.AbsEncoder" title="espnet2.enh.encoder.abs_encoder.AbsEncoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">espnet2.enh.encoder.abs_encoder.AbsEncoder</span></code></a></p>
-<p>STFT encoder for speech enhancement and separation</p>
-<dl class="method">
-<dt id="espnet2.enh.encoder.stft_encoder.STFTEncoder.forward">
-<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">input: torch.Tensor</em>, <em class="sig-param">ilens: torch.Tensor</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/enh/encoder/stft_encoder.html#STFTEncoder.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.enh.encoder.stft_encoder.STFTEncoder.forward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Forward.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>input</strong> (<em>torch.Tensor</em>) – mixed speech [Batch, sample]</p></li>
-<li><p><strong>ilens</strong> (<em>torch.Tensor</em>) – input lengths [Batch]</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="espnet2.enh.encoder.stft_encoder.STFTEncoder.output_dim">
-<em class="property">property </em><code class="sig-name descname">output_dim</code><a class="headerlink" href="#espnet2.enh.encoder.stft_encoder.STFTEncoder.output_dim" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
 </section>
 <section id="espnet2-enh-encoder-conv-encoder-1">
 <span id="espnet2-enh-encoder-conv-encoder"></span><h2>espnet2.enh.encoder.conv_encoder<a class="headerlink" href="#espnet2-enh-encoder-conv-encoder-1" title="Permalink to this headline">¶</a></h2>
