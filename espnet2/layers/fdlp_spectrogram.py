@@ -1774,7 +1774,7 @@ class fdlp_spectrogram_dropout(fdlp_spectrogram):
         num_batch = input.shape[0]
 
         # First divide the signal into frames
-        tsamples_original, t_samples, frames = self.get_frames(input)
+        tsamples_original, t_samples, frames = self.get_frames(input,lfr=self.lfr)
         num_frames = frames.shape[1]
         num_batch_changed = frames.shape[0]
 
