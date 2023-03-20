@@ -2332,6 +2332,7 @@ class mvector(fdlp_spectrogram):
                  log_magnitude_modulation: bool = False,
                  full_modulation_spectrum: bool = False,
                  return_as_magnitude_phase: bool = False,
+                 interp_mode: str = 'bicubic',
                  **kwargs
                  ):
         assert check_argument_types()
@@ -2340,6 +2341,7 @@ class mvector(fdlp_spectrogram):
         self.log_magnitude_modulation = log_magnitude_modulation
         self.full_modulation_spectrum = full_modulation_spectrum
         self.return_as_magnitude_phase = return_as_magnitude_phase
+        self.interp_mode=interp_mode
 
     def compute_spectrogram(self, input: torch.Tensor, ilens: torch.Tensor = None) -> Tuple[
         torch.Tensor, Optional[torch.Tensor]]:
@@ -2452,18 +2454,21 @@ class mvector(fdlp_spectrogram):
             frames = frames[0:frame_num_original * num_batch, :]
             frames = torch.reshape(frames, (num_batch, frame_num_original, self.n_filters * self.coeff_num))
 
+        frames = torch.reshape(frames, (num_batch, frames.shape[1], self.n_filters, self.coeff_num))
+
         if self.lfr != self.frate:
             # We have to bilinear interpolate features to frame rate
             if self.full_modulation_spectrum and self.complex_modulation:
                 for f_idx in range(2):
                     frames[f_idx] = frames[f_idx].transpose(1, 2)
                     frames[f_idx] = torch.nn.functional.interpolate(frames[f_idx], scale_factor=self.frate / self.lfr,
-                                                                    mode='linear')
+                                                                    mode=self.interp_mode)
                     frames[f_idx] = frames[f_idx].transpose(1, 2)
             else:
                 frames = frames.transpose(1, 2)
-                frames = torch.nn.functional.interpolate(frames, scale_factor=self.frate / self.lfr, mode='linear')
+                frames = torch.nn.functional.interpolate(frames, scale_factor=(self.frate / self.lfr,1), mode=self.interp_mode)
                 frames = frames.transpose(1, 2)
+                #frames = torch.reshape(frames, (num_batch, frames.shape[1], self.n_filters, self.coeff_num))
 
         if ilens is not None:
             olens = torch.floor(ilens * self.frate / self.srate)
