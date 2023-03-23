@@ -1,11 +1,11 @@
 # Source from https://github.com/groadabike/Kaldi-Dsing-task
 
-import json
 import argparse
-from os.path import join, exists, isfile
-from os import makedirs, listdir
-import re
 import hashlib
+import json
+import re
+from os import listdir, makedirs
+from os.path import exists, isfile, join
 
 
 class DataSet:
@@ -19,7 +19,6 @@ class DataSet:
         self.db_path = db_path
 
     def add_utterance(self, utt, recording):
-
         text = utt["text"]
         arrangement, performance, country, gender, user = recording[:-4].split("-")
 

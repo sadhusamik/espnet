@@ -6,9 +6,7 @@
 import torch
 import torch.nn as nn
 
-from espnet2.enh.layers.dprnn import merge_feature
-from espnet2.enh.layers.dprnn import SingleRNN
-from espnet2.enh.layers.dprnn import split_feature
+from espnet2.enh.layers.dprnn import SingleRNN, merge_feature, split_feature
 from espnet2.enh.layers.tcn import choose_norm
 
 
@@ -299,7 +297,6 @@ class SkiM(nn.Module):
 
 
 if __name__ == "__main__":
-
     model = SkiM(
         333,
         111,

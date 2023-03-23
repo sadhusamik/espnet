@@ -63,11 +63,11 @@ separator_conf:
     flooring_thres_bf: 1e-6
     use_torch_solver: True
 
-criterions: 
+criterions:
   # The first criterion
   - name: snr
     conf:
-      eps: 1e-8
+      eps: 1.0e-08
     # the wrapper for the current criterion
     # for single-talker case, we simplely use fixed_order wrapper
     wrapper: fixed_order

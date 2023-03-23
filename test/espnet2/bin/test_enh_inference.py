@@ -1,14 +1,12 @@
+import string
 from argparse import ArgumentParser
 from pathlib import Path
-import string
 
 import pytest
 import torch
 import yaml
 
-from espnet2.bin.enh_inference import get_parser
-from espnet2.bin.enh_inference import main
-from espnet2.bin.enh_inference import SeparateSpeech
+from espnet2.bin.enh_inference import SeparateSpeech, get_parser, main
 from espnet2.enh.encoder.stft_encoder import STFTEncoder
 from espnet2.tasks.enh import EnhancementTask
 from espnet2.tasks.enh_s2t import EnhS2TTask
@@ -142,6 +140,8 @@ def enh_s2t_config_file(tmp_path: Path, token_list):
             str(token_list),
             "--token_type",
             "char",
+            "--asr_decoder",
+            "rnn",
         ]
     )
 

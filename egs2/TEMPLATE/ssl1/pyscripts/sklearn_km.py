@@ -8,27 +8,23 @@
 
 import argparse
 import logging
+import math
 import os
 import sys
-from random import sample
 import warnings
+from random import sample
 
+import fairseq
 import joblib
 import numpy as np
-import math
-
 import soundfile as sf
 import torch
 import torchaudio
 import tqdm
-
+from feature_loader import HubertFeatureReader, MfccFeatureReader
 from sklearn.cluster import MiniBatchKMeans
-import fairseq
 
 from espnet2.asr.encoder.hubert_encoder import FairseqHubertEncoder
-
-from feature_loader import MfccFeatureReader
-from feature_loader import HubertFeatureReader
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -103,7 +99,6 @@ def get_mfcc_feature(feats_dir, fs, nj, portion):
 
 
 def get_hubert_feature(feats_dir, fs, portion, url, dir, layer):
-
     reader = HubertFeatureReader(fs, url, dir, layer)
     generator, num = get_path_iterator(f"{feats_dir}/wav.scp", portion)
     iterator = generator()

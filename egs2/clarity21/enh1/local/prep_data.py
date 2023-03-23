@@ -2,7 +2,6 @@ import argparse
 import json
 import os
 
-
 parser = argparse.ArgumentParser("Clarity")
 parser.add_argument(
     "--clarity_root",
@@ -19,7 +18,6 @@ parser.add_argument(
 
 
 def prepare_data(clarity_root, samplerate):
-
     output_folder = "./data"
     ids = {"train": set(), "dev": set()}
 

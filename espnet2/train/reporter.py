@@ -1,27 +1,19 @@
 """Reporter module."""
-from collections import defaultdict
-from contextlib import contextmanager
 import dataclasses
 import datetime
 import logging
-from packaging.version import parse as V
-from pathlib import Path
 import time
-from typing import ContextManager
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Sequence
-from typing import Tuple
-from typing import Union
 import warnings
+from collections import defaultdict
+from contextlib import contextmanager
+from pathlib import Path
+from typing import ContextManager, Dict, List, Optional, Sequence, Tuple, Union
 
 import humanfriendly
 import numpy as np
 import torch
-from typeguard import check_argument_types
-from typeguard import check_return_type
-
+from packaging.version import parse as V
+from typeguard import check_argument_types, check_return_type
 
 Num = Union[float, int, complex, torch.Tensor, np.ndarray]
 
@@ -535,7 +527,7 @@ class Reporter:
 
             plt.plot(epochs, y, label=key, marker="x")
         plt.legend()
-        plt.title(f"epoch vs {key2}")
+        plt.title(f"{key2} vs epoch")
         # Force integer tick for x-axis
         plt.gca().get_xaxis().set_major_locator(ticker.MaxNLocator(integer=True))
         plt.xlabel("epoch")

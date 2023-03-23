@@ -1,5 +1,4 @@
 import pytest
-
 import torch
 from torch import Tensor
 from torch_complex import ComplexTensor
@@ -118,7 +117,6 @@ def test_skim_separator_invalid_type():
 
 
 def test_skim_separator_output():
-
     x = torch.rand(2, 10, 10)
     x_lens = torch.tensor([10, 8], dtype=torch.long)
 

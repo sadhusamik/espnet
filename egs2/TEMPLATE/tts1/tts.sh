@@ -67,8 +67,8 @@ f0max=400 # Minimum f0 for pitch extraction.
 
 # X-Vector related
 use_xvector=false   # Whether to use x-vector.
-xvector_tool=kaldi  # Toolkit for extracting x-vector (speechbrain, espnet, kaldi)
-xvector_model=speechbrain/spkrec-ecapa-voxceleb  # For only espnet or speechbrain
+xvector_tool=kaldi  # Toolkit for extracting x-vector (speechbrain, rawnet, espnet, kaldi)
+xvector_model=speechbrain/spkrec-ecapa-voxceleb  # For only espnet, speechbrain, or rawnet
 
 # Vocabulary related
 oov="<unk>"         # Out of vocabrary symbol.
@@ -210,7 +210,7 @@ EOF
 
 log "$0 $*"
 # Save command line args for logging (they will be lost after utils/parse_options.sh)
-run_args=$(pyscripts/utils/print_args.py $0 "$@")
+run_args=$(scripts/utils/print_args.sh $0 "$@")
 . utils/parse_options.sh
 
 if [ $# -ne 0 ]; then
@@ -357,8 +357,13 @@ if ! "${skip_data_prep}"; then
 
                 # Generate the MFCC features, VAD decision, and X-vector
                 for dset in "${train_set}" "${valid_set}" ${test_sets}; do
+                    if [ "${dset}" = "${train_set}" ] || [ "${dset}" = "${valid_set}" ]; then
+                        _suf="/org"
+                    else
+                        _suf=""
+                    fi
                     # 1. Copy datadir and resample to 16k
-                    utils/copy_data_dir.sh "data/${dset}" "${dumpdir}/mfcc/${dset}"
+                    utils/copy_data_dir.sh "${data_feats}${_suf}/${dset}" "${dumpdir}/mfcc/${dset}"
                     utils/data/resample_data_dir.sh 16000 "${dumpdir}/mfcc/${dset}"
 
                     # 2. Extract mfcc features
@@ -386,11 +391,6 @@ if ! "${skip_data_prep}"; then
                     # NOTE(kan-bayashi): Since sometimes mfcc or x-vector extraction is failed,
                     #   the number of utts will be different from the original features (raw or fbank).
                     #   To avoid this mismatch, perform filtering of the original feature scp here.
-                    if [ "${dset}" = "${train_set}" ] || [ "${dset}" = "${valid_set}" ]; then
-                        _suf="/org"
-                    else
-                        _suf=""
-                    fi
                     cp "${data_feats}${_suf}/${dset}"/wav.{scp,scp.bak}
                     <"${data_feats}${_suf}/${dset}/wav.scp.bak" \
                         utils/filter_scp.pl "${dumpdir}/xvector/${dset}/xvector.scp" \
@@ -405,6 +405,9 @@ if ! "${skip_data_prep}"; then
                         _suf="/org"
                     else
                         _suf=""
+                    fi
+                    if [ "${xvector_tool}" = "rawnet" ]; then
+                        xvector_model="RawNet"
                     fi
                     pyscripts/utils/extract_xvectors.py \
                         --pretrained_model ${xvector_model} \
@@ -498,15 +501,15 @@ if ! "${skip_data_prep}"; then
                 awk ' { if( NF != 1 ) print $0; } ' >"${data_feats}/${dset}/text"
 
             # fix_data_dir.sh leaves only utts which exist in all files
-            _fix_opts=""
+            _utt_extra_files=""
             if [ -e "${data_feats}/org/${dset}/utt2sid" ]; then
-                _fix_opts="--utt_extra_files utt2sid "
+                _utt_extra_files+="utt2sid "
             fi
             if [ -e "${data_feats}/org/${dset}/utt2lid" ]; then
-                _fix_opts="--utt_extra_files utt2lid "
+                _utt_extra_files+="utt2lid "
             fi
             # shellcheck disable=SC2086
-            utils/fix_data_dir.sh ${_fix_opts} "${data_feats}/${dset}"
+            utils/fix_data_dir.sh --utt_extra_files "${_utt_extra_files}" "${data_feats}/${dset}"
 
             # Filter x-vector
             if "${use_xvector}"; then
@@ -672,6 +675,10 @@ if ! "${skip_train}"; then
         for i in $(seq "${_nj}"); do
             _opts+="--input_dir ${_logdir}/stats.${i} "
         done
+        if [ "${feats_normalize}" != global_mvn ]; then
+            # Skip summerizaing stats if not using global MVN
+            _opts+="--skip_sum_stats"
+        fi
         ${python} -m espnet2.bin.aggregate_stats_dirs ${_opts} --output_dir "${tts_stats_dir}"
 
         # Append the num-tokens at the last dimensions. This is used for batch-bins count

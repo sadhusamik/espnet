@@ -1,5 +1,4 @@
 import pytest
-
 import torch
 
 from espnet2.enh.loss.criterions.tf_domain import FrequencyDomainL1
@@ -8,7 +7,6 @@ from espnet2.enh.loss.wrappers.multilayer_pit_solver import MultiLayerPITSolver
 
 @pytest.mark.parametrize("num_spk", [1, 2, 3])
 def test_MultiLayerPITSolver_forward_multi_layer(num_spk):
-
     batch = 2
     num_layers = 2
     # infs is a List of List (num_layer x num_speaker Tensors)
@@ -33,7 +31,6 @@ def test_MultiLayerPITSolver_forward_multi_layer(num_spk):
 
 @pytest.mark.parametrize("num_spk", [1, 2, 3])
 def test_MultiLayerPITSolver_forward_single_layer(num_spk):
-
     batch = 2
     # inf is a List of Tensors
     inf = [torch.rand(batch, 10, 100) for spk in range(num_spk)]

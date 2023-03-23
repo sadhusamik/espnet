@@ -10,15 +10,15 @@ import numpy as np
 from filelock import FileLock
 import logging
 import os
-from typing import Optional
-from typing import Tuple
+from typing import Optional, Tuple
 
 import torch
+from filelock import FileLock
 from typeguard import check_argument_types
 
+from espnet2.asr.encoder.abs_encoder import AbsEncoder
 from espnet.nets.pytorch_backend.nets_utils import make_pad_mask
 from espnet.nets.pytorch_backend.transformer.layer_norm import LayerNorm
-from espnet2.asr.encoder.abs_encoder import AbsEncoder
 
 
 class FairSeqWav2Vec2Encoder(AbsEncoder):
@@ -118,10 +118,10 @@ class FairSeqWav2Vec2Encoder(AbsEncoder):
         return self._output_size
 
     def forward(
-            self,
-            xs_pad: torch.Tensor,
-            ilens: torch.Tensor,
-            prev_states: torch.Tensor = None,
+        self,
+        xs_pad: torch.Tensor,
+        ilens: torch.Tensor,
+        prev_states: torch.Tensor = None,
     ) -> Tuple[torch.Tensor, torch.Tensor, Optional[torch.Tensor]]:
         """Forward FairSeqWav2Vec2 Encoder.
 
@@ -175,7 +175,6 @@ class FairSeqWav2Vec2Encoder(AbsEncoder):
         return xs_pad, olens, None
 
     def reload_pretrained_parameters(self):
-
         self.encoders.load_state_dict(self.pretrained_params)
         logging.info("Pretrained Wav2Vec model parameters reloaded!")
 

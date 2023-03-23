@@ -11,8 +11,7 @@ import torch
 import torch.nn as nn
 
 from espnet2.enh.layers import dprnn
-from espnet2.enh.layers.fasnet import BF_module
-from espnet2.enh.layers.fasnet import FaSNet_base
+from espnet2.enh.layers.fasnet import BF_module, FaSNet_base
 
 
 # implicit FaSNet (iFaSNet)
@@ -59,7 +58,6 @@ class iFaSNet(FaSNet_base):
         self.gen_output = nn.Conv1d(self.feature_dim, self.enc_dim, 1)
 
     def forward(self, input, num_mic):
-
         batch_size = input.size(0)
         nmic = input.size(1)
 
