@@ -298,7 +298,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">return_mvector</span> <span class="o">=</span> <span class="n">return_mvector</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coeff_num</span> <span class="o">=</span> <span class="n">coeff_num</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">complex_modulation</span> <span class="o">=</span> <span class="n">complex_modulation</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">hop_length</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="n">frate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">full_modulation_spectrum</span> <span class="o">=</span> <span class="n">full_modulation_spectrum</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hop_length</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">frate</span>
 
         <span class="k">if</span> <span class="n">multiorder</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fdlp_spectrogram</span> <span class="o">=</span> <span class="n">fdlp_spectrogram_multiorder</span><span class="p">(</span><span class="n">n_filters</span><span class="o">=</span><span class="n">n_filters</span><span class="p">,</span> <span class="n">coeff_num</span><span class="o">=</span><span class="n">coeff_num</span><span class="p">,</span>
@@ -466,7 +467,10 @@
 
 <div class="viewcode-block" id="RobustFrontend.output_size"><a class="viewcode-back" href="../../../../_gen/espnet2.asr.html#espnet2.asr.frontend.robust.RobustFrontend.output_size">[docs]</a>    <span class="k">def</span> <span class="nf">output_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">return_mvector</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeff_num</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">full_modulation_spectrum</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeff_num</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeff_num</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_modulation_head</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_filters</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_modulation_head</span>
         <span class="k">else</span><span class="p">:</span>
