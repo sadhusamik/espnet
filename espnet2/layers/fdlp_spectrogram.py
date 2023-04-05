@@ -1774,7 +1774,7 @@ class fdlp_spectrogram_dropout(fdlp_spectrogram):
         num_batch = input.shape[0]
 
         # First divide the signal into frames
-        tsamples_original, t_samples, frames = self.get_frames(input,lfr=self.lfr)
+        tsamples_original, t_samples, frames = self.get_frames(input, lfr=self.lfr)
         num_frames = frames.shape[1]
         num_batch_changed = frames.shape[0]
 
@@ -2341,7 +2341,7 @@ class mvector(fdlp_spectrogram):
         self.log_magnitude_modulation = log_magnitude_modulation
         self.full_modulation_spectrum = full_modulation_spectrum
         self.return_as_magnitude_phase = return_as_magnitude_phase
-        self.interp_mode=interp_mode
+        self.interp_mode = interp_mode
 
     def compute_spectrogram(self, input: torch.Tensor, ilens: torch.Tensor = None) -> Tuple[
         torch.Tensor, Optional[torch.Tensor]]:
@@ -2447,50 +2447,55 @@ class mvector(fdlp_spectrogram):
 
         if self.feature_batch is not None:
             frames = torch.reshape(frames, (-1, self.n_filters * self.coeff_num))
-            print(frames.shape)
             frame_num_original = int(np.ceil(tsamples_original * self.lfr / self.srate))
-            print(frame_num_original)
-            print(num_batch)
             frames = frames[0:frame_num_original * num_batch, :]
             frames = torch.reshape(frames, (num_batch, frame_num_original, self.n_filters * self.coeff_num))
 
-        frames = torch.reshape(frames, (num_batch, frames.shape[1], self.n_filters, self.coeff_num))
+        if self.complex_modulation:
+            for f_idx in range(2):
+                frames[f_idx] = torch.reshape(frames[f_idx],
+                                              (num_batch, frames[f_idx].shape[1], self.n_filters, self.coeff_num))
+                frames = torch.cat(frames, axis=-1)  # batch x num_frames x self.n_filters x 2 * self.coeff_num
+        else:
+            frames = torch.reshape(frames, (num_batch, frames.shape[1], self.n_filters, self.coeff_num))
 
         if self.lfr != self.frate:
             # We have to bilinear interpolate features to frame rate
-            if self.full_modulation_spectrum and self.complex_modulation:
-                for f_idx in range(2):
-                    frames[f_idx] = frames[f_idx].transpose(1, 2)
-                    frames[f_idx] = torch.nn.functional.interpolate(frames[f_idx], scale_factor=self.frate / self.lfr,
-                                                                    mode=self.interp_mode)
-                    frames[f_idx] = frames[f_idx].transpose(1, 2)
-            else:
-                frames = frames.transpose(1, 2)
-                frames = torch.nn.functional.interpolate(frames, scale_factor=(self.frate / self.lfr,1), mode=self.interp_mode)
-                frames = frames.transpose(1, 2)
-                #frames = torch.reshape(frames, (num_batch, frames.shape[1], self.n_filters, self.coeff_num))
+            # if self.full_modulation_spectrum and self.complex_modulation:
+            #    #for f_idx in range(2):
+            #    #    frames[f_idx] = frames[f_idx].transpose(1, 2)
+            #    #    frames[f_idx] = torch.nn.functional.interpolate(frames[f_idx],
+            #                                                        scale_factor=(self.frate / self.lfr, 1),
+            #                                                        mode=self.interp_mode)
+            #        frames[f_idx] = frames[f_idx].transpose(1, 2)
+            # else:
+            frames = frames.transpose(1, 2)
+            frames = torch.nn.functional.interpolate(frames, scale_factor=(self.frate / self.lfr, 1),
+                                                     mode=self.interp_mode)
+            frames = frames.transpose(1, 2)
+            #    # frames = torch.reshape(frames, (num_batch, frames.shape[1], self.n_filters, self.coeff_num))
 
         if ilens is not None:
             olens = torch.floor(ilens * self.frate / self.srate)
             olens = olens.to(ilens.dtype)
-            if self.full_modulation_spectrum and self.complex_modulation:
-                for f_idx in range(2):
-                    frames[f_idx].masked_fill_(make_pad_mask(olens, frames[f_idx], 1), 0.0000001)
-                    frames[f_idx] = frames[f_idx][:, :torch.max(olens), :]
-            else:
-                frames.masked_fill_(make_pad_mask(olens, frames, 1), 0.0000001)
-                frames = frames[:, :torch.max(olens), :]
+            #if self.full_modulation_spectrum and self.complex_modulation:
+            #    for f_idx in range(2):
+            #        frames[f_idx].masked_fill_(make_pad_mask(olens, frames[f_idx], 1), 0.0000001)
+            #        frames[f_idx] = frames[f_idx][:, :torch.max(olens), :]
+            #else:
+            frames.masked_fill_(make_pad_mask(olens, frames, 1), 0.0000001)
+            frames = frames[:, :torch.max(olens), :]
         else:
             olens = None
 
-        if self.full_modulation_spectrum and self.complex_modulation:
-            for f_idx in range(2):
-                frames[f_idx] = torch.reshape(frames[f_idx], (
-                    frames[f_idx].shape[0], frames[f_idx].shape[1], self.n_filters, self.coeff_num))
-        else:
-            frames = torch.reshape(frames, (frames.shape[0], frames.shape[1], self.n_filters, self.coeff_num))
-            frames = frames.transpose(2, 3)
-            # frames = torch.reshape(frames, (frames.shape[0], frames.shape[1], self.n_filters, self.coeff_num))
+        #if self.full_modulation_spectrum and self.complex_modulation:
+        #    for f_idx in range(2):
+        #        frames[f_idx] = torch.reshape(frames[f_idx], (
+        #            frames[f_idx].shape[0], frames[f_idx].shape[1], self.n_filters, self.coeff_num))
+        #else:
+        #    frames = torch.reshape(frames, (frames.shape[0], frames.shape[1], self.n_filters, self.coeff_num))
+        frames = frames.transpose(2, 3)
+        # frames = torch.reshape(frames, (frames.shape[0], frames.shape[1], self.n_filters, self.coeff_num))
 
         return frames, olens
 
