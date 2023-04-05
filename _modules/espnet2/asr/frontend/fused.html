@@ -204,11 +204,12 @@
 <span class="kn">from</span> <span class="nn">espnet2.asr.frontend.abs_frontend</span> <span class="kn">import</span> <span class="n">AbsFrontend</span>
 <span class="kn">from</span> <span class="nn">espnet2.asr.frontend.default</span> <span class="kn">import</span> <span class="n">DefaultFrontend</span>
 <span class="kn">from</span> <span class="nn">espnet2.asr.frontend.s3prl</span> <span class="kn">import</span> <span class="n">S3prlFrontend</span>
+<span class="kn">from</span> <span class="nn">espnet2.asr.frontend.robust</span> <span class="kn">import</span> <span class="n">RobustFrontend</span>
 
 
 <div class="viewcode-block" id="FusedFrontends"><a class="viewcode-back" href="../../../../_gen/espnet2.asr.html#espnet2.asr.frontend.fused.FusedFrontends">[docs]</a><span class="k">class</span> <span class="nc">FusedFrontends</span><span class="p">(</span><span class="n">AbsFrontend</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">frontends</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">align_method</span><span class="o">=</span><span class="s2">&quot;linear_projection&quot;</span><span class="p">,</span> <span class="n">proj_dim</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="mi">16000</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">frontends</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">align_method</span><span class="o">=</span><span class="s2">&quot;linear_projection&quot;</span><span class="p">,</span> <span class="n">proj_dim</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="mi">16000</span>
     <span class="p">):</span>
         <span class="k">assert</span> <span class="n">check_argument_types</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
@@ -258,6 +259,36 @@
                         <span class="n">apply_stft</span><span class="o">=</span><span class="n">apply_stft</span><span class="p">,</span>
                     <span class="p">)</span>
                 <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">frontend_type</span> <span class="o">==</span> <span class="s2">&quot;robust&quot;</span><span class="p">:</span>
+                <span class="n">n_filters</span><span class="p">,</span> <span class="n">srate</span><span class="p">,</span> <span class="n">coeff_num</span><span class="p">,</span> <span class="n">coeff_range</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">fduration</span><span class="p">,</span> <span class="n">frate</span><span class="p">,</span> <span class="n">overlap_fraction</span><span class="p">,</span> <span class="n">return_mvector</span><span class="p">,</span> <span class="n">lfr</span><span class="p">,</span> <span class="n">complex_modulation</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">frontend</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;n_filters&quot;</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span>
+                    <span class="n">fs</span><span class="p">,</span>
+                    <span class="n">frontend</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;coeff_num&quot;</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span>
+                    <span class="n">frontend</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;coeff_range&quot;</span><span class="p">,</span> <span class="s1">&#39;0,80&#39;</span><span class="p">),</span>
+                    <span class="n">frontend</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;order&quot;</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span>
+                    <span class="n">frontend</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fduration&quot;</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">),</span>
+                    <span class="n">frontend</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;frate&quot;</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">),</span>
+                    <span class="n">frontend</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;overlap_fraction&quot;</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+                    <span class="n">frontend</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;return_mvector&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                    <span class="n">frontend</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lfr&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+                    <span class="n">frontend</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;complex_modulation&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                <span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">frontends</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">RobustFrontend</span><span class="p">(</span>
+                        <span class="n">n_filters</span><span class="o">=</span><span class="n">n_filters</span><span class="p">,</span>
+                        <span class="n">coeff_num</span><span class="o">=</span><span class="n">coeff_num</span><span class="p">,</span>
+                        <span class="n">coeff_range</span><span class="o">=</span><span class="n">coeff_range</span><span class="p">,</span>
+                        <span class="n">srate</span><span class="o">=</span><span class="n">fs</span><span class="p">,</span>
+                        <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
+                        <span class="n">fduration</span><span class="o">=</span><span class="n">fduration</span><span class="p">,</span>
+                        <span class="n">frate</span><span class="o">=</span><span class="n">frate</span><span class="p">,</span>
+                        <span class="n">overlap_fraction</span><span class="o">=</span><span class="n">overlap_fraction</span><span class="p">,</span>
+                        <span class="n">complex_modulation</span><span class="o">=</span><span class="n">complex_modulation</span><span class="p">,</span>
+                        <span class="n">return_mvector</span><span class="o">=</span><span class="n">return_mvector</span><span class="p">,</span>
+                        <span class="n">lfr</span><span class="o">=</span><span class="n">lfr</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
             <span class="k">elif</span> <span class="n">frontend_type</span> <span class="o">==</span> <span class="s2">&quot;s3prl&quot;</span><span class="p">:</span>
                 <span class="n">frontend_conf</span><span class="p">,</span> <span class="n">download_dir</span><span class="p">,</span> <span class="n">multilayer_feature</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="n">frontend</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;frontend_conf&quot;</span><span class="p">),</span>
@@ -299,7 +330,7 @@
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frontends</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">proj_dim</span></div>
 
 <div class="viewcode-block" id="FusedFrontends.forward"><a class="viewcode-back" href="../../../../_gen/espnet2.asr.html#espnet2.asr.frontend.fused.FusedFrontends.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">input_lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">input_lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
         <span class="c1"># step 0 : get all frontends features</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">feats</span> <span class="o">=</span> <span class="p">[]</span>
@@ -309,7 +340,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">feats</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">input_feats</span><span class="p">,</span> <span class="n">feats_lens</span><span class="p">])</span>
 
         <span class="k">if</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">align_method</span> <span class="o">==</span> <span class="s2">&quot;linear_projection&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">align_method</span> <span class="o">==</span> <span class="s2">&quot;linear_projection&quot;</span>
         <span class="p">):</span>  <span class="c1"># TODO(Dan): to add other align methods</span>
             <span class="c1"># first step : projections</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">feats_proj</span> <span class="o">=</span> <span class="p">[]</span>
