@@ -27,7 +27,7 @@ class RobustFrontend(AbsFrontend):
             self,
             n_filters: int = 20,
             coeff_num: int = 80,
-            coeff_range: str = '1,80',
+            coeff_range: str = '0,80',
             order: int = 80,
             fduration: float = 1.5,
             frate: int = 125,
@@ -101,6 +101,7 @@ class RobustFrontend(AbsFrontend):
         self.return_mvector = return_mvector
         self.coeff_num = coeff_num
         self.complex_modulation = complex_modulation
+        self.hop_length=1/frate
 
         if multiorder:
             self.fdlp_spectrogram = fdlp_spectrogram_multiorder(n_filters=n_filters, coeff_num=coeff_num,

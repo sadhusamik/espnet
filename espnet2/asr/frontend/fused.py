@@ -7,11 +7,12 @@ from typeguard import check_argument_types
 from espnet2.asr.frontend.abs_frontend import AbsFrontend
 from espnet2.asr.frontend.default import DefaultFrontend
 from espnet2.asr.frontend.s3prl import S3prlFrontend
+from espnet2.asr.frontend.robust import RobustFrontend
 
 
 class FusedFrontends(AbsFrontend):
     def __init__(
-        self, frontends=None, align_method="linear_projection", proj_dim=100, fs=16000
+            self, frontends=None, align_method="linear_projection", proj_dim=100, fs=16000
     ):
         assert check_argument_types()
         super().__init__()
@@ -61,6 +62,36 @@ class FusedFrontends(AbsFrontend):
                         apply_stft=apply_stft,
                     )
                 )
+            elif frontend_type == "robust":
+                n_filters, srate, coeff_num, coeff_range, order, fduration, frate, overlap_fraction, return_mvector, lfr, complex_modulation = (
+                    frontend.get("n_filters", 20),
+                    fs,
+                    frontend.get("coeff_num", 80),
+                    frontend.get("coeff_range", '0,80'),
+                    frontend.get("order", 80),
+                    frontend.get("fduration", 1.5),
+                    frontend.get("frate", 1.5),
+                    frontend.get("overlap_fraction", 0.5),
+                    frontend.get("return_mvector", False),
+                    frontend.get("lfr", 5),
+                    frontend.get("complex_modulation", False),
+                )
+
+                self.frontends.append(
+                    RobustFrontend(
+                        n_filters=n_filters,
+                        coeff_num=coeff_num,
+                        coeff_range=coeff_range,
+                        srate=fs,
+                        order=order,
+                        fduration=fduration,
+                        frate=frate,
+                        overlap_fraction=overlap_fraction,
+                        complex_modulation=complex_modulation,
+                        return_mvector=return_mvector,
+                        lfr=lfr,
+                    )
+                )
             elif frontend_type == "s3prl":
                 frontend_conf, download_dir, multilayer_feature = (
                     frontend.get("frontend_conf"),
@@ -102,7 +133,7 @@ class FusedFrontends(AbsFrontend):
         return len(self.frontends) * self.proj_dim
 
     def forward(
-        self, input: torch.Tensor, input_lengths: torch.Tensor
+            self, input: torch.Tensor, input_lengths: torch.Tensor
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         # step 0 : get all frontends features
         self.feats = []
@@ -112,7 +143,7 @@ class FusedFrontends(AbsFrontend):
             self.feats.append([input_feats, feats_lens])
 
         if (
-            self.align_method == "linear_projection"
+                self.align_method == "linear_projection"
         ):  # TODO(Dan): to add other align methods
             # first step : projections
             self.feats_proj = []
