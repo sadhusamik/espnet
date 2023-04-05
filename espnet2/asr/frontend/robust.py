@@ -101,7 +101,8 @@ class RobustFrontend(AbsFrontend):
         self.return_mvector = return_mvector
         self.coeff_num = coeff_num
         self.complex_modulation = complex_modulation
-        self.hop_length=1/frate
+        self.full_modulation_spectrum = full_modulation_spectrum
+        self.hop_length = 1 / frate
 
         if multiorder:
             self.fdlp_spectrogram = fdlp_spectrogram_multiorder(n_filters=n_filters, coeff_num=coeff_num,
@@ -269,7 +270,10 @@ class RobustFrontend(AbsFrontend):
 
     def output_size(self) -> int:
         if self.return_mvector:
-            return self.coeff_num
+            if self.full_modulation_spectrum:
+                return 2 * self.coeff_num
+            else:
+                return self.coeff_num
         elif self.num_modulation_head:
             return self.n_filters * self.num_modulation_head
         else:
