@@ -2455,7 +2455,7 @@ class mvector(fdlp_spectrogram):
             for f_idx in range(2):
                 frames[f_idx] = torch.reshape(frames[f_idx],
                                               (num_batch, frames[f_idx].shape[1], self.n_filters, self.coeff_num))
-                frames = torch.cat(frames, axis=-1)  # batch x num_frames x self.n_filters x 2 * self.coeff_num
+            frames = torch.cat(frames, axis=-1)  # batch x num_frames x self.n_filters x 2 * self.coeff_num
         else:
             frames = torch.reshape(frames, (num_batch, frames.shape[1], self.n_filters, self.coeff_num))
 
