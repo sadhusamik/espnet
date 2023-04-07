@@ -152,6 +152,10 @@ class modulation_spectrum(torch.nn.Module):
         torch.Tensor, Optional[torch.Tensor]]:
 
         """Compute Modulation Spectrum - S. Greenberg & B. Kingsbury 1997"""
+        if self.fbank.device.type != input.device.type:
+            print('Transferring low pass filter to {:s}'.format(input.device.type))
+            self.lpf = self.lpf.to(input.device)
+            self.fbank = self.fbank.to(input.device)
         tsamples_original, t_samples, frames = self.get_frames(input, self.lfr)
 
         frames = torch.fft.fft(frames)  # * int(self.srate * self.fduration)
@@ -162,10 +166,7 @@ class modulation_spectrum(torch.nn.Module):
         num_batch, num_frames, _, frame_dim = frames.shape
         frames = torch.reshape(frames, (num_batch * num_frames * self.n_filters, -1))
         frames = torch.abs(frames.unsqueeze(1))
-        if self.fbank.device.type != input.device.type:
-            print('Transferring low pass filter to {:s}'.format(input.device.type))
-            self.lpf = self.lpf.to(input.device)
-            self.fbank = self.fbank.to(input.device)
+
         frames = torch.nn.functional.conv1d(frames, self.lpf)
         frames = frames[:, 0, ::self.downsample_factor]
         frames = torch.reshape(frames, (num_batch, num_frames, self.n_filters, -1))
