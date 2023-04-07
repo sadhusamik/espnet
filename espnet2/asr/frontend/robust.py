@@ -275,7 +275,9 @@ class RobustFrontend(AbsFrontend):
             self.pretrained_params = None
 
     def output_size(self) -> int:
-        if self.return_mvector:
+        if self.pure_modulation_spectrum:
+            return 2 * self.coeff_num
+        elif self.return_mvector:
             if self.full_modulation_spectrum:
                 return 2 * self.coeff_num
             else:
