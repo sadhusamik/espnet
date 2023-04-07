@@ -162,7 +162,7 @@ class modulation_spectrum(torch.nn.Module):
         num_batch, num_frames, _, frame_dim = frames.shape
         frames = torch.reshape(frames, (num_batch * num_frames * self.n_filters, -1))
         frames = torch.abs(frames.unsqueeze(1))
-        if self.lpf.device.type != input.device.type:
+        if self.fbank.device.type != input.device.type:
             print('Transferring low pass filter to {:s}'.format(input.device.type))
             self.lpf = self.lpf.to(input.device)
             self.fbank = self.fbank.to(input.device)
