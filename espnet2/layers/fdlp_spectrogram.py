@@ -14,10 +14,215 @@ from espnet.nets.pytorch_backend.nets_utils import make_pad_mask
 from torch.profiler import profile, record_function, ProfilerActivity
 import time
 import contextlib
+import scipy.signal as signal
 
 is_torch_1_9_plus = LooseVersion(torch.__version__) >= LooseVersion("1.9.0")
 
 is_torch_1_7_plus = LooseVersion(torch.__version__) >= LooseVersion("1.7")
+
+
+class modulation_spectrum(torch.nn.Module):
+    def __init__(
+            self,
+            n_filters: int = 20,
+            fduration: float = 1.5,
+            frate: int = 30,
+            downsample_factor: int = 100,
+            srate: int = 16000,
+            lfr: int = 5,
+            coeff_num: int = 80,
+            interp_mode: str = 'bicubic',
+            fbank_config: str = '1,1,2.5',  # om_w,alpha,beta
+    ):
+        assert check_argument_types()
+        super().__init__()
+        self.n_filters = n_filters
+        self.fduration = fduration
+        self.frate = frate
+        self.interp_mode = interp_mode
+        self.coeff_num = coeff_num
+        self.device = torch.device("cpu")
+        self.datatype = torch.float32
+        self.feature_batch = None
+        self.downsample_factor = downsample_factor
+        self.srate = srate
+        self.lfr = lfr
+        self.fbank_config = [float(x) for x in fbank_config.split(',')]
+        self.fbank = self.initialize_filterbank(self.n_filters, int(2 * self.fduration * self.srate),
+                                                self.srate,
+                                                om_w=self.fbank_config[0],
+                                                alp=self.fbank_config[1], fixed=1, bet=self.fbank_config[2],
+                                                warp_fact=1)
+
+        lpf = signal.firwin(numtaps=300, cutoff=60 / 8000, fs=None)
+        self.lpf = torch.tensor(lpf, dtype=self.datatype, device=self.device).unsqueeze(0).unsqueeze(0)
+
+    def __warp_func_bark(self, x, warp_fact=1):
+        import numpy as np
+        return 6 * np.arcsinh((x / warp_fact) / 600)
+
+    def initialize_filterbank(self, nfilters, nfft, srate, om_w=1, alp=1, fixed=1, bet=2.5, warp_fact=1,
+                              make_symmetric=False):
+        f_max = srate / 2
+        warped_max = self.__warp_func_bark(f_max, warp_fact)
+        fwarped_cf = np.linspace(0, warped_max, nfilters)
+        f_linear = np.linspace(0, f_max, int(np.floor(nfft / 2 + 1)))
+        f_warped = self.__warp_func_bark(f_linear, warp_fact)
+        filts = np.zeros((nfilters, int(np.floor(nfft / 2 + 1))))
+        alp_c = alp
+        for i in range(nfilters):
+            fc = fwarped_cf[i]
+            if fixed == 1:
+                alp = alp_c
+            else:
+                alp = alp_c * np.exp(-0.1 * fc)
+            for j, fw in enumerate(f_warped):
+                if fw - fc <= -om_w / 2:
+                    filts[i, j] = np.power(10, alp * (fw - fc + om_w / 2))
+                elif fw - fc > -om_w / 2 and fw - fc < om_w / 2:
+                    filts[i, j] = 1
+                else:
+                    filts[i, j] = np.power(10, -bet * (fw - fc - om_w / 2))
+        # return torch.tensor(filts, dtype=self.datatype)
+        if make_symmetric:
+            filts = np.concatenate((filts[:, :-1], np.flip(filts, axis=1)), axis=1)
+
+        return torch.tensor(filts, dtype=self.datatype, device=self.device)
+
+    def get_frames(self, signal: torch.Tensor, lfr) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
+        """Divide speech signal into frames.
+
+                Args:
+                    signal: (Batch, Nsamples) or (Batch, Nsample)
+                Returns:
+                    output: (Batch, Frame num, Frame dimension) or (Batch, Frame num, Frame dimension)
+                """
+
+        flength_samples = int(self.srate * self.fduration)
+        frate_samples = int(self.srate / lfr)
+
+        if flength_samples % 2 == 0:
+            sp_b = int(flength_samples / 2) - 1
+            sp_f = int(flength_samples / 2)
+            extend = int(flength_samples / 2) - 1
+        else:
+            sp_b = int((flength_samples - 1) / 2)
+            sp_f = int((flength_samples - 1) / 2)
+            extend = int((flength_samples - 1) / 2)
+
+        tsamples_original = signal.shape[1]
+
+        if self.feature_batch is not None:
+            # Reshape to have longer utterances, helps in feature extraction
+            # Might not be equally divisible, deal with that
+            sig_size = signal.shape[0] * signal.shape[1]
+            div_req = self.feature_batch
+            div_reminder = sig_size % div_req
+            signal = signal.flatten()
+            if div_reminder != 0:
+                # if div_reminder < int(div_req / 2):
+                #    signal = signal[:-div_reminder]
+                # else:
+                signal = torch.cat(
+                    [signal, torch.zeros(div_req - div_reminder + 10000, device=signal.device)])  # append extra zeros
+            else:
+                signal = torch.cat(
+                    [signal, torch.zeros(10000, device=signal.device)])
+            signal = torch.reshape(signal, (self.feature_batch, -1))
+
+        tsamples = signal.shape[1]
+
+        # signal = torch.nn.functional.pad(signal.unsqueeze(1), (extend, extend), mode='constant', value=0.0).squeeze(1)
+        signal = torch.nn.functional.pad(signal.unsqueeze(1), (extend, extend), mode='reflect').squeeze(1)
+
+        signal_length = signal.shape[1]
+
+        win = torch.hamming_window(flength_samples, dtype=signal.dtype, device=signal.device)
+
+        idx = sp_b
+        frames = []
+        while (idx + sp_f) < signal_length:
+            frames.append(signal[:, idx - sp_b:idx + sp_f + 1].unsqueeze(1) * win)
+            idx += frate_samples
+
+        frames = torch.cat(frames, dim=1)
+        return tsamples_original, tsamples, frames
+
+    def compute_mspec(self, input: torch.Tensor, ilens: torch.Tensor = None) -> Tuple[
+        torch.Tensor, Optional[torch.Tensor]]:
+
+        """Compute Modulation Spectrum - S. Greenberg & B. Kingsbury 1997"""
+        tsamples_original, t_samples, frames = self.get_frames(input, self.lfr)
+
+        frames = torch.fft.fft(frames)  # * int(self.srate * self.fduration)
+        # Divide into sub-bands
+        frames = frames.unsqueeze(2).repeat(1, 1, self.n_filters, 1)
+        frames = frames * self.fbank[:, 0:-1]  # batch x num_frames x n_filters x frame_dim of 1.5 secs
+        frames = torch.fft.ifft(frames)
+        num_batch, num_frames, _, frame_dim = frames.shape
+        frames = torch.reshape(frames, (num_batch * num_frames * self.n_filters, -1))
+        frames = torch.abs(frames.unsqueeze(1))
+        if self.lpf.device.type != input.device.type:
+            print('Transferring low pass filter to {:s}'.format(input.device.type))
+            self.lpf = self.lpf.to(input.device)
+        frames = torch.nn.functional.conv1d(frames, self.lpf)
+        frames = frames[:, 0, ::self.downsample_factor]
+        frames = torch.reshape(frames, (num_batch, num_frames, self.n_filters, -1))
+        frames = torch.fft.fft(frames)[:,:,:,0:self.coeff_num]
+        frames = torch.cat([torch.real(frames), torch.imag(frames)], dim=-1)
+        # frames = np.abs(frames[:, :, :, 0:self.coeff_num])
+
+        if self.lfr != self.frate:
+            frames = frames.transpose(1, 2)
+            frames = torch.nn.functional.interpolate(frames, scale_factor=(self.frate / self.lfr, 1),
+                                                     mode=self.interp_mode)
+            frames = frames.transpose(1, 2)
+
+        if ilens is not None:
+            olens = torch.floor(ilens * self.frate / self.srate)
+            olens = olens.to(ilens.dtype)
+            frames.masked_fill_(make_pad_mask(olens, frames, 1), 0.0000001)
+            # frames = frames[:, :torch.max(olens), :]
+            frames = frames[:, :torch.max(olens), :, :]
+        else:
+            olens = None
+
+        frames = frames.transpose(2, 3)
+
+        return frames, olens
+
+    def forward(self, input: torch.Tensor, ilens: torch.Tensor = None
+                ) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
+        """Compute FDLP-Spectrogram forward function.
+
+        Args:
+            input: (Batch, Nsamples) or (Batch, Nsample, Channels)
+            ilens: (Batch)
+        Returns:
+            output: (Batch, Frames, Freq) or (Batch, Frames, Channels, Freq)
+        """
+
+        bs = input.size(0)
+        if input.dim() == 3:
+            input = input[:, :, 0]
+
+        if input.dim() == 3:
+            multi_channel = True
+            # input: (Batch, Nsample, Channels) -> (Batch * Channels, Nsample)
+            input = input.transpose(1, 2).reshape(-1, input.size(1))
+        else:
+            multi_channel = False
+
+        output, olens = self.compute_mspec(input, ilens)
+
+        if multi_channel:
+            # output: (Batch * Channel, Frames, Freq, 2=real_imag)
+            # -> (Batch, Frame, Channel, Freq, 2=real_imag)
+            output = output.view(bs, -1, output.size(1), output.size(2)).transpose(
+                1, 2
+            )
+
+        return output, olens
 
 
 class fdlp_spectrogram(torch.nn.Module):
@@ -2478,21 +2683,21 @@ class mvector(fdlp_spectrogram):
         if ilens is not None:
             olens = torch.floor(ilens * self.frate / self.srate)
             olens = olens.to(ilens.dtype)
-            #if self.full_modulation_spectrum and self.complex_modulation:
+            # if self.full_modulation_spectrum and self.complex_modulation:
             #    for f_idx in range(2):
             #        frames[f_idx].masked_fill_(make_pad_mask(olens, frames[f_idx], 1), 0.0000001)
             #        frames[f_idx] = frames[f_idx][:, :torch.max(olens), :]
-            #else:
+            # else:
             frames.masked_fill_(make_pad_mask(olens, frames, 1), 0.0000001)
             frames = frames[:, :torch.max(olens), :]
         else:
             olens = None
 
-        #if self.full_modulation_spectrum and self.complex_modulation:
+        # if self.full_modulation_spectrum and self.complex_modulation:
         #    for f_idx in range(2):
         #        frames[f_idx] = torch.reshape(frames[f_idx], (
         #            frames[f_idx].shape[0], frames[f_idx].shape[1], self.n_filters, self.coeff_num))
-        #else:
+        # else:
         #    frames = torch.reshape(frames, (frames.shape[0], frames.shape[1], self.n_filters, self.coeff_num))
         frames = frames.transpose(2, 3)
         # frames = torch.reshape(frames, (frames.shape[0], frames.shape[1], self.n_filters, self.coeff_num))

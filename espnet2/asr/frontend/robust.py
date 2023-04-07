@@ -13,7 +13,7 @@ from typeguard import check_argument_types
 from espnet.nets.pytorch_backend.frontends.frontend import Frontend
 from espnet2.asr.frontend.abs_frontend import AbsFrontend
 from espnet2.layers.fdlp_spectrogram import fdlp_spectrogram, fdlp_spectrogram_update, fdlp_spectrogram_dropout, \
-    fdlp_spectrogram_with_mmh, fdlp_spectrogram_modnet, mvector, fdlp_spectrogram_multiorder
+    fdlp_spectrogram_with_mmh, fdlp_spectrogram_modnet, mvector, fdlp_spectrogram_multiorder, modulation_spectrum
 from espnet2.utils.get_default_kwargs import get_default_kwargs
 
 
@@ -84,6 +84,8 @@ class RobustFrontend(AbsFrontend):
             lifter_scale: float = None,
             purturb_lifter: float = None,
             lifter_purturb_prob: float = 0.8,
+            pure_modulation_spectrum: bool = False,
+            downsample_factor: int = 100,
             fs: Union[int, str] = 16000,
             frontend_conf: Optional[dict] = get_default_kwargs(Frontend),
     ):
@@ -98,13 +100,17 @@ class RobustFrontend(AbsFrontend):
         self.num_modulation_head = num_modulation_head
         self.fduration = fduration
         self.frate = frate
+        self.pure_modulation_spectrum = pure_modulation_spectrum
         self.return_mvector = return_mvector
         self.coeff_num = coeff_num
         self.complex_modulation = complex_modulation
         self.full_modulation_spectrum = full_modulation_spectrum
         self.hop_length = 1 / frate
-
-        if multiorder:
+        if pure_modulation_spectrum:
+            self.fdlp_spectrogram = modulation_spectrum(n_filters=n_filters, coeff_num=coeff_num, fduration=fduration,
+                                                        frate=frate, downsample_factor=downsample_factor, srate=srate,
+                                                        lfr=lfr, fbank_config=fbank_config)
+        elif multiorder:
             self.fdlp_spectrogram = fdlp_spectrogram_multiorder(n_filters=n_filters, coeff_num=coeff_num,
                                                                 coeff_range=coeff_range, order=order,
                                                                 fduration=fduration, frate=frate,
