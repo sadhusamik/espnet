@@ -26,12 +26,12 @@ espnet2.modnet_v2.espnet_model
     :show-inheritance:
 
 
-.. _espnet2.modnet_v2.projector.abs_projector:
+.. _espnet2.modnet_v2.projector.modulation_projector:
 
-espnet2.modnet_v2.projector.abs_projector
------------------------------------------
+espnet2.modnet_v2.projector.modulation_projector
+------------------------------------------------
 
-.. automodule:: espnet2.modnet_v2.projector.abs_projector
+.. automodule:: espnet2.modnet_v2.projector.modulation_projector
     :members:
     :undoc-members:
     :show-inheritance:
@@ -48,12 +48,12 @@ espnet2.modnet_v2.projector.__init__
     :show-inheritance:
 
 
-.. _espnet2.modnet_v2.projector.modulation_projector:
+.. _espnet2.modnet_v2.projector.abs_projector:
 
-espnet2.modnet_v2.projector.modulation_projector
-------------------------------------------------
+espnet2.modnet_v2.projector.abs_projector
+-----------------------------------------
 
-.. automodule:: espnet2.modnet_v2.projector.modulation_projector
+.. automodule:: espnet2.modnet_v2.projector.abs_projector
     :members:
     :undoc-members:
     :show-inheritance:
