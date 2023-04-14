@@ -22,6 +22,8 @@ is_torch_1_7_plus = LooseVersion(torch.__version__) >= LooseVersion("1.7")
 
 
 class modulation_spectrum(torch.nn.Module):
+    """Compute Modulation Spectrum, the original way- S. Greenberg & B. Kingsbury 1997"""
+
     def __init__(
             self,
             n_filters: int = 20,
@@ -158,19 +160,29 @@ class modulation_spectrum(torch.nn.Module):
             self.fbank = self.fbank.to(input.device)
         tsamples_original, t_samples, frames = self.get_frames(input, self.lfr)
 
+        # Divide speech into cochlear filter-bank
         frames = torch.fft.fft(frames)  # * int(self.srate * self.fduration)
         # Divide into sub-bands
         frames = frames.unsqueeze(2).repeat(1, 1, self.n_filters, 1)
         frames = frames * self.fbank[:, 0:-1]  # batch x num_frames x n_filters x frame_dim of 1.5 secs
         frames = torch.fft.ifft(frames)
+
         num_batch, num_frames, _, frame_dim = frames.shape
         frames = torch.reshape(frames, (num_batch * num_frames * self.n_filters, -1))
+
+        # Rectify
         frames = torch.abs(frames.unsqueeze(1))
 
+        # low pass filter
         frames = torch.nn.functional.conv1d(frames, self.lpf)
+        # frames = torch.log(frames)
+
+        # downsample
         frames = frames[:, 0, ::self.downsample_factor]
         frames = torch.reshape(frames, (num_batch, num_frames, self.n_filters, -1))
-        frames = torch.fft.fft(frames)[:,:,:,0:self.coeff_num]
+
+        # Compute Modulation Spectrum
+        frames = torch.fft.fft(frames)[:, :, :, 0:self.coeff_num]
         frames = torch.cat([torch.real(frames), torch.imag(frames)], dim=-1)
         # frames = np.abs(frames[:, :, :, 0:self.coeff_num])
 
@@ -2733,3 +2745,226 @@ class mvector(fdlp_spectrogram):
             )
 
         return output, olens
+
+
+class mvector_plus_spectrogram(mvector):
+
+    def __init__(self,
+                 num_channel_dropout: int = None,
+                 **kwargs
+                 ):
+        assert check_argument_types()
+        super().__init__(**kwargs)
+        self.num_channel_dropout = num_channel_dropout
+
+    def compute_spectrogram(self, input: torch.Tensor, ilens: torch.Tensor = None) -> Tuple[
+        torch.Tensor, Optional[torch.Tensor]]:
+        """Compute FDLP-Spectrogram With Matrices.
+
+        Args:
+            input: (Batch, Nsamples) or (Batch, Nsample)
+            ilens: (Batch)
+        Returns:
+            output: (Batch, Frames, Freq) or (Batch, Frames, Freq)
+
+        """
+        if input.shape[1] <= self.srate * self.fduration / 2 - 1:
+            # Appped zeros to make it 1 second long signal
+            input = torch.cat([input, torch.zeros(input.shape[0], int(self.srate), device=input.device)], axis=1)
+
+        num_batch = input.shape[0]
+        if self.online_normalize:
+            _, _, _, self.spectral_substraction_vector = self.get_normalizing_vector(input, fduration=25,
+                                                                                     overlap_fraction=0.98,
+                                                                                     append_len=400000, discont=np.pi)
+
+        # First divide the signal into frames
+        tsamples_original, tsamples, frames = self.get_frames(input, lfr=self.lfr)
+        num_frames = frames.shape[1]
+        han_weight = torch.hann_window(self.cut, dtype=input.dtype, device=input.device)
+        ham_weight = torch.hamming_window(self.cut, dtype=input.dtype, device=input.device)
+
+        if self.spectral_substraction_vector is not None:
+            self.spectral_substraction_vector = self.spectral_substraction_vector.to(input.device)
+            # logging.info('Substracting spectral vector')
+            frames = self.spectral_substraction_preprocessing(frames)
+
+        if self.fbank.device.type != input.device.type:
+            print('Transferring fbank to {:s}'.format(input.device.type))
+            self.fbank = self.fbank.to(input.device)
+
+        if self.num_chunks:
+            chunk_size = int(np.ceil(frames.shape[1] / self.num_chunks))  # Number of frames
+            frames = list(torch.split(frames, split_size_or_sections=chunk_size, dim=1))
+
+            for idx in range(len(frames)):
+                if self.complex_modulation:
+                    frames[idx] = torch.fft.ifft(frames[idx]) * int(self.srate * self.fduration)
+                else:
+                    frames[idx] = self.dct_type2(frames[idx]) / np.sqrt(2 * int(self.srate * self.fduration))
+
+                frames[idx] = frames[idx].unsqueeze(2).repeat(1, 1, self.n_filters, 1)
+                frames[idx] = frames[idx] * self.fbank[:,
+                                            0:-1]  # batch x num_frames x n_filters x frame_dim of 1.5 secs
+
+                frames[idx], gain = self.compute_lpc(frames[idx],
+                                                     self.order)  # batch x num_frames x n_filters x lpc_coeff
+                if self.do_bwe:
+                    frames[idx] = self.bwe_lpc_stabilizer(frames[idx])
+
+                frames[idx] = self.compute_modspec_from_lpc(gain, frames[idx],
+                                                            self.coeff_num)  # batch x num_frames x n_filters x num_modspec
+
+                frames[idx] = frames[idx].reshape(frames[idx].size(0), frames[idx].size(1),
+                                                  -1)  # batch x num_frames x n_filters * num_modspec
+                if self.complex_modulation:
+                    if self.log_magnitude_modulation:
+                        frames[idx] = torch.log(torch.abs(frames[idx]))
+                    elif not self.full_modulation_spectrum:
+                        frames[idx] = torch.abs(frames[idx])
+
+            frames = torch.cat(frames, dim=1)
+            if self.full_modulation_spectrum and self.complex_modulation:
+                if self.return_as_magnitude_phase:
+                    frames = [torch.abs(frames), torch.angle(frames)]
+                else:
+                    frames = [torch.real(frames), torch.imag(frames)]
+        else:
+            # Compute DCT (olens remains the same)
+            if self.complex_modulation:
+                frames = torch.fft.ifft(frames) * int(self.srate * self.fduration)
+            else:
+                frames = self.dct_type2(frames) / np.sqrt(2 * int(self.srate * self.fduration))
+
+            frames = frames.unsqueeze(2).repeat(1, 1, self.n_filters, 1)
+            frames = frames * self.fbank[:, 0:-1]  # batch x num_frames x n_filters x frame_dim of 1.5 secs
+
+            ### Compute all LPC in all bands and all frames parallely to make it fast
+
+            frames, gain = self.compute_lpc(frames, self.order)  # batch x num_frames x n_filters x lpc_coeff
+            if self.do_bwe:
+                frames = self.bwe_lpc_stabilizer(frames)
+
+            frames = self.compute_modspec_from_lpc(gain, frames,
+                                                   self.coeff_num)  # batch x num_frames x n_filters x num_modspec
+            frames_copy = torch.clone(frames)
+
+            # Downsample fdlp mvector by a factor of 6
+            frames_copy = frames_copy[:, ::6, :, :]
+
+            # Convert original modulation spectrum to spectrogram
+            if self.complex_modulation:
+                frames_copy_nodropout = torch.fft.fft(frames_copy, 1 * int(round(
+                    self.fduration * self.frate)))  # (batch x num_frames x n_filters x int(self.fduration * self.frate))
+            else:
+                frames_copy_nodropout = torch.fft.fft(frames_copy, 2 * int(round(
+                    self.fduration * self.frate)))  # (batch x num_frames x n_filters x int(self.fduration * self.frate))
+            frames_copy_nodropout = torch.abs(torch.exp(frames_copy_nodropout))
+            frames_copy_nodropout = frames_copy_nodropout[:, :, :, 0:self.cut] * han_weight / ham_weight
+            frames_copy_nodropout = torch.transpose(frames_copy_nodropout, 2,
+                                                    3)  # (batch x num_frames x int(self.fduration * self.frate) x n_filters)
+
+            frames_copy_nodropout = self.OLA(modspec=frames_copy_nodropout, t_samples=tsamples, dtype=input.dtype,
+                                             device=input.device)
+
+            # Dropout some randomly chosen bands
+            k = None
+            if self.training:
+                if self.num_channel_dropout is not None:
+                    k = np.arange(self.coeff_num)
+                    random.shuffle(k)
+                    k = k[0:self.num_channel_dropout]
+                    for one_idx in k:
+                        frames_copy[:, :, :, one_idx] = frames_copy[:, :, :, one_idx] * 0
+
+            # Convert original modulation spectrum to spectrogram
+            if self.complex_modulation:
+                frames_copy = torch.fft.fft(frames_copy, 1 * int(round(
+                    self.fduration * self.frate)))  # (batch x num_frames x n_filters x int(self.fduration * self.frate))
+            else:
+                frames_copy = torch.fft.fft(frames_copy, 2 * int(round(
+                    self.fduration * self.frate)))  # (batch x num_frames x n_filters x int(self.fduration * self.frate))
+            frames_copy = torch.abs(torch.exp(frames_copy))
+            frames_copy = frames_copy[:, :, :, 0:self.cut] * han_weight / ham_weight
+            frames_copy = torch.transpose(frames_copy, 2,
+                                          3)  # (batch x num_frames x int(self.fduration * self.frate) x n_filters)
+
+            frames_copy = self.OLA(modspec=frames_copy, t_samples=tsamples, dtype=input.dtype,
+                                   device=input.device)  # (batch x num_frames x n_filters)
+
+            frames = frames.reshape(frames.size(0), frames.size(1), -1)  # batch x num_frames x n_filters * num_modspec
+
+            if self.complex_modulation:
+                if self.log_magnitude_modulation:
+                    frames = torch.log(torch.abs(frames))  # batch x num_frames x n_filters * num_modspec
+                elif self.full_modulation_spectrum:
+                    if self.return_as_magnitude_phase:
+                        frames = [torch.abs(frames), torch.angle(frames)]  # log_magnitude, phase
+                    else:
+                        frames = [torch.real(frames), torch.imag(frames)]
+                else:
+                    frames = torch.abs(frames)
+
+        if self.feature_batch is not None:
+            frames = torch.reshape(frames, (-1, self.n_filters * self.coeff_num))
+            frame_num_original = int(np.ceil(tsamples_original * self.lfr / self.srate))
+            frames = frames[0:frame_num_original * num_batch, :]
+            frames = torch.reshape(frames, (num_batch, frame_num_original, self.n_filters * self.coeff_num))
+
+        if self.complex_modulation:
+            for f_idx in range(2):
+                frames[f_idx] = torch.reshape(frames[f_idx],
+                                              (num_batch, frames[f_idx].shape[1], self.n_filters, self.coeff_num))
+            frames = torch.cat(frames, axis=-1)  # batch x num_frames x self.n_filters x 2 * self.coeff_num
+        else:
+            frames = torch.reshape(frames, (num_batch, frames.shape[1], self.n_filters, self.coeff_num))
+
+        if self.lfr != self.frate:
+            frames = frames.transpose(1, 2)
+            frames = torch.nn.functional.interpolate(frames, scale_factor=(self.frate / self.lfr, 1),
+                                                     mode=self.interp_mode)
+            frames = frames.transpose(1, 2)
+
+        if ilens is not None:
+            olens = torch.floor(ilens * self.frate / self.srate)
+            olens = olens.to(ilens.dtype)
+            frames.masked_fill_(make_pad_mask(olens, frames, 1), 0.0000001)
+            frames = frames[:, :torch.max(olens), :]
+            frames_copy.masked_fill_(make_pad_mask(olens, frames_copy, 1), 0.0000001)
+            frames_copy = frames_copy[:, :torch.max(olens), :]
+            frames_copy_nodropout.masked_fill_(make_pad_mask(olens, frames_copy_nodropout, 1), 0.0000001)
+            frames_copy_nodropout = frames_copy_nodropout[:, :torch.max(olens), :]
+        else:
+            olens = None
+
+        frames = frames.transpose(2, 3)
+
+        return frames, frames_copy, frames_copy_nodropout, k, olens
+
+    def forward(self, input: torch.Tensor, ilens: torch.Tensor = None
+                ) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
+        """Compute FDLP-Spectrogram forward function.
+
+        Args:
+            input: (Batch, Nsamples) or (Batch, Nsample, Channels)
+            ilens: (Batch)
+        Returns:
+            output: (Batch, Frames, Freq) or (Batch, Frames, Channels, Freq)
+
+        """
+        bs = input.size(0)
+        if input.dim() == 3:
+            multi_channel = True
+            # input: (Batch, Nsample, Channels) -> (Batch * Channels, Nsample)
+            input = input.transpose(1, 2).reshape(-1, input.size(1))
+        else:
+            multi_channel = False
+        output, frames_copy, frames_copy_nodropout, k, olens = self.compute_spectrogram(input, ilens)
+        if multi_channel:
+            # output: (Batch * Channel, Frames, Freq, 2=real_imag)
+            # -> (Batch, Frame, Channel, Freq, 2=real_imag)
+            output = output.view(bs, -1, output.size(1), output.size(2)).transpose(
+                1, 2
+            )
+
+        return output, frames_copy, frames_copy_nodropout, k, olens
