@@ -15,9 +15,9 @@ class LinearProjector(AbsProjector):
     """Linear Projection Preencoder."""
 
     def __init__(
-        self,
-        input_size: int,
-        output_size: int,
+            self,
+            input_size: int = 256,
+            output_size: int = 20,
     ):
         """Initialize the module."""
         assert check_argument_types()
@@ -27,7 +27,7 @@ class LinearProjector(AbsProjector):
         self.linear_out = torch.nn.Linear(input_size, output_size)
 
     def forward(
-        self, input: torch.Tensor, input_lengths: torch.Tensor
+            self, input: torch.Tensor, input_lengths: torch.Tensor
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         """Forward."""
         output = self.linear_out(input)

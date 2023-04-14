@@ -271,7 +271,7 @@ class ModnetTask_v3(AbsTask):
         # Projection
         projector_class = projector_choices.get_class(args.projector)
         encoder_output_size = encoder.output_size()
-        projector = projector_class(input_size=encoder_output_size, output_size=input_size)
+        projector = projector_class(input_size=encoder_output_size,  **args.projector_conf)
 
         # 8. Build model
         model = ModNet_v3(
