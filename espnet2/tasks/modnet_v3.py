@@ -86,7 +86,6 @@ projector_choices = ClassChoices(
     classes=dict(
         linear=LinearProjector,
     ),
-    type_check=AbsProjector,
     default="linear",
 )
 
