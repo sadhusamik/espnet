@@ -235,7 +235,7 @@ class ModnetTask_v3(AbsTask):
     def required_data_names(
             cls, train: bool = True, inference: bool = False
     ) -> Tuple[str, ...]:
-        retval = ("speech", "speech_original")
+        retval = ("speech")
         return retval
 
     @classmethod

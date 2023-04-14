@@ -1321,11 +1321,11 @@ if [ ${stage} -le 11 ] && [ ${stop_stage} -ge 11 ] && ! [[ " ${skip_stages} " =~
             done
         fi
         # shellcheck disable=SC2068
-        for i in ${!ref_text_names[@]}; do
-            _opts+="--fold_length ${asr_text_fold_length} "
-            _opts+="--train_data_path_and_name_and_type ${_asr_train_dir}/${ref_text_files[$i]},${ref_text_names[$i]},text "
-            _opts+="--train_shape_file ${asr_stats_dir}/train/${ref_text_names[$i]}_shape.${token_type} "
-        done
+        #for i in ${!ref_text_names[@]}; do
+        #    _opts+="--fold_length ${asr_text_fold_length} "
+        #    _opts+="--train_data_path_and_name_and_type ${_asr_train_dir}/${ref_text_files[$i]},${ref_text_names[$i]},text "
+        #    _opts+="--train_shape_file ${asr_stats_dir}/train/${ref_text_names[$i]}_shape.${token_type} "
+        #done
     fi
 
     # shellcheck disable=SC2068
