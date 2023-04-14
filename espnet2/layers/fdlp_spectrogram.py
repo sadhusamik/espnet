@@ -2751,11 +2751,13 @@ class mvector_plus_spectrogram(mvector):
 
     def __init__(self,
                  num_channel_dropout: int = None,
+                 dropout_while_eval: bool = True,
                  **kwargs
                  ):
         assert check_argument_types()
         super().__init__(**kwargs)
         self.num_channel_dropout = num_channel_dropout
+        self.dropout_while_eval=dropout_while_eval
 
     def compute_spectrogram(self, input: torch.Tensor, ilens: torch.Tensor = None) -> Tuple[
         torch.Tensor, Optional[torch.Tensor]]:
@@ -2869,7 +2871,7 @@ class mvector_plus_spectrogram(mvector):
 
             # Dropout some randomly chosen bands
             k = None
-            if self.training:
+            if self.training or self.dropout_while_eval:
                 if self.num_channel_dropout is not None:
                     k = np.arange(self.coeff_num)
                     random.shuffle(k)
