@@ -356,6 +356,17 @@ espnet2.bin.diar_inference
     :show-inheritance:
 
 
+.. _espnet2.bin.modnet_v3_train:
+
+espnet2.bin.modnet_v3_train
+---------------------------
+
+.. automodule:: espnet2.bin.modnet_v3_train
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
 .. _espnet2.bin.aggregate_stats_dirs:
 
 espnet2.bin.aggregate_stats_dirs

@@ -1,0 +1,71 @@
+
+espnet2.modnet_v3 package
+=========================
+
+
+
+.. _espnet2.modnet_v3.__init__:
+
+espnet2.modnet_v3.__init__
+--------------------------
+
+.. automodule:: espnet2.modnet_v3.__init__
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+.. _espnet2.modnet_v3.espnet_model:
+
+espnet2.modnet_v3.espnet_model
+------------------------------
+
+.. automodule:: espnet2.modnet_v3.espnet_model
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+.. _espnet2.modnet_v3.projector.projector:
+
+espnet2.modnet_v3.projector.projector
+-------------------------------------
+
+.. automodule:: espnet2.modnet_v3.projector.projector
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+.. _espnet2.modnet_v3.projector.modulation_projector:
+
+espnet2.modnet_v3.projector.modulation_projector
+------------------------------------------------
+
+.. automodule:: espnet2.modnet_v3.projector.modulation_projector
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+.. _espnet2.modnet_v3.projector.__init__:
+
+espnet2.modnet_v3.projector.__init__
+------------------------------------
+
+.. automodule:: espnet2.modnet_v3.projector.__init__
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+.. _espnet2.modnet_v3.projector.abs_projector:
+
+espnet2.modnet_v3.projector.abs_projector
+-----------------------------------------
+
+.. automodule:: espnet2.modnet_v3.projector.abs_projector
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

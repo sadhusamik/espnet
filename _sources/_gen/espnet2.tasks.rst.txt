@@ -15,6 +15,17 @@ espnet2.tasks.gan_svs
     :show-inheritance:
 
 
+.. _espnet2.tasks.modnet_v3:
+
+espnet2.tasks.modnet_v3
+-----------------------
+
+.. automodule:: espnet2.tasks.modnet_v3
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
 .. _espnet2.tasks.asr_transducer:
 
 espnet2.tasks.asr_transducer
