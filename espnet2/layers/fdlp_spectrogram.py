@@ -2895,7 +2895,7 @@ class mvector_plus_spectrogram(mvector):
                                    device=input.device)  # (batch x num_frames x n_filters)
 
             frames = frames.reshape(frames.size(0), frames.size(1), -1)  # batch x num_frames x n_filters * num_modspec
-            print(frames.shape)
+            #print(frames.shape)
             if self.complex_modulation:
                 if self.log_magnitude_modulation:
                     frames = torch.log(torch.abs(frames))  # batch x num_frames x n_filters * num_modspec
@@ -2906,7 +2906,7 @@ class mvector_plus_spectrogram(mvector):
                         frames = [torch.real(frames), torch.imag(frames)]
                 else:
                     frames = torch.abs(frames)
-            print(frames[0].shape)
+            #print(frames[0].shape)
         if self.feature_batch is not None:
             frames = torch.reshape(frames, (-1, self.n_filters * self.coeff_num))
             frame_num_original = int(np.ceil(tsamples_original * self.lfr / self.srate))
