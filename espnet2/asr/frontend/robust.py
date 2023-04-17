@@ -308,7 +308,7 @@ class RobustFrontend(AbsFrontend):
     def output_size(self) -> int:
         if self.pure_modulation_spectrum:
             return 2 * self.coeff_num
-        elif self.return_mvector:
+        elif self.return_mvector or self.return_mvector_plus_spectrogram:
             if self.full_modulation_spectrum:
                 return 2 * self.coeff_num
             else:
@@ -337,8 +337,9 @@ class RobustFrontend(AbsFrontend):
                 input_spec, input_spec_ori, feats_lens = self.fdlp_spectrogram(input, input_lengths)
             else:
                 input_spec, feats_lens = self.fdlp_spectrogram(input, input_lengths)
+        elif self.return_mvector_plus_spectrogram:
+            output, frames_copy, frames_copy_nodropout, k, olens = self.fdlp_spectrogram(input, input_lengths)
         else:
-
             input_spec, feats_lens = self.fdlp_spectrogram(input, input_lengths)
 
         # 3. [Multi channel case]: Select a channel
@@ -351,6 +352,9 @@ class RobustFrontend(AbsFrontend):
         #    else:
         #        # Use the first channel
         #        input_spec = input_spec[:, :, 0, :]
+
+        if self.return_mvector_plus_spectrogram:
+            return output, frames_copy, frames_copy_nodropout, k, olens
 
         if self.modulation_dropout:
             if self.return_dropout_mask and self.return_nondropout_spectrogram:
