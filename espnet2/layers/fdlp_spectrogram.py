@@ -2906,7 +2906,7 @@ class mvector_plus_spectrogram(mvector):
                         frames = [torch.real(frames), torch.imag(frames)]
                 else:
                     frames = torch.abs(frames)
-            print(frames.shape)
+            print(frames[0].shape)
         if self.feature_batch is not None:
             frames = torch.reshape(frames, (-1, self.n_filters * self.coeff_num))
             frame_num_original = int(np.ceil(tsamples_original * self.lfr / self.srate))
