@@ -506,7 +506,7 @@
 <div class="viewcode-block" id="RobustFrontend.output_size"><a class="viewcode-back" href="../../../../_gen/espnet2.asr.html#espnet2.asr.frontend.robust.RobustFrontend.output_size">[docs]</a>    <span class="k">def</span> <span class="nf">output_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pure_modulation_spectrum</span><span class="p">:</span>
             <span class="k">return</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeff_num</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">return_mvector</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">return_mvector</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">return_mvector_plus_spectrogram</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">full_modulation_spectrum</span><span class="p">:</span>
                 <span class="k">return</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeff_num</span>
             <span class="k">else</span><span class="p">:</span>
@@ -535,8 +535,9 @@
                 <span class="n">input_spec</span><span class="p">,</span> <span class="n">input_spec_ori</span><span class="p">,</span> <span class="n">feats_lens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fdlp_spectrogram</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">input_lengths</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">input_spec</span><span class="p">,</span> <span class="n">feats_lens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fdlp_spectrogram</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">input_lengths</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">return_mvector_plus_spectrogram</span><span class="p">:</span>
+            <span class="n">output</span><span class="p">,</span> <span class="n">frames_copy</span><span class="p">,</span> <span class="n">frames_copy_nodropout</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">olens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fdlp_spectrogram</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">input_lengths</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-
             <span class="n">input_spec</span><span class="p">,</span> <span class="n">feats_lens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fdlp_spectrogram</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">input_lengths</span><span class="p">)</span>
 
         <span class="c1"># 3. [Multi channel case]: Select a channel</span>
@@ -549,6 +550,9 @@
         <span class="c1">#    else:</span>
         <span class="c1">#        # Use the first channel</span>
         <span class="c1">#        input_spec = input_spec[:, :, 0, :]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">return_mvector_plus_spectrogram</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">output</span><span class="p">,</span> <span class="n">frames_copy</span><span class="p">,</span> <span class="n">frames_copy_nodropout</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">olens</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">modulation_dropout</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">return_dropout_mask</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">return_nondropout_spectrogram</span><span class="p">:</span>
