@@ -105,6 +105,7 @@ class RobustFrontend(AbsFrontend):
         self.frate = frate
         self.pure_modulation_spectrum = pure_modulation_spectrum
         self.return_mvector = return_mvector
+        self.return_mvector_plus_spectrogram = return_mvector_plus_spectrogram
         self.coeff_num = coeff_num
         self.complex_modulation = complex_modulation
         self.full_modulation_spectrum = full_modulation_spectrum
