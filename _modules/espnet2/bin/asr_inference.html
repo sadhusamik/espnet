@@ -645,12 +645,12 @@
                 <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">beam_search</span><span class="o">.</span><span class="n">nn_dict</span><span class="p">,</span> <span class="s2">&quot;decoder&quot;</span><span class="p">):</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">beam_search</span><span class="o">.</span><span class="n">nn_dict</span><span class="o">.</span><span class="n">decoder</span><span class="p">,</span> <span class="n">S4Decoder</span><span class="p">):</span>
-                    <span class="c1"># Setup: required for S4 autoregressive generation</span>
-                    <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">beam_search</span><span class="o">.</span><span class="n">nn_dict</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">modules</span><span class="p">():</span>
-                        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="s2">&quot;setup_step&quot;</span><span class="p">):</span>
-                            <span class="n">module</span><span class="o">.</span><span class="n">setup_step</span><span class="p">()</span>
+            <span class="c1">#if hasattr(self.beam_search.nn_dict, &quot;decoder&quot;):</span>
+                <span class="c1">#if isinstance(self.beam_search.nn_dict.decoder, S4Decoder):</span>
+                <span class="c1">#    # Setup: required for S4 autoregressive generation</span>
+                <span class="c1">#    for module in self.beam_search.nn_dict.decoder.modules():</span>
+                <span class="c1">#        if hasattr(module, &quot;setup_step&quot;):</span>
+                <span class="c1">#            module.setup_step()</span>
             <span class="n">nbest_hyps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">beam_search</span><span class="p">(</span>
                 <span class="n">x</span><span class="o">=</span><span class="n">enc</span><span class="p">,</span> <span class="n">maxlenratio</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">maxlenratio</span><span class="p">,</span> <span class="n">minlenratio</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">minlenratio</span>
             <span class="p">)</span>
