@@ -1375,6 +1375,15 @@
                         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Setting </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">.requires_grad = False&quot;</span><span class="p">)</span>
                         <span class="n">p</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span class="kc">False</span>
 
+            <span class="n">vv</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;frontend.upstream.upstream.model.encoder.layers.23&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;frontend.upstream.upstream.model.encoder.layers.22&#39;</span><span class="p">,]</span>
+            <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">vv</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">named_parameters</span><span class="p">():</span>
+                    <span class="c1">#print</span>
+                    <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">t</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">k</span> <span class="o">==</span> <span class="n">t</span><span class="p">:</span>
+                        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Setting </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">.requires_grad = True&quot;</span><span class="p">)</span>
+                        <span class="n">p</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span class="kc">True</span>
+
             <span class="c1"># 3. Build optimizer</span>
             <span class="n">optimizers</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">build_optimizers</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">)</span>
 
