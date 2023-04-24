@@ -1177,6 +1177,15 @@ class AbsTask(ABC):
                         logging.info(f"Setting {k}.requires_grad = False")
                         p.requires_grad = False
 
+            vv=['frontend.upstream.upstream.model.encoder.layers.23',
+                'frontend.upstream.upstream.model.encoder.layers.22',]
+            for t in vv:
+                for k, p in model.named_parameters():
+                    #print
+                    if k.startswith(t + ".") or k == t:
+                        logging.info(f"Setting {k}.requires_grad = True")
+                        p.requires_grad = True
+
             # 3. Build optimizer
             optimizers = cls.build_optimizers(args, model=model)
 
