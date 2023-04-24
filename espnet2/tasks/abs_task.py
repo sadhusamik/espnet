@@ -1184,9 +1184,7 @@ class AbsTask(ABC):
                 'frontend.upstream.upstream.model.encoder.layers.19',
                 'frontend.upstream.upstream.model.encoder.layers.18',
                 'frontend.upstream.upstream.model.encoder.layers.17',
-                'frontend.upstream.upstream.model.encoder.layers.16',
-                'frontend.upstream.upstream.model.encoder.layers.15',
-                'frontend.upstream.upstream.model.encoder.layers.14']
+                'frontend.upstream.upstream.model.encoder.layers.16']
             for t in vv:
                 for k, p in model.named_parameters():
                     #print
