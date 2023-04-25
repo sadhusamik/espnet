@@ -1178,7 +1178,8 @@ class AbsTask(ABC):
                         p.requires_grad = False
 
             vv=['frontend.upstream.upstream.model.encoder.layers.23',
-                'frontend.upstream.upstream.model.encoder.layers.22']
+                'frontend.upstream.upstream.model.encoder.layers.22',
+                'frontend.upstream.upstream.model.encoder.layers.21']
             for t in vv:
                 for k, p in model.named_parameters():
                     #print
