@@ -93,7 +93,7 @@ import torch.utils.checkpoint
 
 class CheckPointed(torch.nn.Module):
   def forward(self, *args):
-    return torch.utils.checkpoint.checkpoint(super().forward, *args)
+    return torch.utils.checkpoint.checkpoint(super().forward)
 
 frontend_choices = ClassChoices(
     name="frontend",
