@@ -290,7 +290,7 @@
 <span class="kn">import</span> <span class="nn">torch.utils.checkpoint</span>
 
 
-<div class="viewcode-block" id="CheckPointed"><a class="viewcode-back" href="../../../_gen/espnet2.tasks.html#espnet2.tasks.asr.CheckPointed">[docs]</a><span class="k">class</span> <span class="nc">CheckPointed</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="CheckPointed"><a class="viewcode-back" href="../../../_gen/espnet2.tasks.html#espnet2.tasks.asr.CheckPointed">[docs]</a><span class="k">class</span> <span class="nc">CheckPointed</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">):</span>
 <div class="viewcode-block" id="CheckPointed.forward"><a class="viewcode-back" href="../../../_gen/espnet2.tasks.html#espnet2.tasks.asr.CheckPointed.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">checkpoint</span><span class="o">.</span><span class="n">checkpoint</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">forward</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span></div></div>
 
@@ -707,7 +707,7 @@
             <span class="n">frontend_class</span> <span class="o">=</span> <span class="n">frontend_choices</span><span class="o">.</span><span class="n">get_class</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">frontend</span><span class="p">)</span>
             <span class="n">frontend</span> <span class="o">=</span> <span class="n">frontend_class</span><span class="p">(</span><span class="o">**</span><span class="n">args</span><span class="o">.</span><span class="n">frontend_conf</span><span class="p">)</span>
             <span class="n">input_size</span> <span class="o">=</span> <span class="n">frontend</span><span class="o">.</span><span class="n">output_size</span><span class="p">()</span>
-            <span class="n">frontend</span> <span class="o">=</span> <span class="n">CheckPointed</span><span class="p">(</span><span class="n">frontend</span><span class="p">)</span>
+            <span class="c1">#frontend = CheckPointed(frontend)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Give features from data-loader</span>
             <span class="n">args</span><span class="o">.</span><span class="n">frontend</span> <span class="o">=</span> <span class="kc">None</span>
@@ -806,14 +806,14 @@
             <span class="n">token_list</span><span class="o">=</span><span class="n">token_list</span><span class="p">,</span>
             <span class="o">**</span><span class="n">args</span><span class="o">.</span><span class="n">model_conf</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="c1"># model = CheckPointed(model)</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">CheckPointed</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 
         <span class="c1"># FIXME(kamo): Should be done in model?</span>
         <span class="c1"># 8. Initialize</span>
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">init</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">initialize</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
 
-        <span class="k">assert</span> <span class="n">check_return_type</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+        <span class="c1">#assert check_return_type(model)</span>
         <span class="k">return</span> <span class="n">model</span></div></div>
 </pre></div>
 
