@@ -190,8 +190,7 @@ class ESPnetASRModel(AbsESPnetModel):
             speech: torch.Tensor,
             speech_lengths: torch.Tensor,
             text: torch.Tensor,
-            text_lengths: torch.Tensor,
-            **kwargs,
+            text_lengths: torch.Tensor,  #**kwargs,
     ) -> Tuple[torch.Tensor, Dict[str, torch.Tensor], torch.Tensor]:
         """Frontend + Encoder + Decoder + Calc loss
 
