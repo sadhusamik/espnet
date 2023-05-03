@@ -1366,11 +1366,11 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># 2. Build model</span>
             <span class="n">model</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">build_model</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">AbsESPnetModel</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;model must inherit </span><span class="si">{</span><span class="n">AbsESPnetModel</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">,&quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot; but got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="p">)</span>
+            <span class="c1">#if not isinstance(model, AbsESPnetModel):</span>
+            <span class="c1">#    raise RuntimeError(</span>
+            <span class="c1">#        f&quot;model must inherit {AbsESPnetModel.__name__},&quot;</span>
+            <span class="c1">#        f&quot; but got {type(model)}&quot;</span>
+            <span class="c1">#    )</span>
             <span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span>
                 <span class="n">dtype</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">torch</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">train_dtype</span><span class="p">),</span>
                 <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">ngpu</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">,</span>
