@@ -931,8 +931,13 @@ class fdlp_spectrogram(torch.nn.Module):
         feats = torch.zeros((num_batch, int(np.ceil(t_samples * self.frate / self.srate)), self.n_filters), dtype=dtype,
                             device=device)
         ptr = int(0)
+        print(self.cut_overlap)
+        print(self.cut_half)
         ### Overlap and Add stage
         for j in range(0, num_frames):
+            print(feats.shape)
+            print(ptr)
+            print(modspec.shape)
             if j == 0:
                 if feats.shape[1] < self.cut_half:
                     feats += modspec[:, j, :self.cut_half:self.cut_half + feats.shape[1], :]
