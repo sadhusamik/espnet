@@ -92,7 +92,7 @@ from espnet2.asr.encoder.modnet_encoder import ModnetEncoder
 import torch.utils.checkpoint
 
 
-class CheckPointed(AbsFrontend):
+class CheckPointed(torch.nn.Module):
     def forward(self, *args):
         return torch.utils.checkpoint.checkpoint(super().forward, *args)
 
