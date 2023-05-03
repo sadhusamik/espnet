@@ -14,7 +14,7 @@ from espnet2.asr.decoder.hugging_face_transformers_decoder import (  # noqa: H30
 )
 from espnet2.asr.decoder.mlm_decoder import MLMDecoder
 from espnet2.asr.decoder.rnn_decoder import RNNDecoder
-#from espnet2.asr.decoder.s4_decoder import S4Decoder
+# from espnet2.asr.decoder.s4_decoder import S4Decoder
 from espnet2.asr.decoder.transducer_decoder import TransducerDecoder
 from espnet2.asr.decoder.transformer_decoder import (
     DynamicConvolution2DTransformerDecoder,
@@ -91,9 +91,11 @@ from espnet2.utils.types import float_or_none, int_or_none, str2bool, str_or_non
 from espnet2.asr.encoder.modnet_encoder import ModnetEncoder
 import torch.utils.checkpoint
 
-class CheckPointed(torch.nn.Module):
-  def forward(self, *args):
-    return torch.utils.checkpoint.checkpoint(super().forward)
+
+class CheckPointed(ESPnetASRModel):
+    def forward(self, *args):
+        return torch.utils.checkpoint.checkpoint(super().forward, *args)
+
 
 frontend_choices = ClassChoices(
     name="frontend",
@@ -193,7 +195,7 @@ decoder_choices = ClassChoices(
         mlm=MLMDecoder,
         whisper=OpenAIWhisperDecoder,
         hugging_face_transformers=HuggingFaceTransformersDecoder,
-        #s4=S4Decoder,
+        # s4=S4Decoder,
     ),
     type_check=AbsDecoder,
     default=None,
@@ -384,7 +386,7 @@ class ASRTask(AbsTask):
             type=float,
             default=0.5,
             help="If len(noise) / len(speech) is smaller than this threshold during "
-            "dynamic mixing, a warning will be displayed.",
+                 "dynamic mixing, a warning will be displayed.",
         )
         group.add_argument(
             "--aux_ctc_tasks",
@@ -401,7 +403,7 @@ class ASRTask(AbsTask):
 
     @classmethod
     def build_collate_fn(
-        cls, args: argparse.Namespace, train: bool
+            cls, args: argparse.Namespace, train: bool
     ) -> Callable[
         [Collection[Tuple[str, Dict[str, np.ndarray]]]],
         Tuple[List[str], Dict[str, torch.Tensor]],
@@ -412,7 +414,7 @@ class ASRTask(AbsTask):
 
     @classmethod
     def build_preprocess_fn(
-        cls, args: argparse.Namespace, train: bool
+            cls, args: argparse.Namespace, train: bool
     ) -> Optional[Callable[[str, Dict[str, np.array]], Dict[str, np.ndarray]]]:
         assert check_argument_types()
         if args.use_preprocessor:
@@ -463,7 +465,7 @@ class ASRTask(AbsTask):
 
     @classmethod
     def required_data_names(
-        cls, train: bool = True, inference: bool = False
+            cls, train: bool = True, inference: bool = False
     ) -> Tuple[str, ...]:
         if not inference:
             retval = ("speech", "text")
@@ -474,14 +476,14 @@ class ASRTask(AbsTask):
 
     @classmethod
     def optional_data_names(
-        cls, train: bool = True, inference: bool = False
+            cls, train: bool = True, inference: bool = False
     ) -> Tuple[str, ...]:
         MAX_REFERENCE_NUM = 4
 
         retval = ["text_spk{}".format(n) for n in range(2, MAX_REFERENCE_NUM + 1)]
         retval = tuple(retval)
 
-        logging.info(f"Optional Data Names: {retval }")
+        logging.info(f"Optional Data Names: {retval}")
         assert check_return_type(retval)
         return retval
 
@@ -499,7 +501,7 @@ class ASRTask(AbsTask):
         else:
             raise RuntimeError("token_list must be str or list")
         vocab_size = len(token_list)
-        logging.info(f"Vocabulary size: {vocab_size }")
+        logging.info(f"Vocabulary size: {vocab_size}")
 
         # 1. frontend
         if args.input_size is None:
@@ -605,7 +607,7 @@ class ASRTask(AbsTask):
             token_list=token_list,
             **args.model_conf,
         )
-        model=CheckPointed(model)
+        model = CheckPointed(model)
 
         # FIXME(kamo): Should be done in model?
         # 8. Initialize
