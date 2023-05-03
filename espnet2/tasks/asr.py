@@ -92,7 +92,7 @@ from espnet2.asr.encoder.modnet_encoder import ModnetEncoder
 import torch.utils.checkpoint
 
 
-class CheckPointed(torch.nn.Module):
+class CheckPointed(torch.nn.Sequential):
     def forward(self, *args):
         return torch.utils.checkpoint.checkpoint(super().forward, *args)
 
@@ -509,7 +509,7 @@ class ASRTask(AbsTask):
             frontend_class = frontend_choices.get_class(args.frontend)
             frontend = frontend_class(**args.frontend_conf)
             input_size = frontend.output_size()
-            frontend = CheckPointed(frontend)
+            #frontend = CheckPointed(frontend)
         else:
             # Give features from data-loader
             args.frontend = None
@@ -608,7 +608,7 @@ class ASRTask(AbsTask):
             token_list=token_list,
             **args.model_conf,
         )
-        # model = CheckPointed(model)
+        model = CheckPointed(model)
 
         # FIXME(kamo): Should be done in model?
         # 8. Initialize
