@@ -1168,11 +1168,11 @@ class AbsTask(ABC):
         else:
             # 2. Build model
             model = cls.build_model(args=args)
-            if not isinstance(model, AbsESPnetModel):
-                raise RuntimeError(
-                    f"model must inherit {AbsESPnetModel.__name__},"
-                    f" but got {type(model)}"
-                )
+            #if not isinstance(model, AbsESPnetModel):
+            #    raise RuntimeError(
+            #        f"model must inherit {AbsESPnetModel.__name__},"
+            #        f" but got {type(model)}"
+            #    )
             model = model.to(
                 dtype=getattr(torch, args.train_dtype),
                 device="cuda" if args.ngpu > 0 else "cpu",
