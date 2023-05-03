@@ -89,6 +89,11 @@ from espnet2.utils.nested_dict_action import NestedDictAction
 from espnet2.utils.types import float_or_none, int_or_none, str2bool, str_or_none
 
 from espnet2.asr.encoder.modnet_encoder import ModnetEncoder
+import torch.utils.checkpoint
+
+class CheckPointed(torch.nn.Module):
+  def forward(self, *args):
+    return torch.utils.checkpoint.checkpoint(super().forward, *args)
 
 frontend_choices = ClassChoices(
     name="frontend",
@@ -600,6 +605,7 @@ class ASRTask(AbsTask):
             token_list=token_list,
             **args.model_conf,
         )
+        model=CheckPointed(model)
 
         # FIXME(kamo): Should be done in model?
         # 8. Initialize
