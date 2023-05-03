@@ -852,6 +852,10 @@
         <span class="n">loss_ctc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctc</span><span class="p">(</span><span class="n">encoder_out</span><span class="p">,</span> <span class="n">encoder_out_lens</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">text_lengths</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ctc</span><span class="o">.</span><span class="n">reduce</span> <span class="o">=</span> <span class="n">do_reduce</span>
         <span class="k">return</span> <span class="n">loss_ctc</span></div>
+
+<div class="viewcode-block" id="ESPnetASRModel_checkpointed"><a class="viewcode-back" href="../../../_gen/espnet2.asr.html#espnet2.asr.espnet_model.ESPnetASRModel_checkpointed">[docs]</a><span class="k">class</span> <span class="nc">ESPnetASRModel_checkpointed</span><span class="p">(</span><span class="n">ESPnetASRModel</span><span class="p">):</span>
+<div class="viewcode-block" id="ESPnetASRModel_checkpointed.forward"><a class="viewcode-back" href="../../../_gen/espnet2.asr.html#espnet2.asr.espnet_model.ESPnetASRModel_checkpointed.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">checkpoint</span><span class="o">.</span><span class="n">checkpoint</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">forward</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

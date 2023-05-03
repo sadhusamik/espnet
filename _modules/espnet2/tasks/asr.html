@@ -246,7 +246,7 @@
 <span class="kn">from</span> <span class="nn">espnet2.asr.encoder.vgg_rnn_encoder</span> <span class="kn">import</span> <span class="n">VGGRNNEncoder</span>
 <span class="kn">from</span> <span class="nn">espnet2.asr.encoder.wav2vec2_encoder</span> <span class="kn">import</span> <span class="n">FairSeqWav2Vec2Encoder</span>
 <span class="kn">from</span> <span class="nn">espnet2.asr.encoder.whisper_encoder</span> <span class="kn">import</span> <span class="n">OpenAIWhisperEncoder</span>
-<span class="kn">from</span> <span class="nn">espnet2.asr.espnet_model</span> <span class="kn">import</span> <span class="n">ESPnetASRModel</span>
+<span class="kn">from</span> <span class="nn">espnet2.asr.espnet_model</span> <span class="kn">import</span> <span class="n">ESPnetASRModel</span><span class="p">,</span> <span class="n">ESPnetASRModel_checkpointed</span>
 <span class="kn">from</span> <span class="nn">espnet2.asr.frontend.abs_frontend</span> <span class="kn">import</span> <span class="n">AbsFrontend</span>
 <span class="kn">from</span> <span class="nn">espnet2.asr.frontend.default</span> <span class="kn">import</span> <span class="n">DefaultFrontend</span>
 <span class="kn">from</span> <span class="nn">espnet2.asr.frontend.fused</span> <span class="kn">import</span> <span class="n">FusedFrontends</span>
@@ -290,9 +290,7 @@
 <span class="kn">import</span> <span class="nn">torch.utils.checkpoint</span>
 
 
-<div class="viewcode-block" id="CheckPointed"><a class="viewcode-back" href="../../../_gen/espnet2.tasks.html#espnet2.tasks.asr.CheckPointed">[docs]</a><span class="k">class</span> <span class="nc">CheckPointed</span><span class="p">(</span><span class="n">ESPnetASRModel</span><span class="p">):</span>
-<div class="viewcode-block" id="CheckPointed.forward"><a class="viewcode-back" href="../../../_gen/espnet2.tasks.html#espnet2.tasks.asr.CheckPointed.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">checkpoint</span><span class="o">.</span><span class="n">checkpoint</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">forward</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span></div></div>
+
 
 
 <span class="n">frontend_choices</span> <span class="o">=</span> <span class="n">ClassChoices</span><span class="p">(</span>
@@ -331,6 +329,7 @@
     <span class="s2">&quot;model&quot;</span><span class="p">,</span>
     <span class="n">classes</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
         <span class="n">espnet</span><span class="o">=</span><span class="n">ESPnetASRModel</span><span class="p">,</span>
+        <span class="n">espnet_checkpointed</span><span class="o">=</span><span class="n">ESPnetASRModel_checkpointed</span><span class="p">,</span>
         <span class="n">maskctc</span><span class="o">=</span><span class="n">MaskCTCModel</span><span class="p">,</span>
         <span class="n">pit_espnet</span><span class="o">=</span><span class="n">PITESPnetModel</span><span class="p">,</span>
     <span class="p">),</span>

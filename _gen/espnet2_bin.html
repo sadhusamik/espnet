@@ -510,7 +510,7 @@ usage: asr_train.py [-h] [--config CONFIG] [--print_config]
                     [--specaug_conf SPECAUG_CONF]
                     [--normalize {global_mvn,utterance_mvn,None}]
                     [--normalize_conf NORMALIZE_CONF]
-                    [--model {espnet,maskctc,pit_espnet}]
+                    [--model {espnet,espnet_checkpointed,maskctc,pit_espnet}]
                     [--model_conf MODEL_CONF]
                     [--preencoder {sinc,linear,linear_multistream,None}]
                     [--preencoder_conf PREENCODER_CONF]
@@ -922,7 +922,7 @@ Optimizer related:
                         The normalize type (default: None)
   --normalize_conf NORMALIZE_CONF
                         The keyword arguments for normalize (default: {})
-  --model {espnet,maskctc,pit_espnet}
+  --model {espnet,espnet_checkpointed,maskctc,pit_espnet}
                         The model type (default: espnet)
   --model_conf MODEL_CONF
                         The keyword arguments for model (default: {})

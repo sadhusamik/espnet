@@ -2018,29 +2018,6 @@ If your model is defined as following,</p>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="espnet2.tasks.asr.CheckPointed">
-<em class="property">class </em><code class="sig-prename descclassname">espnet2.tasks.asr.</code><code class="sig-name descname">CheckPointed</code><span class="sig-paren">(</span><em class="sig-param">vocab_size: int, token_list: Union[Tuple[str, ...], List[str]], frontend: Optional[espnet2.asr.frontend.abs_frontend.AbsFrontend], specaug: Optional[espnet2.asr.specaug.abs_specaug.AbsSpecAug], normalize: Optional[espnet2.layers.abs_normalize.AbsNormalize], preencoder: Optional[espnet2.asr.preencoder.abs_preencoder.AbsPreEncoder], encoder: espnet2.asr.encoder.abs_encoder.AbsEncoder, postencoder: Optional[espnet2.asr.postencoder.abs_postencoder.AbsPostEncoder], decoder: Optional[espnet2.asr.decoder.abs_decoder.AbsDecoder], ctc: espnet2.asr.ctc.CTC, joint_network: Optional[torch.nn.modules.module.Module], aux_ctc: dict = None, ctc_weight: float = 0.5, interctc_weight: float = 0.0, ignore_id: int = -1, lsm_weight: float = 0.0, length_normalized_loss: bool = False, report_cer: bool = True, report_wer: bool = True, sym_space: str = '&lt;space&gt;', sym_blank: str = '&lt;blank&gt;', sym_sos: str = '&lt;sos/eos&gt;', sym_eos: str = '&lt;sos/eos&gt;', extract_feats_in_collect_stats: bool = True, lang_token_id: int = -1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/tasks/asr.html#CheckPointed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.tasks.asr.CheckPointed" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="espnet2.asr.html#espnet2.asr.espnet_model.ESPnetASRModel" title="espnet2.asr.espnet_model.ESPnetASRModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">espnet2.asr.espnet_model.ESPnetASRModel</span></code></a></p>
-<dl class="method">
-<dt id="espnet2.tasks.asr.CheckPointed.forward">
-<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/tasks/asr.html#CheckPointed.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.tasks.asr.CheckPointed.forward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Frontend + Encoder + Decoder + Calc loss</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>speech</strong> – (Batch, Length, …)</p></li>
-<li><p><strong>speech_lengths</strong> – (Batch, )</p></li>
-<li><p><strong>text</strong> – (Batch, Length)</p></li>
-<li><p><strong>text_lengths</strong> – (Batch,)</p></li>
-<li><p><strong>kwargs</strong> – “utt_id” is among the input.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
 </section>
 <section id="espnet2-tasks-tts-1">
 <span id="espnet2-tasks-tts"></span><h2>espnet2.tasks.tts<a class="headerlink" href="#espnet2-tasks-tts-1" title="Permalink to this headline">¶</a></h2>
