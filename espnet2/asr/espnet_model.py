@@ -654,3 +654,7 @@ class ESPnetASRModel(AbsESPnetModel):
         loss_ctc = self.ctc(encoder_out, encoder_out_lens, text, text_lengths)
         self.ctc.reduce = do_reduce
         return loss_ctc
+
+class ESPnetASRModel_checkpointed(ESPnetASRModel):
+    def forward(self, *args):
+        return torch.utils.checkpoint.checkpoint(super().forward, *args)
