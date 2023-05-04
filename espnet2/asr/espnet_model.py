@@ -25,6 +25,8 @@ from espnet.nets.pytorch_backend.transformer.label_smoothing_loss import (  # no
     LabelSmoothingLoss,
 )
 
+import torch.utils.checkpoint as checkpoint
+
 if V(torch.__version__) >= V("1.6.0"):
     from torch.cuda.amp import autocast
 else:
@@ -185,6 +187,12 @@ class ESPnetASRModel(AbsESPnetModel):
         else:
             self.lang_token_id = None
 
+    def run_function(self):
+        def custom_forward(speech, speech_lengths):
+            encoder_out, encoder_out_lens = self.encode(speech, speech_lengths)
+            return encoder_out, encoder_out_lens
+        return custom_forward
+
     def forward(
             self,
             speech: torch.Tensor,
@@ -218,7 +226,8 @@ class ESPnetASRModel(AbsESPnetModel):
         text = text[:, : text_lengths.max()]
 
         # 1. Encoder
-        encoder_out, encoder_out_lens = self.encode(speech, speech_lengths)
+        encoder_out, encoder_out_lens = checkpoint.checkpoint(self.run_function(), speech, speech_lengths)
+        #encoder_out, encoder_out_lens = self.encode(speech, speech_lengths)
         intermediate_outs = None
         if isinstance(encoder_out, tuple):
             intermediate_outs = encoder_out[1]
@@ -347,6 +356,8 @@ class ESPnetASRModel(AbsESPnetModel):
     ) -> Dict[str, torch.Tensor]:
         feats, feats_lengths = self._extract_feats(speech, speech_lengths)
         return {"feats": feats, "feats_lengths": feats_lengths}
+
+
 
     def encode(
             self, speech: torch.Tensor, speech_lengths: torch.Tensor
