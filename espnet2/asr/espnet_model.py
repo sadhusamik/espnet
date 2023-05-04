@@ -190,7 +190,8 @@ class ESPnetASRModel(AbsESPnetModel):
             speech: torch.Tensor,
             speech_lengths: torch.Tensor,
             text: torch.Tensor,
-            text_lengths: torch.Tensor,  #**kwargs,
+            text_lengths: torch.Tensor,
+            utt_id, #**kwargs,
     ) -> Tuple[torch.Tensor, Dict[str, torch.Tensor], torch.Tensor]:
         """Frontend + Encoder + Decoder + Calc loss
 
@@ -660,6 +661,6 @@ class ESPnetASRModel_checkpointed(ESPnetASRModel):
                 speech_lengths: torch.Tensor,
                 text: torch.Tensor,
                 text_lengths: torch.Tensor,
-                *args):
-        print(args)
-        return torch.utils.checkpoint.checkpoint(super().forward, speech, speech_lengths, text, text_lengths, args[0])
+                uttid):
+        #print(args)
+        return torch.utils.checkpoint.checkpoint(super().forward, speech, speech_lengths, text, text_lengths, uttid)
