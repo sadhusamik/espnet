@@ -663,4 +663,4 @@ class ESPnetASRModel_checkpointed(ESPnetASRModel):
                 text_lengths: torch.Tensor,
                 **kwargs):
         print(kwargs)
-        return torch.utils.checkpoint.checkpoint(super().forward, speech, speech_lengths, text, text_lengths, **kwargs)
+        return torch.utils.checkpoint.checkpoint(super().forward, speech, speech_lengths, text, text_lengths)
