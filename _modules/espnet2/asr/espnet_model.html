@@ -860,8 +860,16 @@
                 <span class="n">text</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
                 <span class="n">text_lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">checkpoint</span><span class="o">.</span><span class="n">checkpoint</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">forward</span><span class="p">,</span> <span class="n">speech</span><span class="p">,</span> <span class="n">speech_lengths</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">text_lengths</span><span class="p">)</span></div></div>
+        <span class="c1">#print(kwargs)</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">checkpoint</span><span class="o">.</span><span class="n">checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">custom</span><span class="p">(),</span> <span class="n">speech</span><span class="p">,</span> <span class="n">speech_lengths</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">text_lengths</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ESPnetASRModel_checkpointed.custom"><a class="viewcode-back" href="../../../_gen/espnet2.asr.html#espnet2.asr.espnet_model.ESPnetASRModel_checkpointed.custom">[docs]</a>    <span class="k">def</span> <span class="nf">custom</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">custom_forward</span><span class="p">(</span><span class="o">*</span><span class="n">inputs</span><span class="p">):</span>
+            <span class="n">inputs</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="o">*</span><span class="n">inputs</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">inputs</span>
+        <span class="k">return</span> <span class="n">custom_forward</span></div></div>
+
+
 </pre></div>
 
            </div>
