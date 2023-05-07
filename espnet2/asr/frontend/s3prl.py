@@ -20,6 +20,7 @@ class S3prlFrontend(AbsFrontend):
         frontend_conf: Optional[dict] = get_default_kwargs(Frontend),
         download_dir: str = None,
         multilayer_feature: bool = False,
+        start_finetune_after: int = 0,
         layer: int = -1,
     ):
         try:
@@ -75,6 +76,9 @@ class S3prlFrontend(AbsFrontend):
         self.frontend_type = "s3prl"
         self.hop_length = self.featurizer.downsample_rate
         self.tile_factor = frontend_conf.get("tile_factor", 1)
+        self.start_finetune_after=start_finetune_after
+        logging.info("Will start fine-tuning s3prl parameters after {:d} steps".format(self.start_finetune_after))
+        self.register_buffer("num_updates", torch.LongTensor([0]))
 
     def _tile_representations(self, feature):
         """Tile up the representations by `tile_factor`.
@@ -100,7 +104,17 @@ class S3prlFrontend(AbsFrontend):
     def forward(
         self, input: torch.Tensor, input_lengths: torch.Tensor
     ) -> Tuple[torch.Tensor, torch.Tensor]:
-        feats, feats_lens = self.upstream(input, input_lengths)
+        ft = self.start_finetune_after <= self.num_updates
+        if self.num_updates <= self.start_finetune_after:
+            self.num_updates += 1
+        elif ft and self.num_updates == self.start_finetune_after + 1:
+            self.num_updates += 1
+            logging.info("Start fine-tuning s3prl parameters!")
+        if not ft:
+            feats, feats_lens = self.upstream(input, input_lengths)
+        else:
+            feats, feats_lens = self.upstream(input, input_lengths)
+
         if self.layer != -1:
             layer = self.layer
             feats, feats_lens = feats[layer], feats_lens[layer]
