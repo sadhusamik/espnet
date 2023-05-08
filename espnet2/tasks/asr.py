@@ -607,12 +607,11 @@ class ASRTask(AbsTask):
             token_list=token_list,
             **args.model_conf,
         )
-        #model = CheckPointed(model)
 
         # FIXME(kamo): Should be done in model?
         # 8. Initialize
         if args.init is not None:
             initialize(model, args.init)
 
-        #assert check_return_type(model)
+        assert check_return_type(model)
         return model

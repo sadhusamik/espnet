@@ -111,7 +111,8 @@ class S3prlFrontend(AbsFrontend):
             self.num_updates += 1
             logging.info("Start fine-tuning s3prl parameters!")
         if not ft:
-            feats, feats_lens = self.upstream(input, input_lengths)
+            with torch.no_grad():
+                feats, feats_lens = self.upstream(input, input_lengths)
         else:
             feats, feats_lens = self.upstream(input, input_lengths)
 
@@ -120,7 +121,7 @@ class S3prlFrontend(AbsFrontend):
             feats, feats_lens = feats[layer], feats_lens[layer]
             return feats, feats_lens
 
-        if self.multilayer_feature:
+        if self.multilayer_feature
             feats, feats_lens = self.featurizer(feats, feats_lens)
         else:
             feats, feats_lens = self.featurizer(feats[-1:], feats_lens[-1:])

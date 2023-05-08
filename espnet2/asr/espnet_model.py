@@ -68,6 +68,7 @@ class ESPnetASRModel(AbsESPnetModel):
             sym_eos: str = "<sos/eos>",
             extract_feats_in_collect_stats: bool = True,
             lang_token_id: int = -1,
+            checkpointed_encoder: bool = False,
     ):
         assert check_argument_types()
         assert 0.0 <= ctc_weight <= 1.0, ctc_weight
@@ -101,6 +102,7 @@ class ESPnetASRModel(AbsESPnetModel):
         self.preencoder = preencoder
         self.postencoder = postencoder
         self.encoder = encoder
+        self.checkpointed_encoder = checkpointed_encoder
 
         if not hasattr(self.encoder, "interctc_use_conditioning"):
             self.encoder.interctc_use_conditioning = False
@@ -191,6 +193,7 @@ class ESPnetASRModel(AbsESPnetModel):
         def custom_forward(speech, speech_lengths):
             encoder_out, encoder_out_lens = self.encode(speech, speech_lengths)
             return encoder_out, encoder_out_lens
+
         return custom_forward
 
     def forward(
@@ -226,8 +229,10 @@ class ESPnetASRModel(AbsESPnetModel):
         text = text[:, : text_lengths.max()]
 
         # 1. Encoder
-        encoder_out, encoder_out_lens = checkpoint.checkpoint(self.run_function(), speech, speech_lengths)
-        #encoder_out, encoder_out_lens = self.encode(speech, speech_lengths)
+        if self.checkpointed_encoder:
+            encoder_out, encoder_out_lens = checkpoint.checkpoint(self.run_function(), speech, speech_lengths)
+        else:
+            encoder_out, encoder_out_lens = self.encode(speech, speech_lengths)
         intermediate_outs = None
         if isinstance(encoder_out, tuple):
             intermediate_outs = encoder_out[1]
@@ -356,8 +361,6 @@ class ESPnetASRModel(AbsESPnetModel):
     ) -> Dict[str, torch.Tensor]:
         feats, feats_lengths = self._extract_feats(speech, speech_lengths)
         return {"feats": feats, "feats_lengths": feats_lengths}
-
-
 
     def encode(
             self, speech: torch.Tensor, speech_lengths: torch.Tensor
