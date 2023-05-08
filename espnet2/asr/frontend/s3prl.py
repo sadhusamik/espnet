@@ -78,8 +78,8 @@ class S3prlFrontend(AbsFrontend):
         self.tile_factor = frontend_conf.get("tile_factor", 1)
         self.start_finetune_after=start_finetune_after
         logging.info("Will start fine-tuning s3prl parameters after {:d} steps".format(self.start_finetune_after))
-        self.register_buffer("num_updates", torch.LongTensor([0]))
-        #self.num_updates=torch.LongTensor([0])
+        #self.register_buffer("num_updates", torch.LongTensor([0]))
+        self.num_updates=torch.LongTensor([0])
 
     def _tile_representations(self, feature):
         """Tile up the representations by `tile_factor`.
