@@ -1979,6 +1979,37 @@ registered hooks while the latter silently ignores them.</p>
 </section>
 <section id="espnet2-asr-frontend-s3prl-1">
 <span id="espnet2-asr-frontend-s3prl"></span><h2>espnet2.asr.frontend.s3prl<a class="headerlink" href="#espnet2-asr-frontend-s3prl-1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-espnet2.asr.frontend.s3prl"></span><dl class="class">
+<dt id="espnet2.asr.frontend.s3prl.S3prlFrontend">
+<em class="property">class </em><code class="sig-prename descclassname">espnet2.asr.frontend.s3prl.</code><code class="sig-name descname">S3prlFrontend</code><span class="sig-paren">(</span><em class="sig-param">fs: Union[int</em>, <em class="sig-param">str] = 16000</em>, <em class="sig-param">frontend_conf: Optional[dict] = {'badim': 320</em>, <em class="sig-param">'bdropout_rate': 0.0</em>, <em class="sig-param">'blayers': 3</em>, <em class="sig-param">'bnmask': 2</em>, <em class="sig-param">'bprojs': 320</em>, <em class="sig-param">'btype': 'blstmp'</em>, <em class="sig-param">'bunits': 300</em>, <em class="sig-param">'delay': 3</em>, <em class="sig-param">'ref_channel': -1</em>, <em class="sig-param">'taps': 5</em>, <em class="sig-param">'use_beamformer': False</em>, <em class="sig-param">'use_dnn_mask_for_wpe': True</em>, <em class="sig-param">'use_wpe': False</em>, <em class="sig-param">'wdropout_rate': 0.0</em>, <em class="sig-param">'wlayers': 3</em>, <em class="sig-param">'wprojs': 320</em>, <em class="sig-param">'wtype': 'blstmp'</em>, <em class="sig-param">'wunits': 300}</em>, <em class="sig-param">download_dir: str = None</em>, <em class="sig-param">multilayer_feature: bool = False</em>, <em class="sig-param">start_finetune_after: int = 0</em>, <em class="sig-param">layer: int = -1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/asr/frontend/s3prl.html#S3prlFrontend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.asr.frontend.s3prl.S3prlFrontend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#espnet2.asr.frontend.abs_frontend.AbsFrontend" title="espnet2.asr.frontend.abs_frontend.AbsFrontend"><code class="xref py py-class docutils literal notranslate"><span class="pre">espnet2.asr.frontend.abs_frontend.AbsFrontend</span></code></a></p>
+<p>Speech Pretrained Representation frontend structure for ASR.</p>
+<dl class="method">
+<dt id="espnet2.asr.frontend.s3prl.S3prlFrontend.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">input: torch.Tensor</em>, <em class="sig-param">input_lengths: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, torch.Tensor]<a class="reference internal" href="../_modules/espnet2/asr/frontend/s3prl.html#S3prlFrontend.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.asr.frontend.s3prl.S3prlFrontend.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</aside>
+</dd></dl>
+
+<dl class="method">
+<dt id="espnet2.asr.frontend.s3prl.S3prlFrontend.output_size">
+<code class="sig-name descname">output_size</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; int<a class="reference internal" href="../_modules/espnet2/asr/frontend/s3prl.html#S3prlFrontend.output_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.asr.frontend.s3prl.S3prlFrontend.output_size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="espnet2.asr.frontend.s3prl.S3prlFrontend.reload_pretrained_parameters">
+<code class="sig-name descname">reload_pretrained_parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/asr/frontend/s3prl.html#S3prlFrontend.reload_pretrained_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.asr.frontend.s3prl.S3prlFrontend.reload_pretrained_parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="espnet2-asr-frontend-default-1">
 <span id="espnet2-asr-frontend-default"></span><h2>espnet2.asr.frontend.default<a class="headerlink" href="#espnet2-asr-frontend-default-1" title="Permalink to this headline">¶</a></h2>
@@ -2015,6 +2046,31 @@ registered hooks while the latter silently ignores them.</p>
 <span class="target" id="module-espnet2.asr.frontend.__init__"></span></section>
 <section id="espnet2-asr-frontend-fused-1">
 <span id="espnet2-asr-frontend-fused"></span><h2>espnet2.asr.frontend.fused<a class="headerlink" href="#espnet2-asr-frontend-fused-1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-espnet2.asr.frontend.fused"></span><dl class="class">
+<dt id="espnet2.asr.frontend.fused.FusedFrontends">
+<em class="property">class </em><code class="sig-prename descclassname">espnet2.asr.frontend.fused.</code><code class="sig-name descname">FusedFrontends</code><span class="sig-paren">(</span><em class="sig-param">frontends=None</em>, <em class="sig-param">align_method='linear_projection'</em>, <em class="sig-param">proj_dim=100</em>, <em class="sig-param">fs=16000</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/espnet2/asr/frontend/fused.html#FusedFrontends"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.asr.frontend.fused.FusedFrontends" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#espnet2.asr.frontend.abs_frontend.AbsFrontend" title="espnet2.asr.frontend.abs_frontend.AbsFrontend"><code class="xref py py-class docutils literal notranslate"><span class="pre">espnet2.asr.frontend.abs_frontend.AbsFrontend</span></code></a></p>
+<dl class="method">
+<dt id="espnet2.asr.frontend.fused.FusedFrontends.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">input: torch.Tensor</em>, <em class="sig-param">input_lengths: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, torch.Tensor]<a class="reference internal" href="../_modules/espnet2/asr/frontend/fused.html#FusedFrontends.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.asr.frontend.fused.FusedFrontends.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</aside>
+</dd></dl>
+
+<dl class="method">
+<dt id="espnet2.asr.frontend.fused.FusedFrontends.output_size">
+<code class="sig-name descname">output_size</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; int<a class="reference internal" href="../_modules/espnet2/asr/frontend/fused.html#FusedFrontends.output_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#espnet2.asr.frontend.fused.FusedFrontends.output_size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="espnet2-asr-state-spaces-base-1">
 <span id="espnet2-asr-state-spaces-base"></span><h2>espnet2.asr.state_spaces.base<a class="headerlink" href="#espnet2-asr-state-spaces-base-1" title="Permalink to this headline">¶</a></h2>
