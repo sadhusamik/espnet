@@ -239,8 +239,8 @@
                 <span class="s2">&quot;All the upstream models in S3PRL now only support 16 kHz audio.&quot;</span>
             <span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">download_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">s3prl</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">download</span><span class="o">.</span><span class="n">set_dir</span><span class="p">(</span><span class="n">download_dir</span><span class="p">)</span>
+        <span class="c1">#if download_dir is not None:</span>
+        <span class="c1">#    s3prl.util.download.set_dir(download_dir)</span>
 
         <span class="k">assert</span> <span class="n">frontend_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;upstream&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">in</span> <span class="n">S3PRLUpstream</span><span class="o">.</span><span class="n">available_names</span><span class="p">()</span>
         <span class="n">upstream</span> <span class="o">=</span> <span class="n">S3PRLUpstream</span><span class="p">(</span>
