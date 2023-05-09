@@ -41,8 +41,8 @@ class S3prlFrontend(AbsFrontend):
                 "All the upstream models in S3PRL now only support 16 kHz audio."
             )
 
-        if download_dir is not None:
-            s3prl.util.download.set_dir(download_dir)
+        #if download_dir is not None:
+        #    s3prl.util.download.set_dir(download_dir)
 
         assert frontend_conf.get("upstream", None) in S3PRLUpstream.available_names()
         upstream = S3PRLUpstream(
