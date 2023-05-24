@@ -143,35 +143,36 @@ class FusedFrontends(AbsFrontend):
                 input_feats, feats_lens = frontend.forward(input, input_lengths)
             self.feats.append([input_feats, feats_lens])
 
+        save_shape=self.feats[0][1]
         if (
                 self.align_method == "linear_projection"
         ):  # TODO(Dan): to add other align methods
             # first step : projections
             self.feats_proj = []
             for i, frontend in enumerate(self.frontends):
-                input_feats = self.feats[i][0]
-                self.feats_proj.append(self.projection_layers[i](input_feats))
+                #input_feats = self.feats[i][0]
+                self.feats[i]=self.projection_layers[i](self.feats[i][0])
 
             # 2nd step : reshape
             self.feats_reshaped = []
             for i, frontend in enumerate(self.frontends):
-                input_feats_proj = self.feats_proj[i]
-                bs, nf, dim = input_feats_proj.shape
-                input_feats_reshaped = torch.reshape(
-                    input_feats_proj, (bs, nf * self.factors[i], dim // self.factors[i])
+                #input_feats_proj = self.feats_proj[i]
+                bs, nf, dim = self.feats[i].shape
+                self.feats[i] = torch.reshape(
+                    self.feats[i], (bs, nf * self.factors[i], dim // self.factors[i])
                 )
-                self.feats_reshaped.append(input_feats_reshaped)
+                #self.feats_reshaped.append(input_feats_reshaped)
 
             # 3rd step : drop the few last frames
-            m = min([x.shape[1] for x in self.feats_reshaped])
-            self.feats_final = [x[:, :m, :] for x in self.feats_reshaped]
+            m = min([x.shape[1] for x in self.feats])
+            self.feats = [x[:, :m, :] for x in self.feats]
 
-            input_feats = torch.cat(
-                self.feats_final, dim=-1
+            self.feats = torch.cat(
+                self.feats, dim=-1
             )  # change the input size of the preencoder : proj_dim * n_frontends
-            feats_lens = torch.ones_like(self.feats[0][1]) * (m)
+            feats_lens = torch.ones_like(save_shape) * (m)
 
         else:
             raise NotImplementedError
 
-        return input_feats, feats_lens
+        return self.feats, feats_lens
