@@ -142,7 +142,6 @@ class FusedFrontends(AbsFrontend):
         for frontend in self.frontends:
             with torch.no_grad():
                 input_feats, feats_lens = frontend.forward(input, input_lengths)
-                print(i)
                 print(input_feats.shape)
             self.feats.append([input_feats, feats_lens])
 
