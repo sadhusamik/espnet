@@ -137,6 +137,7 @@ class FusedFrontends(AbsFrontend):
     def forward(
             self, input: torch.Tensor, input_lengths: torch.Tensor
     ) -> Tuple[torch.Tensor, torch.Tensor]:
+        print(input.shape)
         # step 0 : get all frontends features
         self.feats = []
         for frontend in self.frontends:
