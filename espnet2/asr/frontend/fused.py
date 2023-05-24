@@ -142,6 +142,7 @@ class FusedFrontends(AbsFrontend):
         for frontend in self.frontends:
             with torch.no_grad():
                 input_feats, feats_lens = frontend.forward(input, input_lengths)
+                print(input_feats.shape)
             self.feats.append([input_feats, feats_lens])
 
         if (
@@ -152,6 +153,7 @@ class FusedFrontends(AbsFrontend):
             for i, frontend in enumerate(self.frontends):
                 input_feats = self.feats[i][0]
                 self.feats_proj.append(self.projection_layers[i](input_feats))
+                print(self.feats_proj[i].shape)
 
             # 2nd step : reshape
             self.feats_reshaped = []
