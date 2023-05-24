@@ -65,7 +65,7 @@ class FusedFrontends(AbsFrontend):
             elif frontend_type == "robust":
                 n_filters, srate, coeff_num, coeff_range, order, fduration, frate, overlap_fraction, return_mvector, lfr, complex_modulation = (
                     frontend.get("n_filters", 20),
-                    fs,
+                    frontend.get("srate", 16000),
                     frontend.get("coeff_num", 80),
                     frontend.get("coeff_range", '0,80'),
                     frontend.get("order", 80),
