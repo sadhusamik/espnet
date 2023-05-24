@@ -63,7 +63,7 @@ class FusedFrontends(AbsFrontend):
                     )
                 )
             elif frontend_type == "robust":
-                n_filters, srate, coeff_num, coeff_range, order, fduration, frate, overlap_fraction, return_mvector, lfr, complex_modulation = (
+                n_filters, srate, coeff_num, coeff_range, order, fduration, frate, overlap_fraction, return_mvector, lfr, num_chunks, complex_modulation = (
                     frontend.get("n_filters", 20),
                     frontend.get("srate", 16000),
                     frontend.get("coeff_num", 80),
@@ -74,6 +74,7 @@ class FusedFrontends(AbsFrontend):
                     frontend.get("overlap_fraction", 0.5),
                     frontend.get("return_mvector", False),
                     frontend.get("lfr", 5),
+                    frontend.get("num_chunks", 2),
                     frontend.get("complex_modulation", False),
                 )
 
@@ -86,6 +87,7 @@ class FusedFrontends(AbsFrontend):
                         order=order,
                         fduration=fduration,
                         frate=frate,
+                        num_chunks=num_chunks,
                         overlap_fraction=overlap_fraction,
                         complex_modulation=complex_modulation,
                         return_mvector=return_mvector,
