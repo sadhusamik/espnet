@@ -113,11 +113,8 @@ class FusedFrontends(AbsFrontend):
                 raise NotImplementedError  # frontends are only default or s3prl
 
         self.frontends = torch.nn.ModuleList(self.frontends)
-        #for frontend in self.frontends:
-        #    print(frontend.hop_length)
         self.gcd = np.gcd.reduce([frontend.hop_length for frontend in self.frontends])
         self.factors = [frontend.hop_length // self.gcd for frontend in self.frontends]
-        #print(self.factors)
         if torch.cuda.is_available():
             dev = "cuda"
         else:
@@ -139,13 +136,11 @@ class FusedFrontends(AbsFrontend):
     def forward(
             self, input: torch.Tensor, input_lengths: torch.Tensor
     ) -> Tuple[torch.Tensor, torch.Tensor]:
-        #print(input.shape)
         # step 0 : get all frontends features
         self.feats = []
         for frontend in self.frontends:
             with torch.no_grad():
                 input_feats, feats_lens = frontend.forward(input, input_lengths)
-                #print(input_feats.shape)
             self.feats.append([input_feats, feats_lens])
 
         if (
@@ -156,8 +151,6 @@ class FusedFrontends(AbsFrontend):
             for i, frontend in enumerate(self.frontends):
                 input_feats = self.feats[i][0]
                 self.feats_proj.append(self.projection_layers[i](input_feats))
-                #print(i)
-                #print(self.feats_proj[i].shape)
 
             # 2nd step : reshape
             self.feats_reshaped = []
