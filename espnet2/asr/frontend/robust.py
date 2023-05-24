@@ -109,7 +109,7 @@ class RobustFrontend(AbsFrontend):
         self.coeff_num = coeff_num
         self.complex_modulation = complex_modulation
         self.full_modulation_spectrum = full_modulation_spectrum
-        self.hop_length = 320
+        self.hop_length = 333
         if pure_modulation_spectrum:
             self.fdlp_spectrogram = modulation_spectrum(n_filters=n_filters, coeff_num=coeff_num, fduration=fduration,
                                                         frate=frate, downsample_factor=downsample_factor, srate=srate,
