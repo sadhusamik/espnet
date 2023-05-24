@@ -113,11 +113,11 @@ class FusedFrontends(AbsFrontend):
                 raise NotImplementedError  # frontends are only default or s3prl
 
         self.frontends = torch.nn.ModuleList(self.frontends)
-        for frontend in self.frontends:
-            print(frontend.hop_length)
+        #for frontend in self.frontends:
+        #    print(frontend.hop_length)
         self.gcd = np.gcd.reduce([frontend.hop_length for frontend in self.frontends])
         self.factors = [frontend.hop_length // self.gcd for frontend in self.frontends]
-        print(self.factors)
+        #print(self.factors)
         if torch.cuda.is_available():
             dev = "cuda"
         else:
