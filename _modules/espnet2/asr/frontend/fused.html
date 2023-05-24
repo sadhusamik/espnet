@@ -311,11 +311,8 @@
                 <span class="k">raise</span> <span class="ne">NotImplementedError</span>  <span class="c1"># frontends are only default or s3prl</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">frontends</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frontends</span><span class="p">)</span>
-        <span class="c1">#for frontend in self.frontends:</span>
-        <span class="c1">#    print(frontend.hop_length)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gcd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">gcd</span><span class="o">.</span><span class="n">reduce</span><span class="p">([</span><span class="n">frontend</span><span class="o">.</span><span class="n">hop_length</span> <span class="k">for</span> <span class="n">frontend</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">frontends</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">factors</span> <span class="o">=</span> <span class="p">[</span><span class="n">frontend</span><span class="o">.</span><span class="n">hop_length</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">gcd</span> <span class="k">for</span> <span class="n">frontend</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">frontends</span><span class="p">]</span>
-        <span class="c1">#print(self.factors)</span>
         <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
             <span class="n">dev</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
         <span class="k">else</span><span class="p">:</span>
@@ -337,13 +334,11 @@
 <div class="viewcode-block" id="FusedFrontends.forward"><a class="viewcode-back" href="../../../../_gen/espnet2.asr.html#espnet2.asr.frontend.fused.FusedFrontends.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">input_lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
-        <span class="c1">#print(input.shape)</span>
         <span class="c1"># step 0 : get all frontends features</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">feats</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">frontend</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">frontends</span><span class="p">:</span>
             <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
                 <span class="n">input_feats</span><span class="p">,</span> <span class="n">feats_lens</span> <span class="o">=</span> <span class="n">frontend</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">input_lengths</span><span class="p">)</span>
-                <span class="c1">#print(input_feats.shape)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">feats</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">input_feats</span><span class="p">,</span> <span class="n">feats_lens</span><span class="p">])</span>
 
         <span class="k">if</span> <span class="p">(</span>
@@ -354,8 +349,6 @@
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">frontend</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frontends</span><span class="p">):</span>
                 <span class="n">input_feats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feats</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">feats_proj</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projection_layers</span><span class="p">[</span><span class="n">i</span><span class="p">](</span><span class="n">input_feats</span><span class="p">))</span>
-                <span class="c1">#print(i)</span>
-                <span class="c1">#print(self.feats_proj[i].shape)</span>
 
             <span class="c1"># 2nd step : reshape</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">feats_reshaped</span> <span class="o">=</span> <span class="p">[]</span>
