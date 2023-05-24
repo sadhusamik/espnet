@@ -105,6 +105,7 @@ class S3prlFrontend(AbsFrontend):
     def forward(
         self, input: torch.Tensor, input_lengths: torch.Tensor
     ) -> Tuple[torch.Tensor, torch.Tensor]:
+        '''
         ft = self.start_finetune_after <= self.num_updates
         if self.num_updates <= self.start_finetune_after:
             self.num_updates += 1
@@ -115,7 +116,8 @@ class S3prlFrontend(AbsFrontend):
             with torch.no_grad():
                 feats, feats_lens = self.upstream(input, input_lengths)
         else:
-            feats, feats_lens = self.upstream(input, input_lengths)
+        '''
+        feats, feats_lens = self.upstream(input, input_lengths)
 
         if self.layer != -1:
             layer = self.layer
