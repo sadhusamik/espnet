@@ -261,7 +261,7 @@
                     <span class="p">)</span>
                 <span class="p">)</span>
             <span class="k">elif</span> <span class="n">frontend_type</span> <span class="o">==</span> <span class="s2">&quot;robust&quot;</span><span class="p">:</span>
-                <span class="n">n_filters</span><span class="p">,</span> <span class="n">srate</span><span class="p">,</span> <span class="n">coeff_num</span><span class="p">,</span> <span class="n">coeff_range</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">fduration</span><span class="p">,</span> <span class="n">frate</span><span class="p">,</span> <span class="n">overlap_fraction</span><span class="p">,</span> <span class="n">return_mvector</span><span class="p">,</span> <span class="n">lfr</span><span class="p">,</span> <span class="n">complex_modulation</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">n_filters</span><span class="p">,</span> <span class="n">srate</span><span class="p">,</span> <span class="n">coeff_num</span><span class="p">,</span> <span class="n">coeff_range</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">fduration</span><span class="p">,</span> <span class="n">frate</span><span class="p">,</span> <span class="n">overlap_fraction</span><span class="p">,</span> <span class="n">return_mvector</span><span class="p">,</span> <span class="n">lfr</span><span class="p">,</span> <span class="n">num_chunks</span><span class="p">,</span> <span class="n">complex_modulation</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="n">frontend</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;n_filters&quot;</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span>
                     <span class="n">frontend</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;srate&quot;</span><span class="p">,</span> <span class="mi">16000</span><span class="p">),</span>
                     <span class="n">frontend</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;coeff_num&quot;</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span>
@@ -272,6 +272,7 @@
                     <span class="n">frontend</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;overlap_fraction&quot;</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
                     <span class="n">frontend</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;return_mvector&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
                     <span class="n">frontend</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lfr&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+                    <span class="n">frontend</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;num_chunks&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
                     <span class="n">frontend</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;complex_modulation&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
                 <span class="p">)</span>
 
@@ -284,6 +285,7 @@
                         <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
                         <span class="n">fduration</span><span class="o">=</span><span class="n">fduration</span><span class="p">,</span>
                         <span class="n">frate</span><span class="o">=</span><span class="n">frate</span><span class="p">,</span>
+                        <span class="n">num_chunks</span><span class="o">=</span><span class="n">num_chunks</span><span class="p">,</span>
                         <span class="n">overlap_fraction</span><span class="o">=</span><span class="n">overlap_fraction</span><span class="p">,</span>
                         <span class="n">complex_modulation</span><span class="o">=</span><span class="n">complex_modulation</span><span class="p">,</span>
                         <span class="n">return_mvector</span><span class="o">=</span><span class="n">return_mvector</span><span class="p">,</span>
