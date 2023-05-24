@@ -82,7 +82,7 @@ class FusedFrontends(AbsFrontend):
                         n_filters=n_filters,
                         coeff_num=coeff_num,
                         coeff_range=coeff_range,
-                        srate=fs,
+                        srate=srate,
                         order=order,
                         fduration=fduration,
                         frate=frate,
