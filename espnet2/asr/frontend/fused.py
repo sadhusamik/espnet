@@ -70,7 +70,7 @@ class FusedFrontends(AbsFrontend):
                     frontend.get("coeff_range", '0,80'),
                     frontend.get("order", 80),
                     frontend.get("fduration", 1.5),
-                    frontend.get("frate", 1.5),
+                    frontend.get("frate", 100),
                     frontend.get("overlap_fraction", 0.5),
                     frontend.get("return_mvector", False),
                     frontend.get("lfr", 5),
@@ -114,6 +114,7 @@ class FusedFrontends(AbsFrontend):
 
         self.gcd = np.gcd.reduce([frontend.hop_length for frontend in self.frontends])
         self.factors = [frontend.hop_length // self.gcd for frontend in self.frontends]
+        print(self.factors)
         if torch.cuda.is_available():
             dev = "cuda"
         else:
