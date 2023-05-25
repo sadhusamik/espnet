@@ -12,7 +12,7 @@ from espnet2.asr.frontend.robust import RobustFrontend
 
 class FusedFrontends(AbsFrontend):
     def __init__(
-            self, frontends=None, align_method="linear_projection", proj_dim=100, fs=16000
+            self, frontends=None, align_method="linear_projection", interpolate=False, proj_dim=100, fs=16000
     ):
         assert check_argument_types()
         super().__init__()
@@ -21,7 +21,7 @@ class FusedFrontends(AbsFrontend):
         )
         self.proj_dim = proj_dim  # dim of the projection done on each frontend
         self.frontends = []  # list of the frontends to combine
-
+        self.interpolate = interpolate
         for i, frontend in enumerate(frontends):
             frontend_type = frontend["frontend_type"]
             if frontend_type == "default":
@@ -113,22 +113,34 @@ class FusedFrontends(AbsFrontend):
                 raise NotImplementedError  # frontends are only default or s3prl
 
         self.frontends = torch.nn.ModuleList(self.frontends)
-        self.gcd = np.gcd.reduce([frontend.hop_length for frontend in self.frontends])
-        self.factors = [frontend.hop_length // self.gcd for frontend in self.frontends]
-        #for i in self.factors:
-        #    print(i)
+        if self.interpolate:
+            self.gcd = None
+            self.factors = [1, 1]
+        else:
+            self.gcd = np.gcd.reduce([frontend.hop_length for frontend in self.frontends])
+            self.factors = [frontend.hop_length // self.gcd for frontend in self.frontends]
+
         if torch.cuda.is_available():
             dev = "cuda"
         else:
             dev = "cpu"
         if self.align_method == "linear_projection":
-            self.projection_layers = [
-                torch.nn.Linear(
-                    in_features=frontend.output_size(),
-                    out_features=self.factors[i] * self.proj_dim,
-                )
-                for i, frontend in enumerate(self.frontends)
-            ]
+            if self.interpolate:
+                self.projection_layers = [
+                    torch.nn.Linear(
+                        in_features=frontend.output_size(),
+                        out_features=self.proj_dim,
+                    )
+                    for i, frontend in enumerate(self.frontends)
+                ]
+            else:
+                self.projection_layers = [
+                    torch.nn.Linear(
+                        in_features=frontend.output_size(),
+                        out_features=self.factors[i] * self.proj_dim,
+                    )
+                    for i, frontend in enumerate(self.frontends)
+                ]
             self.projection_layers = torch.nn.ModuleList(self.projection_layers)
             self.projection_layers = self.projection_layers.to(torch.device(dev))
 
@@ -150,20 +162,27 @@ class FusedFrontends(AbsFrontend):
                 self.align_method == "linear_projection"
         ):  # TODO(Dan): to add other align methods
             # first step : projections
-            # feats_proj = []
             for i, frontend in enumerate(self.frontends):
-                # input_feats = self.feats[i][0]
                 feats[i] = self.projection_layers[i](feats[i][0])
 
-            # 2nd step : reshape
-            # self.feats_reshaped = []
-            for i, frontend in enumerate(self.frontends):
-                # input_feats_proj = self.feats_proj[i]
-                bs, nf, dim = feats[i].shape
-                feats[i] = torch.reshape(
-                    feats[i], (bs, nf * self.factors[i], dim // self.factors[i])
-                )
-                # self.feats_reshaped.append(input_feats_reshaped)
+            # 2nd step : reshape or interpolate
+            if self.interpolate:
+                shape_list = [x.shape[1] for x in feats]
+                m = max(shape_list)
+                m_idx = shape_list.index(m)
+                for i, F in enumerate(feats):
+                    if i != m_idx:
+                        feats[i] = feats[i].transpose(1, 2)
+                        mlen = feats[i].shape[2]
+                        scl = m / mlen
+                        feats[i] = torch.nn.functional.interpolate(feats[i], scale_factor=scl, mode='linear')
+                        feats[i] = feats[i].transpose(1, 2)
+            else:
+                for i, frontend in enumerate(self.frontends):
+                    bs, nf, dim = feats[i].shape
+                    feats[i] = torch.reshape(
+                        feats[i], (bs, nf * self.factors[i], dim // self.factors[i])
+                    )
 
             # 3rd step : drop the few last frames
             m = min([x.shape[1] for x in feats])
