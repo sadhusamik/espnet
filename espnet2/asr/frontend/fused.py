@@ -137,42 +137,41 @@ class FusedFrontends(AbsFrontend):
             self, input: torch.Tensor, input_lengths: torch.Tensor
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         # step 0 : get all frontends features
-        self.feats = []
+        feats = []
         for frontend in self.frontends:
             with torch.no_grad():
                 input_feats, feats_lens = frontend.forward(input, input_lengths)
-            self.feats.append([input_feats, feats_lens])
+            feats.append([input_feats, feats_lens])
 
-        save_shape=self.feats[0][1]
+        save_shape = feats[0][1]
         if (
                 self.align_method == "linear_projection"
         ):  # TODO(Dan): to add other align methods
             # first step : projections
-            self.feats_proj = []
+            # feats_proj = []
             for i, frontend in enumerate(self.frontends):
-                #input_feats = self.feats[i][0]
-                self.feats[i]=self.projection_layers[i](self.feats[i][0])
+                # input_feats = self.feats[i][0]
+                feats[i] = self.projection_layers[i](self.feats[i][0])
 
             # 2nd step : reshape
-            self.feats_reshaped = []
+            # self.feats_reshaped = []
             for i, frontend in enumerate(self.frontends):
-                #input_feats_proj = self.feats_proj[i]
-                bs, nf, dim = self.feats[i].shape
-                self.feats[i] = torch.reshape(
-                    self.feats[i], (bs, nf * self.factors[i], dim // self.factors[i])
+                # input_feats_proj = self.feats_proj[i]
+                bs, nf, dim = feats[i].shape
+                feats[i] = torch.reshape(
+                    feats[i], (bs, nf * self.factors[i], dim // self.factors[i])
                 )
-                #self.feats_reshaped.append(input_feats_reshaped)
+                # self.feats_reshaped.append(input_feats_reshaped)
 
             # 3rd step : drop the few last frames
-            m = min([x.shape[1] for x in self.feats])
-            self.feats = [x[:, :m, :] for x in self.feats]
+            m = min([x.shape[1] for x in feats])
+            feats = [x[:, :m, :] for x in feats]
 
-            self.feats = torch.cat(
-                self.feats, dim=-1
+            feats = torch.cat(
+                feats, dim=-1
             )  # change the input size of the preencoder : proj_dim * n_frontends
             feats_lens = torch.ones_like(save_shape) * (m)
-
         else:
             raise NotImplementedError
 
-        return self.feats, feats_lens
+        return feats, feats_lens
