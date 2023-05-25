@@ -349,7 +349,7 @@
             <span class="c1"># feats_proj = []</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">frontend</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frontends</span><span class="p">):</span>
                 <span class="c1"># input_feats = self.feats[i][0]</span>
-                <span class="n">feats</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">projection_layers</span><span class="p">[</span><span class="n">i</span><span class="p">](</span><span class="bp">self</span><span class="o">.</span><span class="n">feats</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">feats</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">projection_layers</span><span class="p">[</span><span class="n">i</span><span class="p">](</span><span class="n">feats</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
 
             <span class="c1"># 2nd step : reshape</span>
             <span class="c1"># self.feats_reshaped = []</span>
