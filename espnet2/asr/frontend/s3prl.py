@@ -1,5 +1,6 @@
 import copy
 import logging
+import sys
 from typing import Optional, Tuple, Union
 
 import humanfriendly
@@ -119,7 +120,8 @@ class S3prlFrontend(AbsFrontend):
         '''
         feats, feats_lens = self.upstream(input, input_lengths)
         print(feats.shape)
-
+        import sys
+        sys.stdout.flush()
         if self.layer != -1:
             layer = self.layer
             feats, feats_lens = feats[layer], feats_lens[layer]
