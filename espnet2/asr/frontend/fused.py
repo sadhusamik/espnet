@@ -151,7 +151,7 @@ class FusedFrontends(AbsFrontend):
             # feats_proj = []
             for i, frontend in enumerate(self.frontends):
                 # input_feats = self.feats[i][0]
-                feats[i] = self.projection_layers[i](self.feats[i][0])
+                feats[i] = self.projection_layers[i](feats[i][0])
 
             # 2nd step : reshape
             # self.feats_reshaped = []
