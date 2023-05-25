@@ -118,10 +118,11 @@ class S3prlFrontend(AbsFrontend):
                 feats, feats_lens = self.upstream(input, input_lengths)
         else:
         '''
-        feats, feats_lens = self.upstream(input, input_lengths)
-        print(feats.shape)
+        print(input.shape)
         import sys
         sys.stdout.flush()
+        feats, feats_lens = self.upstream(input, input_lengths)
+
         if self.layer != -1:
             layer = self.layer
             feats, feats_lens = feats[layer], feats_lens[layer]
