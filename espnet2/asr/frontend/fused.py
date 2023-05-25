@@ -115,6 +115,8 @@ class FusedFrontends(AbsFrontend):
         self.frontends = torch.nn.ModuleList(self.frontends)
         self.gcd = np.gcd.reduce([frontend.hop_length for frontend in self.frontends])
         self.factors = [frontend.hop_length // self.gcd for frontend in self.frontends]
+        for i in self.factors:
+            print(i)
         if torch.cuda.is_available():
             dev = "cuda"
         else:
