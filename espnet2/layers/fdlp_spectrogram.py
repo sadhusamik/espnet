@@ -273,6 +273,8 @@ class fdlp_spectrogram(torch.nn.Module):
             concat_utts_before_frames: bool = False,
             attach_mvector: bool = False,
             lfr_attached_mvector: float = None,
+            compensate_window: bool = True,
+            remove_mean_gain: bool = False,
             randomized_lifter: bool = False,
             randomized_lifter_range: str = '0.8,1.2',
             feature_batch: int = None,
@@ -309,6 +311,8 @@ class fdlp_spectrogram(torch.nn.Module):
         self.lfr_attached_mvector = lfr_attached_mvector
         self.attach_mvector = attach_mvector
         self.fbank_config = [float(x) for x in fbank_config.split(',')]
+        self.compensate_window = compensate_window
+        self.remove_mean_gain = remove_mean_gain
         mask = []
         for i in range(coeff_num):
             if i >= self.lowpass and i <= self.highpass:
@@ -335,6 +339,8 @@ class fdlp_spectrogram(torch.nn.Module):
         self.lifter_scale = lifter_scale
         self.purturb_lifter = purturb_lifter
         self.lifter_purturb_prob = lifter_purturb_prob
+        self.window_wise_feats = None
+        self.modspec_feats = None
         # self.register_buffer("num_updates", torch.LongTensor([0]))
         # self.boost_lifter_lr = boost_lifter_lr
         self.register_buffer("boost_lifter_lr", torch.Tensor([boost_lifter_lr]))
@@ -931,13 +937,13 @@ class fdlp_spectrogram(torch.nn.Module):
         feats = torch.zeros((num_batch, int(np.ceil(t_samples * self.frate / self.srate)), self.n_filters), dtype=dtype,
                             device=device)
         ptr = int(0)
-        #print(self.cut_overlap)
-        #print(self.cut_half)
+        # print(self.cut_overlap)
+        # print(self.cut_half)
         ### Overlap and Add stage
         for j in range(0, num_frames):
-            #print(feats.shape)
-            #print(ptr)
-            #print(modspec.shape)
+            # print(feats.shape)
+            # print(ptr)
+            # print(modspec.shape)
             if j == 0:
                 if feats.shape[1] < self.cut_half:
                     feats += modspec[:, j, :self.cut_half:self.cut_half + feats.shape[1], :]
@@ -1055,6 +1061,18 @@ class fdlp_spectrogram(torch.nn.Module):
         # logging.info('Boost rate {}'.format(self.boost_lifter_lr.data))
         # logging.info('lifter mean'.format(torch.mean(self.lifter).data))
         sys.stdout.flush()
+        self.modspec_feats = modspec.clone()
+        if self.remove_mean_gain:
+            n = modspec.shape[1]  # Number of frames
+            m = torch.mean(modspec, axis=1)
+            m = m.unsqueeze(1)
+            m = torch.tile(m, (1, n, 1, 1))
+            modspec[:, :, :, 0] -= m[:, :, :, 0]
+
+            #Do a moving average
+            #for i in range(1, n):
+            #    modspec[:, i, :, 0] = (modspec[:, i-1, :, 0] + modspec[:, i, :, 0]) / 2
+            #    modspec[:, i, :, 0] = (modspec[:, i, :, 0] - modspec[:, i - 1, :, 0]) / 2
 
         if self.purturb_lifter is not None and self.training and self.lifter_purturb_prob >= np.random.random():
             add_purturb = 2 * torch.rand(self.lifter.shape,
@@ -1105,12 +1123,15 @@ class fdlp_spectrogram(torch.nn.Module):
             spectrum_feats = torch.fft.fft(modspec, 2 * int(round(
                 self.fduration * self.frate)))  # (batch x num_frames x n_filters x int(self.fduration * self.frate))
         spectrum_feats = torch.abs(torch.exp(spectrum_feats))
-        spectrum_feats = spectrum_feats[:, :, :, 0:self.cut] * han_weight / ham_weight
+        if self.compensate_window:
+            spectrum_feats = spectrum_feats[:, :, :, 0:self.cut] * han_weight / ham_weight
+        else:
+            spectrum_feats = spectrum_feats[:, :, :, 0:self.cut]
         spectrum_feats = torch.transpose(spectrum_feats, 2,
                                          3)  # (batch x num_frames x int(self.fduration * self.frate) x n_filters)
 
         # OVERLAP AND ADD
-
+        self.window_wise_feats = spectrum_feats.clone()
         spectrum_feats = self.OLA(modspec=spectrum_feats, t_samples=t_samples, dtype=input.dtype, device=input.device)
 
         if self.attach_mvector:
@@ -2682,6 +2703,13 @@ class mvector(fdlp_spectrogram):
             frames = torch.cat(frames, axis=-1)  # batch x num_frames x self.n_filters x 2 * self.coeff_num
         else:
             frames = torch.reshape(frames, (num_batch, frames.shape[1], self.n_filters, self.coeff_num))
+
+        if self.remove_mean_gain:
+            n = frames.shape[1]  # Number of frames
+            m = torch.mean(frames, axis=1)
+            m = m.unsqueeze(1)
+            m = torch.tile(m, (1, n, 1, 1))
+            frames[:, :, :, 0] -= m[:, :, :, 0]
 
         if self.lfr != self.frate:
             # We have to bilinear interpolate features to frame rate
