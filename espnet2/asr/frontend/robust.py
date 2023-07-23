@@ -89,6 +89,7 @@ class RobustFrontend(AbsFrontend):
             downsample_factor: int = 100,
             return_mvector_plus_spectrogram: bool = False,
             num_channel_dropout: int = 5,
+            remove_mean_gain: bool = False,
             fs: Union[int, str] = 16000,
             frontend_conf: Optional[dict] = get_default_kwargs(Frontend),
     ):
@@ -227,6 +228,7 @@ class RobustFrontend(AbsFrontend):
                                             complex_modulation=complex_modulation,
                                             boost_lifter_lr=boost_lifter_lr,
                                             num_chunks=num_chunks,
+                                            remove_mean_gain=remove_mean_gain,
                                             online_normalize=online_normalize,
                                             scale_lifter_gradient=scale_lifter_gradient,
                                             freeze_lifter_finetune_updates=freeze_lifter_finetune_updates,
