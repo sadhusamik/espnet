@@ -139,7 +139,8 @@ class modulation_spectrum(torch.nn.Module):
 
         signal_length = signal.shape[1]
 
-        win = torch.hamming_window(flength_samples, dtype=signal.dtype, device=signal.device)
+        #win = torch.sqrt(torch.hamming_window(flength_samples, dtype=signal.dtype, device=signal.device))
+        win = torch.sqrt(torch.hamming_window(flength_samples, dtype=signal.dtype, device=signal.device))
 
         idx = sp_b
         frames = []
@@ -275,6 +276,7 @@ class fdlp_spectrogram(torch.nn.Module):
             lfr_attached_mvector: float = None,
             compensate_window: bool = True,
             remove_mean_gain: bool = False,
+            bad_dct_norm: bool = False,
             randomized_lifter: bool = False,
             randomized_lifter_range: str = '0.8,1.2',
             feature_batch: int = None,
@@ -313,6 +315,7 @@ class fdlp_spectrogram(torch.nn.Module):
         self.fbank_config = [float(x) for x in fbank_config.split(',')]
         self.compensate_window = compensate_window
         self.remove_mean_gain = remove_mean_gain
+        self.bad_dct_norm=bad_dct_norm
         mask = []
         for i in range(coeff_num):
             if i >= self.lowpass and i <= self.highpass:
@@ -583,7 +586,6 @@ class fdlp_spectrogram(torch.nn.Module):
     def compute_lpc(self, input: torch.Tensor, order: int):
 
         """
-
         :param input: Tensor (batch x num_frames x n_filters x frame_dim)
         :return: Tensor (batch x num_frames x n_filters x lpc_coeff), Tensor (batch x num_frames x n_filters)
         """
@@ -723,6 +725,7 @@ class fdlp_spectrogram(torch.nn.Module):
 
         signal_length = signal.shape[1]
 
+        #win = torch.sqrt(torch.hamming_window(flength_samples, dtype=signal.dtype, device=signal.device))
         win = torch.hamming_window(flength_samples, dtype=signal.dtype, device=signal.device)
 
         idx = sp_b
@@ -847,7 +850,7 @@ class fdlp_spectrogram(torch.nn.Module):
 
         signal_length = signal.shape[1]
 
-        win = torch.hamming_window(flength_samples, dtype=signal.dtype, device=signal.device)
+        win = torch.sqrt(torch.hamming_window(flength_samples, dtype=signal.dtype, device=signal.device))
 
         idx = sp_b
         frames = []
@@ -1010,9 +1013,12 @@ class fdlp_spectrogram(torch.nn.Module):
 
         # Compute DCT (olens remains the same)
         if self.complex_modulation:
-            frames = torch.fft.ifft(frames) * int(self.srate * self.fduration)
+            frames = torch.fft.ifft(frames) #* int(self.srate * self.fduration)
         else:
-            frames = self.dct_type2(frames) / np.sqrt(2 * int(self.srate * self.fduration))
+            if self.bad_dct_norm:
+                frames = self.dct_type2(frames) / np.sqrt((2 * int(self.srate * self.fduration)))
+            else:
+                frames = self.dct_type2(frames) / (1 * int(self.srate * self.fduration))
 
         # Put fbank, mask and lifter into proper device if they are already not there
         if self.fbank.device.type != input.device.type:
@@ -1025,8 +1031,8 @@ class fdlp_spectrogram(torch.nn.Module):
         frames = frames.unsqueeze(2).repeat(1, 1, self.n_filters, 1)
         frames = frames * self.fbank[:, 0:-1]  # batch x num_frames x n_filters x frame_dim of 1.5 secs
 
-        han_weight = torch.hann_window(self.cut, dtype=input.dtype, device=input.device)
-        ham_weight = torch.hamming_window(self.cut, dtype=input.dtype, device=input.device)
+        han_weight = torch.sqrt(torch.hann_window(self.cut, dtype=input.dtype, device=input.device))
+        ham_weight = torch.sqrt(torch.hamming_window(self.cut, dtype=input.dtype, device=input.device))
 
         if self.num_chunks:
 
@@ -1067,12 +1073,12 @@ class fdlp_spectrogram(torch.nn.Module):
             m = torch.mean(modspec, axis=1)
             m = m.unsqueeze(1)
             m = torch.tile(m, (1, n, 1, 1))
-            modspec[:, :, :, 0] -= m[:, :, :, 0]
+            #modspec[:, :, :, 0] -= m[:, :, :, 0]
 
             #Do a moving average
             #for i in range(1, n):
             #    modspec[:, i, :, 0] = (modspec[:, i-1, :, 0] + modspec[:, i, :, 0]) / 2
-            #    modspec[:, i, :, 0] = (modspec[:, i, :, 0] - modspec[:, i - 1, :, 0]) / 2
+                #modspec[:, i, :, 0] = (modspec[:, i, :, 0] - modspec[:, i - 1, :, 0]) / 2
 
         if self.purturb_lifter is not None and self.training and self.lifter_purturb_prob >= np.random.random():
             add_purturb = 2 * torch.rand(self.lifter.shape,
@@ -1124,7 +1130,7 @@ class fdlp_spectrogram(torch.nn.Module):
                 self.fduration * self.frate)))  # (batch x num_frames x n_filters x int(self.fduration * self.frate))
         spectrum_feats = torch.abs(torch.exp(spectrum_feats))
         if self.compensate_window:
-            spectrum_feats = spectrum_feats[:, :, :, 0:self.cut] * han_weight / ham_weight
+            spectrum_feats = spectrum_feats[:, :, :, 0:self.cut] * han_weight / ham_weight   # I think we need to compensate for SQUARE of the window
         else:
             spectrum_feats = spectrum_feats[:, :, :, 0:self.cut]
         spectrum_feats = torch.transpose(spectrum_feats, 2,
@@ -1132,7 +1138,7 @@ class fdlp_spectrogram(torch.nn.Module):
 
         # OVERLAP AND ADD
         self.window_wise_feats = spectrum_feats.clone()
-        spectrum_feats = self.OLA(modspec=spectrum_feats, t_samples=t_samples, dtype=input.dtype, device=input.device)
+        spectrum_feats = self.OLA(modspec=torch.sqrt(spectrum_feats), t_samples=t_samples, dtype=input.dtype, device=input.device)
 
         if self.attach_mvector:
             if self.lfr_attached_mvector:
@@ -2628,9 +2634,9 @@ class mvector(fdlp_spectrogram):
 
             for idx in range(len(frames)):
                 if self.complex_modulation:
-                    frames[idx] = torch.fft.ifft(frames[idx]) * int(self.srate * self.fduration)
+                    frames[idx] = torch.fft.ifft(frames[idx]) #* int(self.srate * self.fduration)
                 else:
-                    frames[idx] = self.dct_type2(frames[idx]) / np.sqrt(2 * int(self.srate * self.fduration))
+                    frames[idx] = self.dct_type2(frames[idx]) / (int(self.srate * self.fduration))
 
                 frames[idx] = frames[idx].unsqueeze(2).repeat(1, 1, self.n_filters, 1)
                 frames[idx] = frames[idx] * self.fbank[:,
@@ -2661,9 +2667,9 @@ class mvector(fdlp_spectrogram):
         else:
             # Compute DCT (olens remains the same)
             if self.complex_modulation:
-                frames = torch.fft.ifft(frames) * int(self.srate * self.fduration)
+                frames = torch.fft.ifft(frames) #* int(self.srate * self.fduration)
             else:
-                frames = self.dct_type2(frames) / np.sqrt(2 * int(self.srate * self.fduration))
+                frames = self.dct_type2(frames) / (int(self.srate * self.fduration))
 
             frames = frames.unsqueeze(2).repeat(1, 1, self.n_filters, 1)
             frames = frames * self.fbank[:, 0:-1]  # batch x num_frames x n_filters x frame_dim of 1.5 secs
