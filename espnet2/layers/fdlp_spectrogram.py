@@ -942,14 +942,50 @@ class fdlp_spectrogram(torch.nn.Module):
         feats = torch.zeros((num_batch, int(np.ceil(t_samples * self.frate / self.srate)), self.n_filters), dtype=dtype,
                             device=device)
         ptr = int(0)
-        # print(self.cut_overlap)
-        # print(self.cut_half)
+
         ### Overlap and Add stage
         for j in range(0, num_frames):
-            # print(feats.shape)
-            # print(ptr)
-            # print(modspec.shape)
+            if j == 0:  # ie. we are at the first frame
+                if feats.shape[1] < self.cut_half:
+                    feats += modspec[:, j, :self.cut_half:self.cut_half + feats.shape[1], :]
+                else:
+                    feats[:, ptr:ptr + self.cut_half, :] += modspec[:, j, self.cut_half:, :]
+            elif j == 1:
+                if ptr < 0: # This means that the second window has extended into the reflected region
+                    feats[:, 0:0 + self.cut + ptr, :] += modspec[:, j, -ptr:, :]
+                else:
+                    if modspec.shape[2] >= feats.shape[1] - ptr:
+                        feats[:, ptr:, :] += modspec[:, j, :feats.shape[1] - ptr, :]
+                    else:
+                        feats[:, ptr:ptr + self.cut, :] += modspec[:, j, :, :]
+            else:
+                if modspec.shape[2] >= feats.shape[1] - ptr:
+                    feats[:, ptr:, :] += modspec[:, j, :feats.shape[1] - ptr, :]
+                else:
+                    feats[:, ptr:ptr + self.cut, :] += modspec[:, j, :, :]
+
             if j == 0:
+                ptr = int(ptr + self.cut_overlap - self.cut_half)
+            else:
+                # ptr = int(ptr + self.cut_overlap + randrange(2))
+                ptr = int(ptr + self.cut_overlap + 0)
+
+        feats = torch.log(torch.clip(feats, max=None, min=0.0000001))
+        feats = torch.nan_to_num(feats, nan=0.0000001, posinf=0.0000001, neginf=0.0000001)  # Probably not the best idea
+
+        return feats
+
+    def OLA_old(self, modspec, t_samples, dtype, device):
+
+        num_batch = modspec.shape[0]
+        num_frames = modspec.shape[1]
+        feats = torch.zeros((num_batch, int(np.ceil(t_samples * self.frate / self.srate)), self.n_filters), dtype=dtype,
+                            device=device)
+        ptr = int(0)
+
+        ### Overlap and Add stage
+        for j in range(0, num_frames):
+            if j == 0:  # ie. we are at the first frame
                 if feats.shape[1] < self.cut_half:
                     feats += modspec[:, j, :self.cut_half:self.cut_half + feats.shape[1], :]
                 else:
