@@ -111,15 +111,18 @@ class DefaultFrontend(AbsFrontend):
         # 4. STFT -> Power spectrum
         # h: ComplexTensor(B, T, F) -> torch.Tensor(B, T, F)
         input_power = input_stft.real ** 2 + input_stft.imag ** 2
-        if self.downsample:
-            B, T, F = input_power.shape
-            T = T - T % 16
-            input_power = input_power[:, 0:T, :]
-            input_power = torch.reshape(input_power, (B, int(T / 16), int(F * 16)))
+
         # 5. Feature transform e.g. Stft -> Log-Mel-Fbank
         # input_power: (Batch, [Channel,] Length, Freq)
         #       -> input_feats: (Batch, Length, Dim)
         input_feats, _ = self.logmel(input_power, feats_lens)
+
+        if self.downsample:
+            B, T, F = input_feats.shape
+            T = T - T % 16
+            input_feats = input_feats[:, 0:T, :]
+            input_feats = torch.reshape(input_feats, (B, int(T / 16), int(F * 16)))
+
 
         return input_feats, feats_lens
 
