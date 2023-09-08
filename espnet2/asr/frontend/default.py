@@ -94,6 +94,7 @@ class DefaultFrontend(AbsFrontend):
         else:
             input_stft = ComplexTensor(input[..., 0], input[..., 1])
             feats_lens = input_lengths
+        print(feats_lens.dtype)
         # 2. [Option] Speech enhancement
         if self.frontend is not None:
             assert isinstance(input_stft, ComplexTensor), type(input_stft)
