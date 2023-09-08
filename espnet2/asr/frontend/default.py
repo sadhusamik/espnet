@@ -125,7 +125,7 @@ class DefaultFrontend(AbsFrontend):
             T = T - T % 16
             input_feats = input_feats[:, 0:T, :]
             input_feats = torch.reshape(input_feats, (B, int(T / 16), int(F * 16)))
-            feats_lens = feats_lens / 16
+            feats_lens = torch.round(feats_lens / 16)
         return input_feats, feats_lens
 
     def _compute_stft(
