@@ -21,21 +21,22 @@ class DefaultFrontend(AbsFrontend):
     """
 
     def __init__(
-        self,
-        fs: Union[int, str] = 16000,
-        n_fft: int = 512,
-        win_length: int = None,
-        hop_length: int = 128,
-        window: Optional[str] = "hann",
-        center: bool = True,
-        normalized: bool = False,
-        onesided: bool = True,
-        n_mels: int = 80,
-        fmin: int = None,
-        fmax: int = None,
-        htk: bool = False,
-        frontend_conf: Optional[dict] = get_default_kwargs(Frontend),
-        apply_stft: bool = True,
+            self,
+            fs: Union[int, str] = 16000,
+            n_fft: int = 512,
+            win_length: int = None,
+            hop_length: int = 128,
+            window: Optional[str] = "hann",
+            center: bool = True,
+            normalized: bool = False,
+            onesided: bool = True,
+            n_mels: int = 80,
+            fmin: int = None,
+            fmax: int = None,
+            htk: bool = False,
+            downsample: bool = False,
+            frontend_conf: Optional[dict] = get_default_kwargs(Frontend),
+            apply_stft: bool = True,
     ):
         assert check_argument_types()
         super().__init__()
@@ -75,12 +76,13 @@ class DefaultFrontend(AbsFrontend):
         )
         self.n_mels = n_mels
         self.frontend_type = "default"
+        self.downsample = downsample
 
     def output_size(self) -> int:
         return self.n_mels
 
     def forward(
-        self, input: torch.Tensor, input_lengths: torch.Tensor
+            self, input: torch.Tensor, input_lengths: torch.Tensor
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         # 1. Domain-conversion: e.g. Stft: time -> time-freq
 
@@ -108,8 +110,12 @@ class DefaultFrontend(AbsFrontend):
 
         # 4. STFT -> Power spectrum
         # h: ComplexTensor(B, T, F) -> torch.Tensor(B, T, F)
-        input_power = input_stft.real**2 + input_stft.imag**2
-
+        input_power = input_stft.real ** 2 + input_stft.imag ** 2
+        if self.downsample:
+            B, T, F = input_power.shape
+            T = T - T % 16
+            input_power = input_power[:, 0:T, :]
+            input_power = torch.reshape(input_power, (B, int(T / 16), int(F * 16)))
         # 5. Feature transform e.g. Stft -> Log-Mel-Fbank
         # input_power: (Batch, [Channel,] Length, Freq)
         #       -> input_feats: (Batch, Length, Dim)
@@ -118,7 +124,7 @@ class DefaultFrontend(AbsFrontend):
         return input_feats, feats_lens
 
     def _compute_stft(
-        self, input: torch.Tensor, input_lengths: torch.Tensor
+            self, input: torch.Tensor, input_lengths: torch.Tensor
     ) -> torch.Tensor:
         input_stft, feats_lens = self.stft(input, input_lengths)
 
