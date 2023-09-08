@@ -79,7 +79,10 @@ class DefaultFrontend(AbsFrontend):
         self.downsample = downsample
 
     def output_size(self) -> int:
-        return self.n_mels
+        if self.downsample:
+            return self.nmels * 16
+        else:
+            return self.n_mels
 
     def forward(
             self, input: torch.Tensor, input_lengths: torch.Tensor
@@ -122,7 +125,6 @@ class DefaultFrontend(AbsFrontend):
             T = T - T % 16
             input_feats = input_feats[:, 0:T, :]
             input_feats = torch.reshape(input_feats, (B, int(T / 16), int(F * 16)))
-
 
         return input_feats, feats_lens
 
