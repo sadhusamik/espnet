@@ -94,7 +94,7 @@ class DefaultFrontend(AbsFrontend):
         else:
             input_stft = ComplexTensor(input[..., 0], input[..., 1])
             feats_lens = input_lengths
-        print(feats_lens.dtype)
+
         # 2. [Option] Speech enhancement
         if self.frontend is not None:
             assert isinstance(input_stft, ComplexTensor), type(input_stft)
@@ -126,8 +126,10 @@ class DefaultFrontend(AbsFrontend):
             T = T - T % 16
             input_feats = input_feats[:, 0:T, :]
             input_feats = torch.reshape(input_feats, (B, int(T / 16), int(F * 16)))
-            feats_lens = torch.floor(feats_lens / 16)
-            print(feats_lens)
+            feats_lens = torch.round(feats_lens / 16)
+            feats_lens=feats_lens.to(input_lengths.dtype)
+
+            #print(feats_lens)
         return input_feats, feats_lens
 
     def _compute_stft(
