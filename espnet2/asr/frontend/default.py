@@ -80,7 +80,7 @@ class DefaultFrontend(AbsFrontend):
 
     def output_size(self) -> int:
         if self.downsample:
-            return self.nmels * 16
+            return self.n_mels * 16
         else:
             return self.n_mels
 
