@@ -94,6 +94,7 @@ class RobustFrontend(AbsFrontend):
             bad_norm: bool = False,
             compensate_window: bool = True,
             make_2D: bool = False,
+            compress: bool = False,
             fs: Union[int, str] = 16000,
             frontend_conf: Optional[dict] = get_default_kwargs(Frontend),
     ):
@@ -116,6 +117,7 @@ class RobustFrontend(AbsFrontend):
         self.full_modulation_spectrum = full_modulation_spectrum
         self.hop_length = 400
         self.make_2D = make_2D
+        self.compress=compress
         if pure_modulation_spectrum:
             self.fdlp_spectrogram = modulation_spectrum(n_filters=n_filters, coeff_num=coeff_num, fduration=fduration,
                                                         frate=frate, downsample_factor=downsample_factor, srate=srate,
@@ -240,6 +242,7 @@ class RobustFrontend(AbsFrontend):
                                             lifter_nonlinear_transformation=lifter_nonlinear_transformation,
                                             fbank_config=fbank_config,
                                             make_2D=make_2D,
+                                            compress=compress,
                                             feature_batch=feature_batch, lfr=lfr,
                                             log_magnitude_modulation=log_magnitude_modulation,
                                             full_modulation_spectrum=full_modulation_spectrum,
