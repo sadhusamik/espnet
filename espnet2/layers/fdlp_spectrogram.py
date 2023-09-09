@@ -2635,6 +2635,7 @@ class mvector(fdlp_spectrogram):
                  log_magnitude_modulation: bool = False,
                  full_modulation_spectrum: bool = False,
                  return_as_magnitude_phase: bool = False,
+                 make_2D: bool = False,
                  interp_mode: str = 'bicubic',
                  **kwargs
                  ):
@@ -2645,6 +2646,7 @@ class mvector(fdlp_spectrogram):
         self.full_modulation_spectrum = full_modulation_spectrum
         self.return_as_magnitude_phase = return_as_magnitude_phase
         self.interp_mode = interp_mode
+        self.make_2D=make_2D
 
     def compute_spectrogram(self, input: torch.Tensor, ilens: torch.Tensor = None) -> Tuple[
         torch.Tensor, Optional[torch.Tensor]]:
@@ -2804,7 +2806,10 @@ class mvector(fdlp_spectrogram):
         #            frames[f_idx].shape[0], frames[f_idx].shape[1], self.n_filters, self.coeff_num))
         # else:
         #    frames = torch.reshape(frames, (frames.shape[0], frames.shape[1], self.n_filters, self.coeff_num))
-        frames = torch.tanh(frames.transpose(2, 3))
+        if self.make_2D:
+            frames = torch.tanh(torch.reshape(frames, (frames.shape[0], frames.shape[1], self.n_filters* self.coeff_num)) )
+        else:
+            frames = torch.tanh(frames.transpose(2, 3))
         # frames = torch.reshape(frames, (frames.shape[0], frames.shape[1], self.n_filters, self.coeff_num))
 
         return frames, olens
