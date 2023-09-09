@@ -139,7 +139,7 @@ class modulation_spectrum(torch.nn.Module):
 
         signal_length = signal.shape[1]
 
-        #win = torch.sqrt(torch.hamming_window(flength_samples, dtype=signal.dtype, device=signal.device))
+        # win = torch.sqrt(torch.hamming_window(flength_samples, dtype=signal.dtype, device=signal.device))
         win = torch.sqrt(torch.hamming_window(flength_samples, dtype=signal.dtype, device=signal.device))
 
         idx = sp_b
@@ -727,7 +727,7 @@ class fdlp_spectrogram(torch.nn.Module):
 
         signal_length = signal.shape[1]
 
-        #win = torch.sqrt(torch.hamming_window(flength_samples, dtype=signal.dtype, device=signal.device))
+        # win = torch.sqrt(torch.hamming_window(flength_samples, dtype=signal.dtype, device=signal.device))
         win = torch.hamming_window(flength_samples, dtype=signal.dtype, device=signal.device)
 
         idx = sp_b
@@ -950,15 +950,15 @@ class fdlp_spectrogram(torch.nn.Module):
                     feats += modspec[:, j, :self.cut_half:self.cut_half + feats.shape[1], :]
                 else:
                     feats[:, ptr:ptr + self.cut_half, :] += modspec[:, j, self.cut_half:, :]
-            elif j == 1: # ie. we are at the second frame
-                if ptr < 0: # This means that the second window has extended into the reflected region
+            elif j == 1:  # ie. we are at the second frame
+                if ptr < 0:  # This means that the second window has extended into the reflected region
                     feats[:, 0:0 + self.cut + ptr, :] += modspec[:, j, -ptr:, :]
                 else:
                     if modspec.shape[2] >= feats.shape[1] - ptr:
                         feats[:, ptr:, :] += modspec[:, j, :feats.shape[1] - ptr, :]
                     else:
                         feats[:, ptr:ptr + self.cut, :] += modspec[:, j, :, :]
-            else:   #  we can check the same conditions for the rest of the frames
+            else:  # we can check the same conditions for the rest of the frames
                 if modspec.shape[2] >= feats.shape[1] - ptr:
                     feats[:, ptr:, :] += modspec[:, j, :feats.shape[1] - ptr, :]
                 else:
@@ -991,7 +991,7 @@ class fdlp_spectrogram(torch.nn.Module):
                 else:
                     feats[:, ptr:ptr + self.cut_half, :] += modspec[:, j, self.cut_half:, :]
             elif j == 1:
-                if ptr < 0: # This means that the second window has extended into the reflected region
+                if ptr < 0:  # This means that the second window has extended into the reflected region
                     feats[:, 0:0 + self.cut + ptr, :] += modspec[:, j, -ptr:, :]
                 else:
                     feats[:, ptr:ptr + self.cut, :] += modspec[:, j, :, :]
@@ -1112,18 +1112,18 @@ class fdlp_spectrogram(torch.nn.Module):
         # logging.info('Boost rate {}'.format(self.boost_lifter_lr.data))
         # logging.info('lifter mean'.format(torch.mean(self.lifter).data))
         sys.stdout.flush()
-        #self.modspec_feats = modspec.clone()
+        # self.modspec_feats = modspec.clone()
         if self.remove_mean_gain:
             n = modspec.shape[1]  # Number of frames
             m = torch.mean(modspec, axis=1)
             m = m.unsqueeze(1)
             m = torch.tile(m, (1, n, 1, 1))
-            #modspec[:, :, :, 0] -= m[:, :, :, 0]
+            # modspec[:, :, :, 0] -= m[:, :, :, 0]
 
-            #Do a moving average
-            #for i in range(1, n):
+            # Do a moving average
+            # for i in range(1, n):
             #    modspec[:, i, :, 0] = (modspec[:, i-1, :, 0] + modspec[:, i, :, 0]) / 2
-                #modspec[:, i, :, 0] = (modspec[:, i, :, 0] - modspec[:, i - 1, :, 0]) / 2
+            # modspec[:, i, :, 0] = (modspec[:, i, :, 0] - modspec[:, i - 1, :, 0]) / 2
 
         if self.purturb_lifter is not None and self.training and self.lifter_purturb_prob >= np.random.random():
             add_purturb = 2 * torch.rand(self.lifter.shape,
@@ -1179,18 +1179,18 @@ class fdlp_spectrogram(torch.nn.Module):
             spectrum_feats = torch.sqrt(spectrum_feats)
 
         if self.compensate_window:
-            spectrum_feats = spectrum_feats[:, :, :, 0:self.cut] * han_weight / ham_weight   # I think we need to compensate for SQUARE of the window
+            spectrum_feats = spectrum_feats[:, :, :,
+                             0:self.cut] * han_weight / ham_weight  # I think we need to compensate for SQUARE of the window
         else:
             spectrum_feats = spectrum_feats[:, :, :, 0:self.cut]
         spectrum_feats = torch.transpose(spectrum_feats, 2,
                                          3)  # (batch x num_frames x int(self.fduration * self.frate) x n_filters)
 
-        #self.window_wise_feats=spectrum_feats
+        # self.window_wise_feats=spectrum_feats
         # OVERLAP AND ADD
-        #self.window_wise_feats = spectrum_feats.clone()
+        # self.window_wise_feats = spectrum_feats.clone()
         spectrum_feats = self.OLA(modspec=spectrum_feats, t_samples=t_samples, dtype=input.dtype,
-                                    device=input.device)
-
+                                  device=input.device)
 
         if self.attach_mvector:
             if self.lfr_attached_mvector:
@@ -2636,6 +2636,7 @@ class mvector(fdlp_spectrogram):
                  full_modulation_spectrum: bool = False,
                  return_as_magnitude_phase: bool = False,
                  make_2D: bool = False,
+                 compress: bool = False,
                  interp_mode: str = 'bicubic',
                  **kwargs
                  ):
@@ -2646,7 +2647,8 @@ class mvector(fdlp_spectrogram):
         self.full_modulation_spectrum = full_modulation_spectrum
         self.return_as_magnitude_phase = return_as_magnitude_phase
         self.interp_mode = interp_mode
-        self.make_2D=make_2D
+        self.make_2D = make_2D
+        self.compress = compress
 
     def compute_spectrogram(self, input: torch.Tensor, ilens: torch.Tensor = None) -> Tuple[
         torch.Tensor, Optional[torch.Tensor]]:
@@ -2688,7 +2690,7 @@ class mvector(fdlp_spectrogram):
 
             for idx in range(len(frames)):
                 if self.complex_modulation:
-                    frames[idx] = torch.fft.ifft(frames[idx]) #* int(self.srate * self.fduration)
+                    frames[idx] = torch.fft.ifft(frames[idx])  # * int(self.srate * self.fduration)
                 else:
                     frames[idx] = self.dct_type2(frames[idx]) / (int(self.srate * self.fduration))
 
@@ -2721,7 +2723,7 @@ class mvector(fdlp_spectrogram):
         else:
             # Compute DCT (olens remains the same)
             if self.complex_modulation:
-                frames = torch.fft.ifft(frames) #* int(self.srate * self.fduration)
+                frames = torch.fft.ifft(frames)  # * int(self.srate * self.fduration)
             else:
                 frames = self.dct_type2(frames) / (int(self.srate * self.fduration))
 
@@ -2807,10 +2809,13 @@ class mvector(fdlp_spectrogram):
         # else:
         #    frames = torch.reshape(frames, (frames.shape[0], frames.shape[1], self.n_filters, self.coeff_num))
         if self.make_2D:
-            frames = torch.tanh(torch.reshape(frames, (frames.shape[0], frames.shape[1], self.n_filters* self.coeff_num)) )
+            frames = torch.reshape(frames, (frames.shape[0], frames.shape[1], self.n_filters * self.coeff_num))
         else:
-            frames = torch.tanh(frames.transpose(2, 3))
+            frames = frames.transpose(2, 3)
         # frames = torch.reshape(frames, (frames.shape[0], frames.shape[1], self.n_filters, self.coeff_num))
+
+        if self.compress:
+            frames = torch.tanh(frames)
 
         return frames, olens
 
