@@ -950,7 +950,7 @@ class fdlp_spectrogram(torch.nn.Module):
                     feats += modspec[:, j, :self.cut_half:self.cut_half + feats.shape[1], :]
                 else:
                     feats[:, ptr:ptr + self.cut_half, :] += modspec[:, j, self.cut_half:, :]
-            elif j == 1:
+            elif j == 1: # ie. we are at the second frame
                 if ptr < 0: # This means that the second window has extended into the reflected region
                     feats[:, 0:0 + self.cut + ptr, :] += modspec[:, j, -ptr:, :]
                 else:
@@ -958,7 +958,7 @@ class fdlp_spectrogram(torch.nn.Module):
                         feats[:, ptr:, :] += modspec[:, j, :feats.shape[1] - ptr, :]
                     else:
                         feats[:, ptr:ptr + self.cut, :] += modspec[:, j, :, :]
-            else:
+            else:   #  we can check the same conditions for the rest of the frames
                 if modspec.shape[2] >= feats.shape[1] - ptr:
                     feats[:, ptr:, :] += modspec[:, j, :feats.shape[1] - ptr, :]
                 else:
@@ -2804,7 +2804,7 @@ class mvector(fdlp_spectrogram):
         #            frames[f_idx].shape[0], frames[f_idx].shape[1], self.n_filters, self.coeff_num))
         # else:
         #    frames = torch.reshape(frames, (frames.shape[0], frames.shape[1], self.n_filters, self.coeff_num))
-        frames = frames.transpose(2, 3)
+        frames = torch.tanh(frames.transpose(2, 3))
         # frames = torch.reshape(frames, (frames.shape[0], frames.shape[1], self.n_filters, self.coeff_num))
 
         return frames, olens
