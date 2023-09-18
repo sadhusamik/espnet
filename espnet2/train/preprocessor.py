@@ -186,8 +186,8 @@ class CommonPreprocessor(AbsPreprocessor):
             self.tokenizer = None
             self.token_id_converter = None
 
-        #if train and rir_scp is not None:
-        if rir_scp is not None:
+        if train and rir_scp is not None:
+        #if rir_scp is not None:
             self.rirs = []
             with open(rir_scp, "r", encoding="utf-8") as f:
                 for line in f:
@@ -199,8 +199,8 @@ class CommonPreprocessor(AbsPreprocessor):
         else:
             self.rirs = None
 
-        #if train and noise_scp is not None:
-        if noise_scp is not None:
+        if train and noise_scp is not None:
+        #if noise_scp is not None:
             self.noises = []
             with open(noise_scp, "r", encoding="utf-8") as f:
                 for line in f:
