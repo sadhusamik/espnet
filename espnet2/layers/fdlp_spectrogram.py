@@ -202,7 +202,8 @@ class modulation_spectrum(torch.nn.Module):
         else:
             olens = None
 
-        frames = frames.transpose(2, 3)
+        #frames = frames.transpose(2, 3)
+        #frames = torch.reshape(frames, (num_batch, num_frames, 2*self.coeff_num * self.n_filters))
 
         return frames, olens
 
