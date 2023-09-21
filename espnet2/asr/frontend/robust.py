@@ -322,7 +322,7 @@ class RobustFrontend(AbsFrontend):
 
     def output_size(self) -> int:
         if self.pure_modulation_spectrum:
-            return 2 * self.coeff_num
+            return self.n_filters #2 * self.coeff_num
         elif self.return_mvector or self.return_mvector_plus_spectrogram:
             if self.full_modulation_spectrum:
                 return 2 * self.coeff_num
