@@ -56,7 +56,7 @@ class modulation_spectrum(torch.nn.Module):
                                                 alp=self.fbank_config[1], fixed=1, bet=self.fbank_config[2],
                                                 warp_fact=1)
 
-        lpf = signal.firwin(numtaps=300, cutoff=60 / 8000, fs=None)
+        lpf = signal.firwin(numtaps=20, cutoff=60 / 8000, fs=None)
         self.lpf = torch.tensor(lpf, dtype=self.datatype, device=self.device).unsqueeze(0).unsqueeze(0)
 
     def __warp_func_bark(self, x, warp_fact=1):
