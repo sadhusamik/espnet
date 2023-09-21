@@ -130,7 +130,7 @@ class Conv2dMultichannel(torch.nn.Module):
         )
 
     def forward(self, x, x_mask):
-        print(x.shape)
+        #print(x.shape)
         """Subsample x.
 
         Args:
@@ -149,7 +149,7 @@ class Conv2dMultichannel(torch.nn.Module):
         # x = x.unsqueeze(1)  # (b, c, t, f)
         x = self.conv(x)
         b, c, t, f = x.size()
-        print(x.shape)
+        #print(x.shape)
         x = self.out(x.transpose(1, 2).contiguous().view(b, t, c * f))
         if x_mask is None:
             return x, None
