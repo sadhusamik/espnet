@@ -175,7 +175,7 @@ class modulation_spectrum(torch.nn.Module):
         frames = torch.abs(frames.unsqueeze(1))
 
         # low pass filter
-        #frames = torch.nn.functional.conv1d(frames, self.lpf)
+        frames = torch.nn.functional.conv1d(frames, self.lpf)
         # frames = torch.log(frames)
 
         # downsample
