@@ -95,6 +95,7 @@ class RobustFrontend(AbsFrontend):
             compensate_window: bool = True,
             make_2D: bool = False,
             compress: bool = False,
+            msn: bool = False,
             fs: Union[int, str] = 16000,
             frontend_conf: Optional[dict] = get_default_kwargs(Frontend),
     ):
@@ -115,7 +116,7 @@ class RobustFrontend(AbsFrontend):
         self.coeff_num = coeff_num
         self.complex_modulation = complex_modulation
         self.full_modulation_spectrum = full_modulation_spectrum
-        self.hop_length = 400
+        self.hop_length = int(fs/self.frate)
         self.make_2D = make_2D
         self.compress=compress
         if pure_modulation_spectrum:
@@ -307,6 +308,7 @@ class RobustFrontend(AbsFrontend):
                                                      attach_mvector=attach_mvector,
                                                      squared_window_ola=squared_window_ola,
                                                      bad_norm=bad_norm,
+                                                     msn=msn,
                                                      compensate_window=compensate_window,
                                                      spectral_substraction_vector=spectral_substraction_vector,
                                                      dereverb_whole_sentence=dereverb_whole_sentence,
