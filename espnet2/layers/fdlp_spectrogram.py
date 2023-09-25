@@ -355,7 +355,7 @@ class fdlp_spectrogram(torch.nn.Module):
         logging.info('Boosting lifter learning rate by {}'.format(self.boost_lifter_lr.data))
         if msn:
             self.msn = torch.nn.Sequential(torch.nn.Linear(self.coeff_num, self.coeff_num), torch.nn.Tanh(),
-                                           torch.nn.Linear(self.coeff_num, self.coeff_num))
+                                           torch.nn.Linear(self.coeff_num, self.coeff_num), torch.nn.Sigmoid())
         else:
             self.msn = None
         if num_chunks:
