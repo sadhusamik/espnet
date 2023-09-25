@@ -1117,7 +1117,7 @@ class fdlp_spectrogram(torch.nn.Module):
         modspec = modspec * self.mask  # (batch x num_frames x n_filters x num_modspec)
         if self.msn:
             modspec = modspec * (
-                torch.mean(self.msn(modspec), axis=1).unsqueeze(1).repeat(1, num_frames, 1, 1))
+                torch.mean(self.msn(torch.abs(modspec)), axis=1).unsqueeze(1).repeat(1, num_frames, 1, 1))
         # logging.info('Boost rate {}'.format(self.boost_lifter_lr.data))
         # logging.info('lifter mean'.format(torch.mean(self.lifter).data))
         # sys.stdout.flush()
