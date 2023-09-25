@@ -155,6 +155,7 @@ class FusedFrontends(AbsFrontend):
         for frontend in self.frontends:
             with torch.no_grad():
                 input_feats, feats_lens = frontend.forward(input, input_lengths)
+                print(frontend.hop_hength)
                 print(input_feats.shape)
             feats.append([input_feats, feats_lens])
 
@@ -195,5 +196,6 @@ class FusedFrontends(AbsFrontend):
             feats_lens = torch.ones_like(save_shape) * (m)
         else:
             raise NotImplementedError
-        #print(feats.shape)
+        print('final_shape')
+        print(feats.shape)
         return feats, feats_lens
