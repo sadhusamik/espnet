@@ -202,8 +202,8 @@ class modulation_spectrum(torch.nn.Module):
         else:
             olens = None
 
-        #frames = frames.transpose(2, 3)
-        #frames = torch.reshape(frames, (num_batch, num_frames, 2*self.coeff_num * self.n_filters))
+        # frames = frames.transpose(2, 3)
+        # frames = torch.reshape(frames, (num_batch, num_frames, 2*self.coeff_num * self.n_filters))
 
         return frames, olens
 
@@ -286,6 +286,7 @@ class fdlp_spectrogram(torch.nn.Module):
             dereverb_whole_sentence: bool = False,
             online_normalize: bool = False,
             squared_window_ola: bool = False,
+            msn: bool = False,
             device: str = 'auto',
     ):
         assert check_argument_types()
@@ -352,7 +353,11 @@ class fdlp_spectrogram(torch.nn.Module):
         self.register_buffer("boost_lifter_lr", torch.Tensor([boost_lifter_lr]))
         self.register_buffer("num_updates", torch.LongTensor([0]))
         logging.info('Boosting lifter learning rate by {}'.format(self.boost_lifter_lr.data))
-
+        if msn:
+            self.msn = torch.nn.Sequential(torch.nn.Linear(self.coeff_num, self.coeff_num), torch.nn.Tanh(),
+                                           torch.nn.Linear(self.coeff_num, self.coeff_num))
+        else:
+            self.msn = None
         if num_chunks:
             self.num_chunks = num_chunks
         else:
@@ -1110,9 +1115,12 @@ class fdlp_spectrogram(torch.nn.Module):
         modspec = frames
 
         modspec = modspec * self.mask  # (batch x num_frames x n_filters x num_modspec)
+        if self.msn:
+            modspec = modspec * (
+                torch.mean(self.msn(modspec), axis=1).unsqueeze(1).repeat(1, num_frames, 1, 1))
         # logging.info('Boost rate {}'.format(self.boost_lifter_lr.data))
         # logging.info('lifter mean'.format(torch.mean(self.lifter).data))
-        sys.stdout.flush()
+        # sys.stdout.flush()
         # self.modspec_feats = modspec.clone()
         if self.remove_mean_gain:
             n = modspec.shape[1]  # Number of frames

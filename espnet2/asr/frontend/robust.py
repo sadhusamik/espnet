@@ -118,7 +118,7 @@ class RobustFrontend(AbsFrontend):
         self.full_modulation_spectrum = full_modulation_spectrum
         self.hop_length = int(fs/self.frate)
         self.make_2D = make_2D
-        self.compress=compress
+        self.compress= compress
         if pure_modulation_spectrum:
             self.fdlp_spectrogram = modulation_spectrum(n_filters=n_filters, coeff_num=coeff_num, fduration=fduration,
                                                         frate=frate, downsample_factor=downsample_factor, srate=srate,
