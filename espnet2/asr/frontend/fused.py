@@ -12,7 +12,7 @@ from espnet2.asr.frontend.robust import RobustFrontend
 
 class FusedFrontends(AbsFrontend):
     def __init__(
-            self, frontends=None, align_method="linear_projection", interpolate=False, proj_dim=100, fs=16000
+            self, frontends=None, align_method="linear_projection", interpolate=False, dpout=0, proj_dim=100, fs=16000
     ):
         assert check_argument_types()
         super().__init__()
@@ -22,6 +22,7 @@ class FusedFrontends(AbsFrontend):
         self.proj_dim = proj_dim  # dim of the projection done on each frontend
         self.frontends = []  # list of the frontends to combine
         self.interpolate = interpolate
+        self.dpout = dpout
         for i, frontend in enumerate(frontends):
             frontend_type = frontend["frontend_type"]
             if frontend_type == "default":
@@ -155,8 +156,6 @@ class FusedFrontends(AbsFrontend):
         for frontend in self.frontends:
             with torch.no_grad():
                 input_feats, feats_lens = frontend.forward(input, input_lengths)
-                #print(frontend.hop_length)
-                #print(input_feats.shape)
             feats.append([input_feats, feats_lens])
 
         save_shape = feats[0][1]
@@ -190,12 +189,18 @@ class FusedFrontends(AbsFrontend):
             m = min([x.shape[1] for x in feats])
             feats = [x[:, :m, :] for x in feats]
 
+            if self.dpout != 0:
+                num_batch = feats[0].shape[0]
+                for i in range(num_batch):
+                    if np.random.rand() > 1 - self.dpout:
+                        stream = np.random.randint(0, 2)
+                        feats[stream][i, :, :] = 0
+
             feats = torch.cat(
                 feats, dim=-1
             )  # change the input size of the preencoder : proj_dim * n_frontends
             feats_lens = torch.ones_like(save_shape) * (m)
         else:
             raise NotImplementedError
-        #print('final_shape')
-        #print(feats.shape)
+
         return feats, feats_lens
