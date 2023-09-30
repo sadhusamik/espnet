@@ -194,7 +194,7 @@ class FusedFrontends(AbsFrontend):
                 for i in range(num_batch):
                     if np.random.rand() > 1 - self.dpout:
                         stream = np.random.randint(0, 2)
-                        feats[stream][i, :, :] = 0
+                        feats[stream][i, :, :] *= 0
 
             feats = torch.cat(
                 feats, dim=-1
