@@ -354,8 +354,12 @@ class fdlp_spectrogram(torch.nn.Module):
         self.register_buffer("num_updates", torch.LongTensor([0]))
         logging.info('Boosting lifter learning rate by {}'.format(self.boost_lifter_lr.data))
         if msn:
-            self.msn = torch.nn.Sequential(torch.nn.Linear(self.coeff_num, self.coeff_num), torch.nn.ReLU(),
-                                           torch.nn.Linear(self.coeff_num, self.coeff_num), torch.nn.ReLU())
+            # self.msn = torch.nn.Sequential(torch.nn.Linear(self.coeff_num, self.coeff_num), torch.nn.Tanh(),
+            #                             torch.nn.Linear(self.coeff_num, self.coeff_num), torch.nn.Sigmoid())
+            self.msn = torch.nn.Sequential(torch.nn.Linear(self.coeff_num, 512), torch.nn.ReLU(),
+                                           torch.nn.Linear(512, 512), torch.nn.ReLU(), torch.nn.Linear(512, 512),
+                                           torch.nn.ReLU(),
+                                           torch.nn.Linear(512, self.coeff_num), torch.nn.Sigmoid())
         else:
             self.msn = None
         if num_chunks:
@@ -1116,7 +1120,7 @@ class fdlp_spectrogram(torch.nn.Module):
 
         modspec = modspec * self.mask  # (batch x num_frames x n_filters x num_modspec)
         if self.msn:
-            #self.wts_save=torch.mean(self.msn(torch.abs(modspec)), axis=1)
+            # self.wts_save=torch.mean(self.msn(torch.abs(modspec)), axis=1)
             modspec = modspec * (
                 torch.mean(self.msn(torch.abs(modspec)), axis=1).unsqueeze(1).repeat(1, num_frames, 1, 1))
         # logging.info('Boost rate {}'.format(self.boost_lifter_lr.data))
