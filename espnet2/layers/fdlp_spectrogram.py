@@ -354,12 +354,12 @@ class fdlp_spectrogram(torch.nn.Module):
         self.register_buffer("num_updates", torch.LongTensor([0]))
         logging.info('Boosting lifter learning rate by {}'.format(self.boost_lifter_lr.data))
         if msn:
-            self.msn = torch.nn.Sequential(torch.nn.Linear(self.coeff_num, self.coeff_num), torch.nn.Tanh(),
-                                         torch.nn.Linear(self.coeff_num, self.coeff_num), torch.nn.Sigmoid())
-            #self.msn = torch.nn.Sequential(torch.nn.Linear(self.coeff_num, 512), torch.nn.ReLU(),
-            #                               torch.nn.Linear(512, 512), torch.nn.ReLU(), torch.nn.Linear(512, 512),
-            #                               torch.nn.ReLU(),
-            #                               torch.nn.Linear(512, self.coeff_num), torch.nn.Sigmoid())
+            #self.msn = torch.nn.Sequential(torch.nn.Linear(self.coeff_num, self.coeff_num), torch.nn.Tanh(),
+            #                             torch.nn.Linear(self.coeff_num, self.coeff_num), torch.nn.Sigmoid())
+            self.msn = torch.nn.Sequential(torch.nn.Linear(self.coeff_num, 512), torch.nn.ReLU(),
+                                           torch.nn.Linear(512, 512), torch.nn.ReLU(), torch.nn.Linear(512, 512),
+                                           torch.nn.ReLU(),
+                                           torch.nn.Linear(512, self.coeff_num), torch.nn.Sigmoid())
         else:
             self.msn = None
         if num_chunks:
