@@ -1126,13 +1126,13 @@ class fdlp_spectrogram(torch.nn.Module):
         # logging.info('Boost rate {}'.format(self.boost_lifter_lr.data))
         # logging.info('lifter mean'.format(torch.mean(self.lifter).data))
         # sys.stdout.flush()
-        # self.modspec_feats = modspec.clone()
+        #self.modspec_feats = modspec.clone()
         if self.remove_mean_gain:
             n = modspec.shape[1]  # Number of frames
             m = torch.mean(modspec, axis=1)
             m = m.unsqueeze(1)
             m = torch.tile(m, (1, n, 1, 1))
-            # modspec[:, :, :, 0] -= m[:, :, :, 0]
+            modspec[:, :, :, 0] -= m[:, :, :, 0]
 
             # Do a moving average
             # for i in range(1, n):
@@ -1202,7 +1202,7 @@ class fdlp_spectrogram(torch.nn.Module):
 
         # self.window_wise_feats=spectrum_feats
         # OVERLAP AND ADD
-        # self.window_wise_feats = spectrum_feats.clone()
+        #self.window_wise_feats = spectrum_feats.clone()
         spectrum_feats = self.OLA(modspec=spectrum_feats, t_samples=t_samples, dtype=input.dtype,
                                   device=input.device)
 
