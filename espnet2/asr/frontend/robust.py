@@ -302,6 +302,7 @@ class RobustFrontend(AbsFrontend):
                                                      fbank_config=fbank_config,
                                                      random_lifter=random_lifter,
                                                      purturb_lifter=purturb_lifter,
+                                                     remove_mean_gain=remove_mean_gain,
                                                      lifter_purturb_prob=lifter_purturb_prob,
                                                      lifter_scale=lifter_scale,
                                                      feature_batch=feature_batch,
