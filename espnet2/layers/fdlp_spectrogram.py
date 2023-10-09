@@ -1455,9 +1455,15 @@ class fdlp_spectrogram_multiorder(fdlp_spectrogram):
 
         # Compute DCT (olens remains the same)
         if self.complex_modulation:
-            frames = torch.fft.ifft(frames) * int(self.srate * self.fduration)
+            if self.bad_norm:
+                frames = torch.fft.ifft(frames) * int(self.srate * self.fduration)
+            else:
+                frames = torch.fft.ifft(frames)
         else:
-            frames = self.dct_type2(frames) / np.sqrt(2 * int(self.srate * self.fduration))
+            if self.bad_norm:
+                frames = self.dct_type2(frames) / np.sqrt((2 * int(self.srate * self.fduration)))
+            else:
+                frames = self.dct_type2(frames) / (1 * int(self.srate * self.fduration))
 
         # Put fbank, mask and lifter into proper device if they are already not there
         if self.fbank.device.type != input.device.type:
@@ -1493,6 +1499,16 @@ class fdlp_spectrogram_multiorder(fdlp_spectrogram):
                 self.fduration * self.frate)))  # (batch x num_frames x n_filters x int(self.fduration * self.frate))
         modspec = torch.abs(torch.exp(modspec))
         modspec = modspec[:, :, :, 0:self.cut] * han_weight / ham_weight
+
+        if not self.squared_window_ola:
+            modspec = torch.sqrt(modspec)
+
+        if self.compensate_window:
+            modspec = modspec[:, :, :,
+                             0:self.cut] * han_weight / ham_weight  # I think we need to compensate for SQUARE of the window
+        else:
+            modspec = modspec[:, :, :, 0:self.cut]
+
         modspec = torch.transpose(modspec, 2,
                                   3)  # (batch x num_frames x int(self.fduration * self.frate) x n_filters)
 
@@ -1505,6 +1521,7 @@ class fdlp_spectrogram_multiorder(fdlp_spectrogram):
             frame_num_original = int(np.ceil(tsamples_original * self.frate / self.srate))
             modspec = modspec[0:frame_num_original * num_batch, :]
             modspec = torch.reshape(modspec, (num_batch, frame_num_original, self.n_filters * len(self.order_list)))
+
 
         if ilens is not None:
             olens = torch.floor(ilens * self.frate / self.srate)
