@@ -717,7 +717,7 @@ class Conv2dSubsamplingMultichannelNChannel(torch.nn.Module):
             torch.nn.Conv2d(1, odim, 3, 2),
             torch.nn.ReLU(),
             torch.nn.Conv2d(odim, odim, 3, 2),
-            torch.nn.ReLU(),
+            torch.nn.ReLU(), torch.nn.Dropout(p=0.1, inplace=False)
         ) for i in range(in_channels)])
 
         self.projs = torch.nn.ModuleList(
